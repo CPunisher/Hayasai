@@ -1,0 +1,7 @@
+[jobs.lab1]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+    "java -classpath \".:lib/*;out\" com.cpunisher.hayasai.Main < $input > $lr",
+]
