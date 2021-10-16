@@ -6,17 +6,18 @@ import com.cpunisher.hayasai.frontend.Visitor;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
+import com.cpunisher.hayasai.util.IOUtils;
 import com.cpunisher.hayasai.util.IrKeywords;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Main {
-    public static void main(String[] args) {
-        String input = "int main() { return 123; }";
-
+    public static void main(String[] args) throws IOException {
+        String input = IOUtils.readFromStream(System.in);
         CharStream charStream = CharStreams.fromString(input);
         MiniSysYLexer lexer = new MiniSysYLexer(charStream);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);

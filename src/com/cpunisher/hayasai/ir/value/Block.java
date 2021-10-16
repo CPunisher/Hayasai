@@ -22,9 +22,9 @@ public final class Block extends Value {
     @Override
     public String build() {
         StringJoiner joiner = new StringJoiner(IrKeywords.LINE_SEPARATOR,
-                " " + IrKeywords.LCURLY + IrKeywords.LINE_SEPARATOR,
+                IrKeywords.LCURLY + IrKeywords.LINE_SEPARATOR,
                 IrKeywords.LINE_SEPARATOR + IrKeywords.RCURLY + IrKeywords.LINE_SEPARATOR);
-        this.subList.stream().map(Value::build).forEach(str -> joiner.add("\t" + str));
+        this.subList.stream().map(Value::build).forEach(str -> joiner.add("    " + str));
         return joiner.toString();
     }
 }

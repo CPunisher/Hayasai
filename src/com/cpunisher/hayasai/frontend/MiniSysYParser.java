@@ -17,7 +17,7 @@ public class MiniSysYParser extends Parser {
 		new PredictionContextCache();
 	public static final int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, DEC_CONST=9, 
-		OCT_CONST=10, HEX_CONST=11, WHITE_SPACE=12;
+		OCT_CONST=10, HEX_CONST=11, COMMENT=12, WHITE_SPACE=13;
 	public static final int
 		RULE_compUnit = 0, RULE_funcDef = 1, RULE_funcType = 2, RULE_ident = 3, 
 		RULE_block = 4, RULE_stmt = 5, RULE_number = 6;
@@ -37,7 +37,7 @@ public class MiniSysYParser extends Parser {
 	private static String[] makeSymbolicNames() {
 		return new String[] {
 			null, null, null, null, null, null, null, null, null, "DEC_CONST", "OCT_CONST", 
-			"HEX_CONST", "WHITE_SPACE"
+			"HEX_CONST", "COMMENT", "WHITE_SPACE"
 		};
 	}
 	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
@@ -369,7 +369,7 @@ public class MiniSysYParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\16\'\4\2\t\2\4\3"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\17\'\4\2\t\2\4\3"+
 		"\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\3\2\3\2\3\3\3\3\3\3\3\3\3"+
 		"\3\3\3\3\4\3\4\3\5\3\5\3\6\3\6\3\6\3\6\3\7\3\7\3\7\3\7\3\b\3\b\3\b\2\2"+
 		"\t\2\4\6\b\n\f\16\2\3\3\2\13\r\2\37\2\20\3\2\2\2\4\22\3\2\2\2\6\30\3\2"+

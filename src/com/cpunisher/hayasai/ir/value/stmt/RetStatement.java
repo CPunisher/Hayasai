@@ -20,7 +20,7 @@ public final class RetStatement extends Statement {
         StringBuilder builder = new StringBuilder();
         builder.append(IrKeywords.RETURN).append(" ");
         builder.append(Optional.of(expression).map(Value::build).orElse(""));
-        builder.append(IrKeywords.DELIMITER);
+//        builder.append(IrKeywords.DELIMITER);
         return builder.toString();
     }
 }

@@ -13,11 +13,13 @@ public class MiniSysYTester {
             for (File testCase : Objects.requireNonNull(testFiles)) {
                 String fileName = testCase.getName();
                 Process process = processBuilder.start();
+
                 // 跑测试
                 FileInputStream testFileInput = new FileInputStream(testCase);
-                InputStream inputStream = process.getInputStream();
                 OutputStream outputStream = process.getOutputStream();
                 testFileInput.transferTo(outputStream);
+                outputStream.close();
+
                 int exitCode = process.waitFor();
 
                 // 获取答案
@@ -27,8 +29,9 @@ public class MiniSysYTester {
                     answer = readFromStream(new FileInputStream(answerFile));
                 }
 
+                InputStream inputStream = process.getInputStream();
                 String out = readFromStream(inputStream);
-                if (out.equals(answer)) {
+                if ((answer == null && exitCode != 0) || out.equals(answer)) {
                     System.out.println(fileName + " pass.");
                 } else {
                     System.out.println(fileName + " fail with your output: ");
