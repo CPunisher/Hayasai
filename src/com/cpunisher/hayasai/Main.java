@@ -16,6 +16,5 @@ public class Main {
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         MiniSysYParser parser = new MiniSysYParser(tokenStream);
         ParseTree tree = parser.compUnit();
-        System.out.println(tree.toStringTree(parser));
     }
 }

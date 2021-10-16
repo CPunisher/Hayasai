@@ -20,4 +20,4 @@ generate:
 	antlr4 MiniSysY.g4 -o out -no-listener -visitor
 
 clean:
-	rm -rf $(OUT_DIR)
+	rm -rf $(OUT_DIR)/*
