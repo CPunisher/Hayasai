@@ -1,6 +1,5 @@
-FROM openjdk:16-alpine3.13
+FROM openjdk:16
 WORKDIR /app
 COPY src ./src/
 COPY lib ./lib/
-COPY Makefile ./Makefile
-RUN make build
+RUN javac -cp ".:lib/*:src" -d out "src/com/cpunisher/hayasai/Main.java"
