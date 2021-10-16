@@ -57,7 +57,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         String text = ctx.getText();
         Integer res = 0;
         if (text.startsWith("0x") || text.startsWith("0X")) {
-            res = Integer.parseInt(text, 16);
+            res = Integer.parseInt(text.substring(2), 16);
         } else if (text.startsWith("0")) {
             res = Integer.parseInt(text, 8);
         } else {
