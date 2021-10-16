@@ -1,5 +1,6 @@
 package com.cpunisher.hayasai.ir.value.stmt;
 
+import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.expr.Expression;
 import com.cpunisher.hayasai.util.IrKeywords;
 
@@ -18,7 +19,7 @@ public final class RetStatement extends Statement {
     public String build() {
         StringBuilder builder = new StringBuilder();
         builder.append(IrKeywords.RETURN).append(" ");
-        builder.append(Optional.of(expression).map(expr -> expr.build() + " ").orElse(""));
+        builder.append(Optional.of(expression).map(Value::build).orElse(""));
         builder.append(IrKeywords.DELIMITER);
         return builder.toString();
     }

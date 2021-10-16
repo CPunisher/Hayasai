@@ -2,10 +2,16 @@ package com.cpunisher.hayasai;
 
 import com.cpunisher.hayasai.frontend.MiniSysYLexer;
 import com.cpunisher.hayasai.frontend.MiniSysYParser;
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import com.cpunisher.hayasai.frontend.Visitor;
+import com.cpunisher.hayasai.ir.global.SymbolTable;
+import com.cpunisher.hayasai.ir.value.Ident;
+import com.cpunisher.hayasai.ir.value.func.FunctionDef;
+import com.cpunisher.hayasai.util.IrKeywords;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,6 +21,21 @@ public class Main {
         MiniSysYLexer lexer = new MiniSysYLexer(charStream);
         CommonTokenStream tokenStream = new CommonTokenStream(lexer);
         MiniSysYParser parser = new MiniSysYParser(tokenStream);
+        parser.addErrorListener(new BaseErrorListener() {
+            @Override
+            public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+                System.exit(1);
+            }
+        });
+
         ParseTree tree = parser.compUnit();
+        Visitor visitor = new Visitor();
+        visitor.visit(tree);
+
+        SymbolTable symbolTable = SymbolTable.INSTANCE;
+        Map<Ident, FunctionDef> functionDefMap = symbolTable.getImmutableSymbolTable();
+        System.out.println(functionDefMap.values().stream()
+                .map(FunctionDef::build)
+                .collect(Collectors.joining(IrKeywords.LINE_SEPARATOR)));
     }
 }

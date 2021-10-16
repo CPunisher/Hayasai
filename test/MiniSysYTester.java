@@ -40,7 +40,7 @@ public class MiniSysYTester {
         }
     }
 
-    public static String readFromStream(InputStream stream) throws Exception {
+    private static String readFromStream(InputStream stream) throws Exception {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(stream));
         StringBuilder stringBuilder = new StringBuilder();
         String line;

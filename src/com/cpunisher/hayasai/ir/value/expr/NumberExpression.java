@@ -1,5 +1,7 @@
 package com.cpunisher.hayasai.ir.value.expr;
 
+import com.cpunisher.hayasai.ir.type.Type;
+
 public final class NumberExpression extends Expression {
     private final int number;
 
@@ -10,6 +12,6 @@ public final class NumberExpression extends Expression {
 
     @Override
     public String build() {
-        return String.valueOf(this.number);
+        return Type.INT.build() + " " + this.number;
     }
 }

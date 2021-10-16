@@ -1,39 +1,68 @@
 package com.cpunisher.hayasai.frontend;
 
-public class Visitor extends MiniSysYBaseVisitor<Void> {
+import com.cpunisher.hayasai.ir.global.SymbolTable;
+import com.cpunisher.hayasai.ir.type.Type;
+import com.cpunisher.hayasai.ir.value.Block;
+import com.cpunisher.hayasai.ir.value.Ident;
+import com.cpunisher.hayasai.ir.value.Value;
+import com.cpunisher.hayasai.ir.value.expr.Expression;
+import com.cpunisher.hayasai.ir.value.expr.NumberExpression;
+import com.cpunisher.hayasai.ir.value.func.FunctionDef;
+import com.cpunisher.hayasai.ir.value.func.FunctionFParams;
+import com.cpunisher.hayasai.ir.value.stmt.RetStatement;
+
+public class Visitor extends MiniSysYBaseVisitor<Value> {
+
+    private final SymbolTable symbolTable = SymbolTable.INSTANCE;
 
     @Override
-    public Void visitCompUnit(MiniSysYParser.CompUnitContext ctx) {
+    public Value visitCompUnit(MiniSysYParser.CompUnitContext ctx) {
         return super.visitCompUnit(ctx);
     }
 
     @Override
-    public Void visitFuncDef(MiniSysYParser.FuncDefContext ctx) {
-        return super.visitFuncDef(ctx);
+    public Value visitFuncDef(MiniSysYParser.FuncDefContext ctx) {
+        Type type = (Type) visitFuncType(ctx.funcType());
+        Ident ident = (Ident) visitIdent(ctx.ident());
+        Block block = (Block) visitBlock(ctx.block());
+        FunctionFParams params = new FunctionFParams("main_param");
+        symbolTable.putFunctionDef(new FunctionDef("fd_main", type, ident, params, block));
+        return null;
     }
 
     @Override
-    public Void visitFuncType(MiniSysYParser.FuncTypeContext ctx) {
-        return super.visitFuncType(ctx);
+    public Value visitFuncType(MiniSysYParser.FuncTypeContext ctx) {
+        return Type.valueOf(ctx.getText());
     }
 
     @Override
-    public Void visitIdent(MiniSysYParser.IdentContext ctx) {
-        return super.visitIdent(ctx);
+    public Value visitIdent(MiniSysYParser.IdentContext ctx) {
+        return Ident.valueOf(ctx.getText());
     }
 
     @Override
-    public Void visitBlock(MiniSysYParser.BlockContext ctx) {
-        return super.visitBlock(ctx);
+    public Value visitBlock(MiniSysYParser.BlockContext ctx) {
+        Block block = new Block("block");
+        block.addSub(visitStmt(ctx.stmt()));
+        return block;
     }
 
     @Override
-    public Void visitStmt(MiniSysYParser.StmtContext ctx) {
-        return super.visitStmt(ctx);
+    public Value visitStmt(MiniSysYParser.StmtContext ctx) {
+        return new RetStatement("stmt_return", (Expression) visitNumber(ctx.number()));
     }
 
     @Override
-    public Void visitNumber(MiniSysYParser.NumberContext ctx) {
-        return super.visitNumber(ctx);
+    public Value visitNumber(MiniSysYParser.NumberContext ctx) {
+        String text = ctx.getText();
+        Integer res = 0;
+        if (text.startsWith("0x") || text.startsWith("0X")) {
+            res = Integer.parseInt(text, 16);
+        } else if (text.startsWith("0")) {
+            res = Integer.parseInt(text, 8);
+        } else {
+            res = Integer.parseInt(text, 10);
+        }
+        return new NumberExpression("expr_number", res);
     }
 }
