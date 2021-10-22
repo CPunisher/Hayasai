@@ -12,7 +12,7 @@ public final class Ident extends Value {
 
     @Override
     public String build() {
-        return IrKeywords.IDENT + this.ident;
+        return this.ident;
     }
 
     public String getIdent() {

@@ -27,6 +27,7 @@ public final class FunctionDef extends Value {
         builder.append(IrKeywords.DEFINE).append(" ");
         builder.append(IrKeywords.DSO_LOCAL).append(" ");
         builder.append(this.funcType.build()).append(" ");
+        builder.append(IrKeywords.FUNC_IDENT);
         builder.append(this.ident.build());
         builder.append(this.param.build());
         builder.append(this.block.build());

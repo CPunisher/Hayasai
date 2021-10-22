@@ -17,7 +17,7 @@ build:
 	javac -cp ".:$(LIB_DIR)/*:$(SRC_DIR)" -d $(OUT_DIR) "$(SRC_DIR)/$(PACKAGE)/$(TARGET).java"
 
 generate:
-	antlr4 MiniSysY.g4 -o out -no-listener -visitor
+	java -jar /usr/local/lib/antlr-4.9.2-complete.jar MiniSysY.g4 -o out -no-listener -visitor
 
 clean:
 	rm -rf $(OUT_DIR)/*

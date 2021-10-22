@@ -60,6 +60,7 @@ public final class FunctionFParams extends Value {
         public String build() {
             StringBuilder builder = new StringBuilder();
             builder.append(this.argType.build()).append(" ");
+            builder.append(IrKeywords.REG_IDENT);
             builder.append(this.ident.build());
             return builder.toString();
         }

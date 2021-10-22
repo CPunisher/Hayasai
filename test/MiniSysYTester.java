@@ -47,12 +47,13 @@ public class MiniSysYTester {
 
     private static int interpret(InputStream llInputStream) throws IOException, InterruptedException {
         Process lliProcess = lliBuilder.start();
-        InputStream inputStream = lliProcess.getInputStream();
         OutputStream outputStream = lliProcess.getOutputStream();
+        llInputStream.mark(1024);
         llInputStream.transferTo(outputStream);
         outputStream.close();
-        int exitCode = lliProcess.waitFor();
-        return exitCode;
+        llInputStream.reset();
+        llInputStream.transferTo(System.out);
+        return lliProcess.waitFor();
     }
 
     private static String readFromStream(InputStream stream) throws Exception {
