@@ -1,4 +1,4 @@
-package com.cpunisher.hayasai.ir.value.expr;
+package com.cpunisher.hayasai.ir.value.stmt;
 
 import com.cpunisher.hayasai.ir.util.BinaryOperator;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
@@ -6,14 +6,14 @@ import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.StringJoiner;
 
-public class BinaryExpression extends Expression {
+public class BinaryOperationStatement extends Statement {
 
     private final Operand receiver;
     private final Operand operand1;
     private final Operand operand2;
     private final BinaryOperator operator;
 
-    public BinaryExpression(String name, Operand receiver, Operand operand1, Operand operand2, BinaryOperator operator) {
+    public BinaryOperationStatement(String name, Operand receiver, Operand operand1, Operand operand2, BinaryOperator operator) {
         super(name);
         // TODO operand type check
         this.receiver = receiver;

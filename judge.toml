@@ -13,3 +13,11 @@ image = { source = "dockerfile", path = "." }
 run = [
     "java -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
 ]
+
+[jobs.lab3]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+    "java -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
+]

@@ -8,6 +8,7 @@ public class Type extends Value {
     public static final Type INT = new Type(IrKeywords.INT);
     public static final Type BIT = new Type(IrKeywords.BIT);
     public static final Type VOID = new Type(IrKeywords.VOID);
+    public static final Type ADDR = new Type(IrKeywords.INT + IrKeywords.POINTER);
 
     private final String name;
 

@@ -13,6 +13,7 @@ public class MiniSysYTester {
         File testDir = new File("test");
 
         if (testDir.exists() && testDir.isDirectory()) {
+            int pass = 0, tot = 0;
             File[] testFiles = testDir.listFiles((dir, name) -> name.startsWith("lab") && name.endsWith(".sy"));
             for (File testCase : Objects.requireNonNull(testFiles)) {
                 String fileName = testCase.getName();
@@ -34,12 +35,15 @@ public class MiniSysYTester {
                 }
 
                 String out = String.valueOf(interpret(inputStream));
+                tot++;
                 if ((answer == null && exitCode != 0) || out.equals(answer)) {
                     System.out.println(fileName + " pass.");
+                    pass++;
                 } else {
                     System.out.println(fileName + " fail with your output: " + out + ", Expect: " + answer);
                 }
             }
+            System.out.println("pass " + pass + "/" + tot);
         } else {
             System.out.println("Can't find testcases.");
         }

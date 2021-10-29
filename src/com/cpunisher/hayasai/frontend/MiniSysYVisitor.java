@@ -16,6 +16,60 @@ public interface MiniSysYVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCompUnit(MiniSysYParser.CompUnitContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#decl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDecl(MiniSysYParser.DeclContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#btype}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBtype(MiniSysYParser.BtypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#constDecl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConstDecl(MiniSysYParser.ConstDeclContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#constDef}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConstDef(MiniSysYParser.ConstDefContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#constInitVal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConstInitVal(MiniSysYParser.ConstInitValContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#constExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConstExp(MiniSysYParser.ConstExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#varDecl}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVarDecl(MiniSysYParser.VarDeclContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#varDef}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVarDef(MiniSysYParser.VarDefContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#initVal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInitVal(MiniSysYParser.InitValContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MiniSysYParser#funcDef}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -28,23 +82,47 @@ public interface MiniSysYVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFuncType(MiniSysYParser.FuncTypeContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MiniSysYParser#ident}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIdent(MiniSysYParser.IdentContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link MiniSysYParser#block}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitBlock(MiniSysYParser.BlockContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#blockItem}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBlockItem(MiniSysYParser.BlockItemContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MiniSysYParser#stmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitStmt(MiniSysYParser.StmtContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#assignStmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAssignStmt(MiniSysYParser.AssignStmtContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#retStmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRetStmt(MiniSysYParser.RetStmtContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#expStmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitExpStmt(MiniSysYParser.ExpStmtContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#lVal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLVal(MiniSysYParser.LValContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MiniSysYParser#exp}.
 	 * @param ctx the parse tree

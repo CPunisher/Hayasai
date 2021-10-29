@@ -8,7 +8,12 @@ public class DefaultAllocator implements IRegisterAllocator {
 
     @Override
     public Register alloc() {
-        return new Register("", Ident.valueOf(String.valueOf(next++)));
+        return new Register("", this);
+    }
+
+    @Override
+    public Ident genIdent() {
+        return Ident.valueOf(String.valueOf(next++));
     }
 
     @Override
