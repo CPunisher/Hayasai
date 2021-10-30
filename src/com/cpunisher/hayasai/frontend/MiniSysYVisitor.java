@@ -148,6 +148,24 @@ public interface MiniSysYVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitUnaryExp(MiniSysYParser.UnaryExpContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#basicUnaryExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBasicUnaryExp(MiniSysYParser.BasicUnaryExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#funcCall}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFuncCall(MiniSysYParser.FuncCallContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#funcRParams}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFuncRParams(MiniSysYParser.FuncRParamsContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MiniSysYParser#primaryExp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

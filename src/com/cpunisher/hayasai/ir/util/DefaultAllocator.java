@@ -8,7 +8,7 @@ public class DefaultAllocator implements IRegisterAllocator {
 
     @Override
     public Register alloc() {
-        return new Register("", this);
+        return new Register(this);
     }
 
     @Override

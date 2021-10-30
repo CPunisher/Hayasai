@@ -3,22 +3,24 @@ package com.cpunisher.hayasai.frontend;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.util.BinaryOperator;
+import com.cpunisher.hayasai.ir.value.expr.VoidExpression;
+import com.cpunisher.hayasai.ir.value.func.Function;
+import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
 import com.cpunisher.hayasai.ir.value.stmt.*;
-import com.cpunisher.hayasai.ir.value.expr.Expression;
 import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
-import com.cpunisher.hayasai.ir.value.func.FunctionFParams;
+import com.cpunisher.hayasai.ir.value.func.FunctionParams;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.SyntaxException;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Visitor extends MiniSysYBaseVisitor<Value> {
@@ -28,12 +30,17 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     private Block curBlock;
 
     @Override
+    public Value visitCompUnit(MiniSysYParser.CompUnitContext ctx) {
+        return super.visitCompUnit(ctx);
+    }
+
+    @Override
     public Value visitFuncDef(MiniSysYParser.FuncDefContext ctx) {
         Type type = (Type) visitFuncType(ctx.funcType());
         Ident ident = Ident.valueOf(ctx.IDENT().getText());
         Block block = (Block) visitBlock(ctx.block());
-        FunctionFParams params = new FunctionFParams("main_param");
-        symbolTable.putFunctionDef(new FunctionDef("fd_main", type, ident, params, block));
+        FunctionParams params = new FunctionParams();
+        symbolTable.putFunctionDef(new FunctionDef(type, ident, params, block));
         return null;
     }
 
@@ -55,12 +62,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     /* visitStmt 和 declare 系列必须返回 Statement */
     @Override
     public Value visitRetStmt(MiniSysYParser.RetStmtContext ctx) {
-        return new RetStatement("stmt_return", (OperandExpression) visitExp(ctx.exp()));
-    }
-
-    @Override
-    public Value visitExpStmt(MiniSysYParser.ExpStmtContext ctx) {
-        return null;
+        return new RetStatement((OperandExpression) visitExp(ctx.exp()));
     }
 
     @Override
@@ -72,7 +74,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             throw new SyntaxException("Cannot assign to constant [" + ctx.lVal().IDENT().getText() + "].");
         }
         OperandExpression exp = (OperandExpression) visitExp(ctx.exp());
-        return new StoreStatement("", exp, pair.a);
+        return new StoreStatement(exp, pair.a);
     }
 
     @Override
@@ -88,7 +90,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         Ident ident = Ident.valueOf(ctx.IDENT().getText());
         OperandExpression expression = (OperandExpression) visitConstInitVal(ctx.constInitVal());
         Register register = this.curBlock.putConst(ident);
-        return new StoreStatement("", expression, register);
+        return new StoreStatement(expression, register);
     }
 
     @Override
@@ -114,7 +116,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         Register register = this.curBlock.putVar(ident);
         if (ctx.initVal() != null) {
             OperandExpression expression = (OperandExpression) visitInitVal(ctx.initVal());
-            return new StoreStatement("", expression, register);
+            return new StoreStatement(expression, register);
         }
         return null;
     }
@@ -130,10 +132,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 Operand operand2 = ((OperandExpression) visitMulExp(ctx.mulExp(i + 1))).getOperand();
                 cur = this.curBlock.alloc();
                 BinaryOperator operator = BinaryOperator.valueOf(ctx.unaryOp(i).getText());
-                this.curBlock.addSub(new BinaryOperationStatement("", cur, operand1, operand2, operator));
+                this.curBlock.addSub(new BinaryOperationStatement(cur, operand1, operand2, operator));
                 last = cur;
             }
-            return new OperandExpression("", last);
+            return new OperandExpression(last);
         }
         return expression;
     }
@@ -148,16 +150,16 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 Operand operand2 = ((OperandExpression) visitUnaryExp(ctx.unaryExp(i + 1))).getOperand();
                 cur = this.curBlock.alloc();
                 BinaryOperator operator = BinaryOperator.valueOf(ctx.binaryOp(i).getText());
-                this.curBlock.addSub(new BinaryOperationStatement("", cur, operand1, operand2, operator));
+                this.curBlock.addSub(new BinaryOperationStatement(cur, operand1, operand2, operator));
                 last = cur;
             }
-            return new OperandExpression("", last);
+            return new OperandExpression(last);
         }
         return expression;
     }
 
     @Override
-    public Value visitUnaryExp(MiniSysYParser.UnaryExpContext ctx) {
+    public Value visitBasicUnaryExp(MiniSysYParser.BasicUnaryExpContext ctx) {
         OperandExpression expression = (OperandExpression) visitPrimaryExp(ctx.primaryExp());
         List<MiniSysYParser.UnaryOpContext> validUnaryOpList = ctx.unaryOp().stream()
                 .filter(unaryOpContext -> unaryOpContext.MINUS() != null)
@@ -168,13 +170,42 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 if (validUnaryOpList.get(i).MINUS() != null) {
                     cur = this.curBlock.alloc();
                     Operand operand = last != null ? last : expression.getOperand();
-                    this.curBlock.addSub(new BinaryOperationStatement("", cur, Literal.ZERO, operand, BinaryOperator.SUB));
+                    this.curBlock.addSub(new BinaryOperationStatement(cur, Literal.ZERO, operand, BinaryOperator.SUB));
                     last = cur;
                 }
             }
-            return new OperandExpression("", last);
+            return new OperandExpression(last);
         }
         return expression;
+    }
+
+    @Override
+    public Value visitFuncCall(MiniSysYParser.FuncCallContext ctx) {
+        Ident ident = Ident.valueOf(ctx.IDENT().getText());
+        FunctionParams params = new FunctionParams(Optional.ofNullable(ctx.funcRParams())
+                .stream()
+                .flatMap(paramsCtx -> paramsCtx.exp().stream())
+                .map(this::visitExp)
+                .map(OperandExpression.class::cast)
+                .map(FunctionParams.FunctionParam::new)
+                .collect(Collectors.toList()));
+        Function f = this.symbolTable.getFunctionByIdent(ident);
+        if (f == null) {
+            throw new SyntaxException("Function [" + ident.getIdent() + "] is not declared.");
+        }
+
+        if (!f.getParam().equals(params)) {
+            throw new SyntaxException("Function [" + ident.getIdent() + "] arguments error.");
+        }
+
+        f = new FunctionDecl(f.getFuncType(), ident, params);
+        if (f.getFuncType() != Type.VOID) {
+            Register register = this.curBlock.alloc();
+            this.curBlock.addSub(new CallStatement(register, f));
+            return new OperandExpression(register);
+        }
+        this.curBlock.addSub(new CallStatement(f));
+        return VoidExpression.VOID_EXPRESSION;
     }
 
     @Override
@@ -195,8 +226,8 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         Ident target = Ident.valueOf(ctx.IDENT().getText());
         Pair<Register, Boolean> pair = this.curBlock.compute(target);
         Register tmpRegister = this.curBlock.alloc();
-        this.curBlock.addSub(new LoadStatement("", tmpRegister, pair.a));
-        return new OperandExpression("", tmpRegister, pair.b);
+        this.curBlock.addSub(new LoadStatement(tmpRegister, pair.a));
+        return new OperandExpression(tmpRegister, pair.b);
     }
 
     @Override
@@ -210,6 +241,6 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         } else {
             res = Integer.parseInt(text, 10);
         }
-        return new OperandExpression("expr_number", new Literal("", res));
+        return new OperandExpression(new Literal(res));
     }
 }

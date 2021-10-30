@@ -1,12 +1,9 @@
 package com.cpunisher.hayasai.ir.value;
 
-import com.cpunisher.hayasai.util.IrKeywords;
-
 public final class Ident extends Value {
     private final String ident;
 
-    private Ident(String name, String ident) {
-        super(name);
+    private Ident(String ident) {
         this.ident = ident;
     }
 
@@ -20,7 +17,7 @@ public final class Ident extends Value {
     }
 
     public static Ident valueOf(String ident) {
-        return new Ident("ident_" + ident, ident);
+        return new Ident(ident);
     }
 
     @Override
@@ -29,11 +26,10 @@ public final class Ident extends Value {
             return true;
         }
 
-        if (!(obj instanceof Ident)) {
+        if (!(obj instanceof Ident ident)) {
             return false;
         }
 
-        Ident ident = (Ident) obj;
         return this.ident.equals(ident.getIdent());
     }
 

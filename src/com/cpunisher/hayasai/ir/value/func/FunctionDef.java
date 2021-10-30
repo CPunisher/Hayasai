@@ -6,18 +6,12 @@ import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.util.IrKeywords;
 
-public final class FunctionDef extends Value {
+public final class FunctionDef extends Function {
 
-    private final Type funcType;
-    private final Ident ident;
-    private final FunctionFParams param;
     private final Block block;
 
-    public FunctionDef(String name, Type funcType, Ident ident, FunctionFParams param, Block block) {
-        super(name);
-        this.funcType = funcType;
-        this.ident = ident;
-        this.param = param;
+    public FunctionDef(Type funcType, Ident ident, FunctionParams param, Block block) {
+        super(funcType, ident, param);
         this.block = block;
     }
 
@@ -32,14 +26,6 @@ public final class FunctionDef extends Value {
         builder.append(this.param.build());
         builder.append(this.block.build());
         return builder.toString();
-    }
-
-    public Type getFuncType() {
-        return funcType;
-    }
-
-    public Ident getIdent() {
-        return ident;
     }
 
     public Block getBlock() {

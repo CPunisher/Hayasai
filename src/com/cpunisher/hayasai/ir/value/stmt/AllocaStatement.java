@@ -10,8 +10,7 @@ public class AllocaStatement extends Statement {
     private final Operand receiver;
     private final Type type;
 
-    public AllocaStatement(String name, Operand receiver, Type type) {
-        super(name);
+    public AllocaStatement(Operand receiver, Type type) {
         this.receiver = receiver;
         this.type = type;
     }

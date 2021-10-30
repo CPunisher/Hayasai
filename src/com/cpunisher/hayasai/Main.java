@@ -5,6 +5,7 @@ import com.cpunisher.hayasai.frontend.MiniSysYParser;
 import com.cpunisher.hayasai.frontend.Visitor;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.value.Ident;
+import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.util.IOUtils;
 import com.cpunisher.hayasai.util.IrKeywords;
@@ -34,7 +35,11 @@ public class Main {
         visitor.visit(tree);
 
         SymbolTable symbolTable = SymbolTable.INSTANCE;
-        Map<Ident, FunctionDef> functionDefMap = symbolTable.getImmutableSymbolTable();
+        Map<Ident, FunctionDecl> functionDeclMap = symbolTable.getFuncDeclTable();
+        Map<Ident, FunctionDef> functionDefMap = symbolTable.getFuncDefTable();
+        System.out.println(functionDeclMap.values().stream()
+                .map(FunctionDecl::build)
+                .collect(Collectors.joining(IrKeywords.LINE_SEPARATOR)));
         System.out.println(functionDefMap.values().stream()
                 .map(FunctionDef::build)
                 .collect(Collectors.joining(IrKeywords.LINE_SEPARATOR)));

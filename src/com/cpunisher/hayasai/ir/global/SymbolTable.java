@@ -1,7 +1,11 @@
 package com.cpunisher.hayasai.ir.global;
 
+import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
+import com.cpunisher.hayasai.ir.value.func.Function;
+import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
+import com.cpunisher.hayasai.ir.value.func.FunctionParams;
 import com.cpunisher.hayasai.util.SyntaxException;
 
 import java.util.Collections;
@@ -11,27 +15,44 @@ import java.util.Map;
 public final class SymbolTable {
     public static final SymbolTable INSTANCE = new SymbolTable();
 
-    private Hashtable<Ident, FunctionDef> functionTable = new Hashtable<>();
+    private final Hashtable<Ident, FunctionDecl> funcDeclTable = new Hashtable<>();
+    private final Hashtable<Ident, FunctionDef> funcDefTable = new Hashtable<>();
 
-    private SymbolTable() {}
+    private SymbolTable() {
+        this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getint"), new FunctionParams()));
+        this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getch"), new FunctionParams()));
+        this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putint"), new FunctionParams(Type.INT)));
+        this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putch"), new FunctionParams(Type.INT)));
+    }
 
-    public void putFunctionDef(FunctionDef functionDef) throws SyntaxException {
-        FunctionDef def = this.functionTable.get(functionDef.getIdent());
+    public void putFunctionDecl(FunctionDecl functionDecl) {
+        FunctionDecl decl = this.funcDeclTable.get(functionDecl.getIdent());
+        if (decl == null || !decl.equals(functionDecl)) {
+            this.funcDeclTable.put(functionDecl.getIdent(), functionDecl);
+        }
+    }
+
+    public void putFunctionDef(FunctionDef functionDef) {
+        FunctionDef def = this.funcDefTable.get(functionDef.getIdent());
         if (def != null && def.equals(functionDef)) {
             throw new SyntaxException("Function has already existed.");
         }
-        this.functionTable.put(functionDef.getIdent(), functionDef);
+        this.funcDefTable.put(functionDef.getIdent(), functionDef);
     }
 
-    public FunctionDef getFunctionDef(Ident ident) throws SyntaxException {
-        FunctionDef def = this.functionTable.get(ident);
-        if (def == null) {
-            throw new SyntaxException("Function is not existed.");
+    public Function getFunctionByIdent(Ident ident) {
+        Function f = this.funcDefTable.get(ident);
+        if (f == null) {
+            f = this.funcDeclTable.get(ident);
         }
-        return def;
+        return f;
     }
 
-    public Map<Ident, FunctionDef> getImmutableSymbolTable() {
-        return Collections.unmodifiableMap(this.functionTable);
+    public Map<Ident, FunctionDecl> getFuncDeclTable() {
+        return Collections.unmodifiableMap(this.funcDeclTable);
+    }
+
+    public Map<Ident, FunctionDef> getFuncDefTable() {
+        return Collections.unmodifiableMap(this.funcDefTable);
     }
 }

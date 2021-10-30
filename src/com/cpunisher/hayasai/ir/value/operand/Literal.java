@@ -1,11 +1,10 @@
 package com.cpunisher.hayasai.ir.value.operand;
 
 public class Literal extends Operand {
-    public static final Literal ZERO = new Literal("literal_zero", 0);
+    public static final Literal ZERO = new Literal(0);
     private final int value;
 
-    public Literal(String name, int number) {
-        super(name);
+    public Literal(int number) {
         this.value = number;
     }
 

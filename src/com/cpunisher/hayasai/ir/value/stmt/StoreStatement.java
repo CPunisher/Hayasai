@@ -11,8 +11,7 @@ public class StoreStatement extends Statement {
     private final OperandExpression source;
     private final Operand addr;
 
-    public StoreStatement(String name, OperandExpression source, Operand addr) {
-        super(name);
+    public StoreStatement(OperandExpression source, Operand addr) {
         this.source = source;
         this.addr = addr;
     }

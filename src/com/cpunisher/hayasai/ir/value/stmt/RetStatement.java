@@ -10,8 +10,7 @@ public final class RetStatement extends Statement {
 
     private final OperandExpression expression;
 
-    public RetStatement(String name, OperandExpression expression) {
-        super(name);
+    public RetStatement(OperandExpression expression) {
         this.expression = expression;
     }
 

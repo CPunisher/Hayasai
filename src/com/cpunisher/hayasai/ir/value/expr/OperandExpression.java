@@ -2,18 +2,16 @@ package com.cpunisher.hayasai.ir.value.expr;
 
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 
-public final class OperandExpression extends Expression {
+public class OperandExpression extends Expression {
     private final Operand operand;
     private final boolean immutable;
 
-    public OperandExpression(String name, Operand operand) {
-        super(name);
+    public OperandExpression(Operand operand) {
         this.operand = operand;
         this.immutable = false;
     }
 
-    public OperandExpression(String name, Operand operand, boolean immutable) {
-        super(name);
+    public OperandExpression(Operand operand, boolean immutable) {
         this.operand = operand;
         this.immutable = immutable;
     }

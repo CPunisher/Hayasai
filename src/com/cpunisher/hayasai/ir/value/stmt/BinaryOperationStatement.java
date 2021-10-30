@@ -13,8 +13,7 @@ public class BinaryOperationStatement extends Statement {
     private final Operand operand2;
     private final BinaryOperator operator;
 
-    public BinaryOperationStatement(String name, Operand receiver, Operand operand1, Operand operand2, BinaryOperator operator) {
-        super(name);
+    public BinaryOperationStatement(Operand receiver, Operand operand1, Operand operand2, BinaryOperator operator) {
         // TODO operand type check
         this.receiver = receiver;
         this.operand1 = operand1;

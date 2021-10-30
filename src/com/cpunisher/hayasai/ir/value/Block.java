@@ -38,10 +38,10 @@ public final class Block extends Value implements IRegisterAllocator {
                 IrKeywords.LCURLY + IrKeywords.LINE_SEPARATOR,
                 IrKeywords.LINE_SEPARATOR + IrKeywords.RCURLY + IrKeywords.LINE_SEPARATOR);
         this.constTable.entrySet().stream()
-                .map(entry -> new AllocaStatement("alloca_" + entry.getKey().getIdent(), entry.getValue(), entry.getValue().getType()))
+                .map(entry -> new AllocaStatement(entry.getValue(), entry.getValue().getType()))
                 .forEach(stmt -> this.subList.add(0, stmt));
         this.varTable.entrySet().stream()
-                .map(entry -> new AllocaStatement("alloca_" + entry.getKey().getIdent(), entry.getValue(), entry.getValue().getType()))
+                .map(entry -> new AllocaStatement( entry.getValue(), entry.getValue().getType()))
                 .forEach(stmt -> this.subList.add(0, stmt));
         for (Statement stmt : this.subList) {
             joiner.add("    " + stmt.build());

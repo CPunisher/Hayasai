@@ -8,8 +8,7 @@ public final class Register extends Operand {
     private Ident ident;
     private final IRegisterAllocator allocator;
 
-    public Register(String name, IRegisterAllocator allocator) {
-        super(name);
+    public Register(IRegisterAllocator allocator) {
         this.allocator = allocator;
     }
 

@@ -4,6 +4,8 @@ public abstract class Value {
 
     private final String name;
 
+    public Value() { this(""); }
+
     public Value(String name) {
         this.name = name;
     }

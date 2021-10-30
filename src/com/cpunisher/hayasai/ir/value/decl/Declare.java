@@ -8,8 +8,7 @@ public abstract class Declare extends Value {
     protected final Type declType;
     protected final Ident ident;
 
-    public Declare(String name, Type declType, Ident ident) {
-        super(name);
+    public Declare(Type declType, Ident ident) {
         this.declType = declType;
         this.ident = ident;
     }

@@ -10,8 +10,7 @@ public class LoadStatement extends Statement {
     private final Operand receiver;
     private final Operand addr;
 
-    public LoadStatement(String name, Operand receiver, Operand addr) {
-        super(name);
+    public LoadStatement(Operand receiver, Operand addr) {
         this.receiver = receiver;
         this.addr = addr;
     }
