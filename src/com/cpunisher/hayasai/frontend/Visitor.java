@@ -28,6 +28,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     private final SymbolTable symbolTable = SymbolTable.INSTANCE;
 
     private Block curBlock;
+    private boolean visitingConstExp;
 
     @Override
     public Value visitCompUnit(MiniSysYParser.CompUnitContext ctx) {
@@ -96,8 +97,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitConstInitVal(MiniSysYParser.ConstInitValContext ctx) {
         if (ctx.constExp() != null) {
-            // TODO 在语义上额外约束这里的 AddExp 必须是一个可以在编译期求出值的常量
-            return visitConstExp(ctx.constExp());
+            this.visitingConstExp = true;
+            Value expression = visitConstExp(ctx.constExp());
+            this.visitingConstExp = false;
+            return expression;
         }
         return null;
     }
@@ -213,7 +216,11 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         if (ctx.exp() != null) {
             return visitExp(ctx.exp());
         } else if (ctx.lVal() != null) {
-            return visitLVal(ctx.lVal());
+            OperandExpression expression = (OperandExpression) visitLVal(ctx.lVal());
+            if (this.visitingConstExp && !expression.isImmutable()) {
+                throw new SyntaxException("Assign a variable to constant.");
+            }
+            return expression;
         } else if (ctx.number() != null) {
             return visitNumber(ctx.number());
         }
@@ -241,6 +248,6 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         } else {
             res = Integer.parseInt(text, 10);
         }
-        return new OperandExpression(new Literal(res));
+        return new OperandExpression(new Literal(res), true);
     }
 }

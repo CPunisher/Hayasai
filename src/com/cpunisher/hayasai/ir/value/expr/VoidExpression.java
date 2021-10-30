@@ -7,7 +7,7 @@ public final class VoidExpression extends OperandExpression {
     public static final VoidExpression VOID_EXPRESSION = new VoidExpression();
 
     private VoidExpression() {
-        super(Literal.ZERO);
+        super(Literal.ZERO, true);
     }
 
     @Override
