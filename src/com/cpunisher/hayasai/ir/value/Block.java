@@ -46,14 +46,14 @@ public final class Block extends Value implements IRegisterAllocator {
         this.register = this.alloc();
     }
 
-    public void addSub(Statement sub) {
-        if (sub != null)
-            this.subList.add(sub);
-    }
-
-    public void addBlock(Block block) {
-        if (block != null)
-            this.subBlockList.add(block);
+    public void addSub(Value sub) {
+        if (sub != null) {
+            if (sub instanceof Block) {
+                this.subBlockList.add((Block) sub);
+            } else if (sub instanceof Statement) {
+                this.subList.add((Statement) sub);
+            }
+        }
     }
 
     @Override
@@ -104,7 +104,7 @@ public final class Block extends Value implements IRegisterAllocator {
 
     public Register getVar(Ident ident) {
         Register register =  this.varTable.get(ident);
-        if (register == null) {
+        if (register == null && this.hasParent()) {
             register = this.parent.getVar(ident);
         }
         return register;
@@ -112,7 +112,7 @@ public final class Block extends Value implements IRegisterAllocator {
 
     public Register getConst(Ident ident) {
         Register register =  this.constTable.get(ident);
-        if (register == null) {
+        if (register == null && this.hasParent()) {
             register = this.parent.getConst(ident);
         }
         return register;
@@ -157,6 +157,10 @@ public final class Block extends Value implements IRegisterAllocator {
 
     public boolean hasParent() {
         return this.parent != null;
+    }
+
+    public boolean isRoot() {
+        return !this.hasParent();
     }
 
     public Register getRegister() {
