@@ -173,7 +173,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 if (validUnaryOpList.get(i).MINUS() != null) {
                     cur = this.curBlock.alloc();
                     Operand operand = last != null ? last : expression.getOperand();
-                    this.curBlock.addSub(new BinaryOperationStatement(cur, Literal.ZERO, operand, BinaryOperator.SUB));
+                    this.curBlock.addSub(new BinaryOperationStatement(cur, Literal.INT_ZERO, operand, BinaryOperator.SUB));
                     last = cur;
                 }
             }

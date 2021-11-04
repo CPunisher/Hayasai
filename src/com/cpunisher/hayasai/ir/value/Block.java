@@ -1,5 +1,6 @@
 package com.cpunisher.hayasai.ir.value;
 
+import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.util.DefaultAllocator;
 import com.cpunisher.hayasai.ir.util.IRegisterAllocator;
 import com.cpunisher.hayasai.ir.value.operand.Register;
@@ -13,17 +14,36 @@ import java.util.*;
 
 public final class Block extends Value implements IRegisterAllocator {
 
+    private final Block parent;
+    private final Register register;
     private final List<Statement> subList;
+    private final List<Block> subBlockList;
     private final IRegisterAllocator allocator;
     private final Map<Ident, Register> varTable;
     private final Map<Ident, Register> constTable;
 
+    public Block(String name, Block parent) {
+        super(name);
+        this.subList = new LinkedList<>();
+        this.subBlockList = new LinkedList<>();
+        this.varTable = new HashMap<>();
+        this.constTable = new HashMap<>();
+
+        this.parent = parent;
+        this.allocator = parent.allocator;
+        this.register = this.alloc();
+    }
+
     public Block(String name) {
         super(name);
         this.subList = new LinkedList<>();
-        this.allocator = new DefaultAllocator();
+        this.subBlockList = new LinkedList<>();
         this.varTable = new HashMap<>();
         this.constTable = new HashMap<>();
+
+        this.parent = null;
+        this.allocator = new DefaultAllocator();
+        this.register = this.alloc();
     }
 
     public void addSub(Statement sub) {
@@ -31,22 +51,35 @@ public final class Block extends Value implements IRegisterAllocator {
             this.subList.add(sub);
     }
 
+    public void addBlock(Block block) {
+        if (block != null)
+            this.subBlockList.add(block);
+    }
+
     @Override
     public String build() {
-        this.release();
-        StringJoiner joiner = new StringJoiner(IrKeywords.LINE_SEPARATOR,
-                IrKeywords.LCURLY + IrKeywords.LINE_SEPARATOR,
-                IrKeywords.LINE_SEPARATOR + IrKeywords.RCURLY + IrKeywords.LINE_SEPARATOR);
-        this.constTable.entrySet().stream()
-                .map(entry -> new AllocaStatement(entry.getValue(), entry.getValue().getType()))
+        String blockHeader = "";
+        Ident ident = this.register.getIdent();
+        if (this.hasParent()) {
+            blockHeader += ident.build();
+            blockHeader += IrKeywords.COLON;
+            blockHeader += IrKeywords.LINE_SEPARATOR;
+        }
+        StringJoiner joiner = new StringJoiner(IrKeywords.LINE_SEPARATOR);
+        this.constTable.values().stream()
+                .map(v -> new AllocaStatement(v, v.getType()))
                 .forEach(stmt -> this.subList.add(0, stmt));
-        this.varTable.entrySet().stream()
-                .map(entry -> new AllocaStatement( entry.getValue(), entry.getValue().getType()))
+        this.varTable.values().stream()
+                .map(v -> new AllocaStatement(v, v.getType()))
                 .forEach(stmt -> this.subList.add(0, stmt));
         for (Statement stmt : this.subList) {
-            joiner.add("    " + stmt.build());
+            joiner.add(IrKeywords.TAB_IDENT + stmt.build());
         }
-        return joiner.toString();
+
+        for (Block block : this.subBlockList) {
+            joiner.add(block.build());
+        }
+        return blockHeader + joiner;
     }
 
     public Register getRegister(Ident ident) {
@@ -70,11 +103,19 @@ public final class Block extends Value implements IRegisterAllocator {
     }
 
     public Register getVar(Ident ident) {
-        return this.varTable.get(ident);
+        Register register =  this.varTable.get(ident);
+        if (register == null) {
+            register = this.parent.getVar(ident);
+        }
+        return register;
     }
 
     public Register getConst(Ident ident) {
-        return this.constTable.get(ident);
+        Register register =  this.constTable.get(ident);
+        if (register == null) {
+            register = this.parent.getConst(ident);
+        }
+        return register;
     }
 
     public Register putVar(Ident ident) {
@@ -105,12 +146,20 @@ public final class Block extends Value implements IRegisterAllocator {
     }
 
     @Override
+    public Register alloc(Type type) {
+        return this.allocator.alloc(type);
+    }
+
+    @Override
     public Ident genIdent() {
         return this.allocator.genIdent();
     }
 
-    @Override
-    public void release() {
+    public boolean hasParent() {
+        return this.parent != null;
+    }
 
+    public Register getRegister() {
+        return register;
     }
 }

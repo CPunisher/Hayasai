@@ -1,10 +1,11 @@
 package com.cpunisher.hayasai.ir.util;
 
+import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 
 public class DefaultAllocator implements IRegisterAllocator {
-    private int next = 1;
+    private int next = 0;
 
     @Override
     public Register alloc() {
@@ -12,10 +13,12 @@ public class DefaultAllocator implements IRegisterAllocator {
     }
 
     @Override
-    public Ident genIdent() {
-        return Ident.valueOf(String.valueOf(next++));
+    public Register alloc(Type type) {
+        return new Register(type, this);
     }
 
     @Override
-    public void release() {}
+    public Ident genIdent() {
+        return Ident.valueOf(String.valueOf(next++));
+    }
 }

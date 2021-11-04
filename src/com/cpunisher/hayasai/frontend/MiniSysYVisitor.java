@@ -106,6 +106,12 @@ public interface MiniSysYVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAssignStmt(MiniSysYParser.AssignStmtContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#ifStmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIfStmt(MiniSysYParser.IfStmtContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MiniSysYParser#retStmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -129,6 +135,12 @@ public interface MiniSysYVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExp(MiniSysYParser.ExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#cond}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCond(MiniSysYParser.CondContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MiniSysYParser#addExp}.
 	 * @param ctx the parse tree
@@ -172,11 +184,47 @@ public interface MiniSysYVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPrimaryExp(MiniSysYParser.PrimaryExpContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#relExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRelExp(MiniSysYParser.RelExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#eqExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEqExp(MiniSysYParser.EqExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#lAndExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLAndExp(MiniSysYParser.LAndExpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#lOrExp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLOrExp(MiniSysYParser.LOrExpContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MiniSysYParser#number}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitNumber(MiniSysYParser.NumberContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#compOp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCompOp(MiniSysYParser.CompOpContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#equalOp}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEqualOp(MiniSysYParser.EqualOpContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MiniSysYParser#unaryOp}.
 	 * @param ctx the parse tree

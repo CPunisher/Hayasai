@@ -24,7 +24,10 @@ public final class FunctionDef extends Function {
         builder.append(IrKeywords.FUNC_IDENT);
         builder.append(this.ident.build());
         builder.append(this.param.build());
+        builder.append(" ");
+        builder.append(IrKeywords.LCURLY).append(IrKeywords.LINE_SEPARATOR);
         builder.append(this.block.build());
+        builder.append(IrKeywords.LINE_SEPARATOR).append(IrKeywords.RCURLY).append(IrKeywords.LINE_SEPARATOR);
         return builder.toString();
     }
 
