@@ -307,21 +307,24 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             }
             return new OperandExpression(last);
         }
-        cur = this.blockManager.current().alloc(Type.BIT);
-        this.blockManager.addToCurrent(new IcmpStatement(cur, expression.getOperand(), Literal.INT_ZERO, IcmpStatement.CompareType.NE));
-        return new OperandExpression(cur);
+        return expression;
     }
 
     @Override
     public Value visitEqExp(MiniSysYParser.EqExpContext ctx) {
-        OperandExpression expression = (OperandExpression) visitRelExp(ctx.relExp(0)); // i1
+        OperandExpression expression = (OperandExpression) visitRelExp(ctx.relExp(0)); // i1 or i32
         Register last = null, cur;
         if (ctx.equalOp().size() > 0) {
             for (int i = 0; i < ctx.equalOp().size(); i++) {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 Operand operand2 = ((OperandExpression) visitRelExp(ctx.relExp(i + 1))).getOperand();
+                if (operand1.getType() == Type.BIT) {
+                    cur = this.blockManager.current().alloc(Type.INT);
+                    this.blockManager.addToCurrent(new ZextStatement(cur, new OperandExpression(operand1), Type.INT));
+                    operand1 = cur;
+                }
                 cur = this.blockManager.current().alloc(Type.BIT);
-                IcmpStatement.CompareType operator = IcmpStatement.CompareType.valueOf(ctx.equalOp(i).getText()); // i1
+                IcmpStatement.CompareType operator = IcmpStatement.CompareType.valueOf(ctx.equalOp(i).getText()); // (i32, i32) to i1
                 this.blockManager.addToCurrent(new IcmpStatement(cur, operand1, operand2, operator));
                 last = cur;
             }
