@@ -64,6 +64,12 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitIfStmt(MiniSysYParser.IfStmtContext ctx) {
         OperandExpression condExp = (OperandExpression) visitCond(ctx.cond());
+        if (condExp.getOperand().getType() != Type.BIT) {
+            Register cur = this.blockManager.current().alloc(Type.BIT);
+            this.blockManager.addToCurrent(new IcmpStatement(cur, condExp.getOperand(), Literal.BIT_ZERO, IcmpStatement.CompareType.EQ));
+            condExp = new OperandExpression(cur);
+        }
+
         Block lastBlock = this.blockManager.current();
         lastBlock.setNext(null);
         Block blockAfter = this.blockManager.create("blockAfter", true);
@@ -199,15 +205,25 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     public Value visitBasicUnaryExp(MiniSysYParser.BasicUnaryExpContext ctx) {
         OperandExpression expression = (OperandExpression) visitPrimaryExp(ctx.primaryExp());
         List<MiniSysYParser.UnaryOpContext> validUnaryOpList = ctx.unaryOp().stream()
-                .filter(unaryOpContext -> unaryOpContext.MINUS() != null)
+                .filter(unaryOpContext -> unaryOpContext.MINUS() != null || unaryOpContext.NOT() != null)
                 .collect(Collectors.toList());
         Register last = null, cur;
         if (validUnaryOpList.size() > 0) {
             for (int i = validUnaryOpList.size() - 1; i >= 0; i--) {
                 if (validUnaryOpList.get(i).MINUS() != null) {
-                    cur = this.blockManager.current().alloc();
                     Operand operand = last != null ? last : expression.getOperand();
+                    if (operand.getType() != Type.INT) {
+                        cur = this.blockManager.current().alloc();
+                        this.blockManager.addToCurrent(new ZextStatement(cur, new OperandExpression(operand), Type.INT));
+                        operand = cur;
+                    }
+                    cur = this.blockManager.current().alloc();
                     this.blockManager.addToCurrent(new BinaryOperationStatement(cur, Literal.INT_ZERO, operand, BinaryOperator.SUB));
+                    last = cur;
+                } else if (validUnaryOpList.get(i).NOT() != null) {
+                    cur = this.blockManager.current().alloc(Type.BIT);
+                    Operand operand = last != null ? last : expression.getOperand();
+                    this.blockManager.addToCurrent(new IcmpStatement(cur, operand, Literal.BIT_ZERO, IcmpStatement.CompareType.EQ));
                     last = cur;
                 }
             }
@@ -237,7 +253,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 
         f = new FunctionDecl(f.getFuncType(), ident, params);
         if (f.getFuncType() != Type.VOID) {
-            Register register = this.blockManager.current().alloc();
+            Register register = this.blockManager.current().alloc(f.getFuncType());
             this.blockManager.addToCurrent(new CallStatement(register, f));
             return new OperandExpression(register);
         }
@@ -269,7 +285,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             for (int i = 0; i < ctx.compOp().size(); i++) {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 Operand operand2 = ((OperandExpression) visitAddExp(ctx.addExp(i + 1))).getOperand();
-                cur = this.blockManager.current().alloc();
+                cur = this.blockManager.current().alloc(Type.BIT);
                 IcmpStatement.CompareType operator = IcmpStatement.CompareType.valueOf(ctx.compOp(i).getText()); // i1
                 this.blockManager.addToCurrent(new IcmpStatement(cur, operand1, operand2, operator));
                 last = cur;
@@ -287,7 +303,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             for (int i = 0; i < ctx.equalOp().size(); i++) {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 Operand operand2 = ((OperandExpression) visitRelExp(ctx.relExp(i + 1))).getOperand();
-                cur = this.blockManager.current().alloc();
+                cur = this.blockManager.current().alloc(Type.BIT);
                 IcmpStatement.CompareType operator = IcmpStatement.CompareType.valueOf(ctx.equalOp(i).getText()); // i1
                 this.blockManager.addToCurrent(new IcmpStatement(cur, operand1, operand2, operator));
                 last = cur;
