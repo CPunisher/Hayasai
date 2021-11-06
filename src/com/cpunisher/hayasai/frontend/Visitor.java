@@ -330,6 +330,12 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             }
             return new OperandExpression(last);
         }
+
+        if (expression.getOperand().getType() == Type.INT) {
+            cur = this.blockManager.current().alloc(Type.BIT);
+            this.blockManager.addToCurrent(new IcmpStatement(cur, expression.getOperand(), Literal.INT_ZERO, IcmpStatement.CompareType.NE));
+            expression = new OperandExpression(cur);
+        }
         return expression;
     }
 
