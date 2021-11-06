@@ -1,7 +1,7 @@
 package com.cpunisher.hayasai;
 
-import com.cpunisher.hayasai.frontend.MiniSysYLexer;
-import com.cpunisher.hayasai.frontend.MiniSysYParser;
+import com.cpunisher.hayasai.frontend.antlr.MiniSysYLexer;
+import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.frontend.Visitor;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.value.Ident;

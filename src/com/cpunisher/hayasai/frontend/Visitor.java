@@ -1,5 +1,7 @@
 package com.cpunisher.hayasai.frontend;
 
+import com.cpunisher.hayasai.frontend.antlr.MiniSysYBaseVisitor;
+import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.util.BinaryOperator;
@@ -28,6 +30,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     private final SymbolTable symbolTable = SymbolTable.INSTANCE;
 
     private final BlockManager blockManager = new BlockManager();
+    private final ConditionContext condCtx = new ConditionContext();
     private boolean visitingConstExp;
 
     @Override
@@ -63,18 +66,27 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 
     @Override
     public Value visitIfStmt(MiniSysYParser.IfStmtContext ctx) {
-        OperandExpression condExp = (OperandExpression) visitCond(ctx.cond());
-        if (condExp.getOperand().getType() == Type.INT) {
-            Register cur = this.blockManager.current().alloc(Type.BIT);
-            this.blockManager.addToCurrent(new IcmpStatement(cur, condExp.getOperand(), Literal.INT_ZERO, IcmpStatement.CompareType.NE));
-            condExp = new OperandExpression(cur);
-        }
-
         Block lastBlock = this.blockManager.current();
         lastBlock.setNext(null);
-        Block blockAfter = this.blockManager.create("blockAfter", true);
 
-        Block blockTrue = this.blockManager.createAndSet("blockTrue");
+        boolean hasElse = ctx.stmt().size() > 1;
+        Block blockAfter = this.blockManager.create("blockAfter", true);
+        Block blockTrue = this.blockManager.create("blockTrue", false);
+        Block blockElse;
+        if (hasElse) blockElse = this.blockManager.create("blockElse", false);
+        else blockElse = blockAfter;
+
+        this.condCtx.setEnable(true);
+        this.condCtx.setBlockTrue(blockTrue);
+        this.condCtx.setBlockFalse(blockElse);
+        OperandExpression condEntryExp = (OperandExpression) visitCond(ctx.cond());
+//        if (condExp.getOperand().getType() == Type.INT) {
+//            Register cur = this.blockManager.current().alloc(Type.BIT);
+//            this.blockManager.addToCurrent(new IcmpStatement(cur, condExp.getOperand(), Literal.INT_ZERO, IcmpStatement.CompareType.NE));
+//            condExp = new OperandExpression(cur);
+//        }
+
+        this.blockManager.setCurrent(blockTrue);
         blockTrue.setNext(blockAfter);
         if (ctx.stmt(0).block() != null) {
             visitBlock(ctx.stmt(0).block());
@@ -82,21 +94,18 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             this.blockManager.addToCurrent(ctx.stmt(0).children.get(0).accept(this));
         }
 
-        Block blockElse;
-        if (ctx.stmt().size() > 1) {
+        if (hasElse) {
             // else
-            blockElse = this.blockManager.createAndSet("blockElse");
+            this.blockManager.setCurrent(blockElse);
             blockElse.setNext(blockAfter);
             if (ctx.stmt(1).block() != null) {
                 visitBlock(ctx.stmt(1).block());
             } else {
                 this.blockManager.addToCurrent(ctx.stmt(1).children.get(0).accept(this));
             }
-        } else {
-            // no else
-            blockElse = blockAfter;
         }
-        lastBlock.addSub(new BrCondStatement(condExp, blockTrue.getBlockRegister(), blockElse.getBlockRegister()));
+//        lastBlock.addSub(new BrCondStatement(condExp, blockTrue.getBlockRegister(), blockElse.getBlockRegister()));
+        lastBlock.addSub(new BrStatement(condEntryExp.getOperand()));
         this.blockManager.setCurrent(blockAfter);
         return null;
     }
@@ -314,41 +323,32 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         return expression;
     }
 
-    // TODO 短路
     @Override
     public Value visitLAndExp(MiniSysYParser.LAndExpContext ctx) {
-        OperandExpression expression = (OperandExpression) visitEqExp(ctx.eqExp(0));
-        Register last = null, cur;
-        if (ctx.eqExp().size() > 1) {
-            for (int i = 1; i < ctx.eqExp().size(); i++) {
-                Operand operand1 = last != null ? last : expression.getOperand();
-                Operand operand2 = ((OperandExpression) visitEqExp(ctx.eqExp(i))).getOperand();
-                cur = this.blockManager.current().alloc(Type.BIT);
-                BinaryOperator operator = BinaryOperator.AND;
-                this.blockManager.addToCurrent(new BinaryOperationStatement(cur, operand1, operand2, operator));
-                last = cur;
-            }
-            return new OperandExpression(last);
+        int size = ctx.eqExp().size();
+        Block[] blocks = new Block[size + 1];
+        for (int i = 0; i < size; i++) {
+            blocks[i] = this.blockManager.create("", false);
         }
-        return expression;
+        blocks[size] = this.condCtx.getBlockTrue();
+        for (int i = 0; i < ctx.eqExp().size(); i++) {
+            this.blockManager.setCurrent(blocks[i]);
+            OperandExpression expression = (OperandExpression) visitEqExp(ctx.eqExp(i));
+            this.blockManager.addToCurrent(new BrCondStatement(expression, blocks[i + 1].getBlockRegister(), this.condCtx.getNextOr().getOperand()));
+        }
+        return new OperandExpression(blocks[0].getBlockRegister());
     }
 
     @Override
     public Value visitLOrExp(MiniSysYParser.LOrExpContext ctx) {
-        OperandExpression expression = (OperandExpression) visitLAndExp(ctx.lAndExp(0));
-        Register last = null, cur;
-        if (ctx.lAndExp().size() > 1) {
-            for (int i = 1; i < ctx.lAndExp().size(); i++) {
-                Operand operand1 = last != null ? last : expression.getOperand();
-                Operand operand2 = ((OperandExpression) visitLAndExp(ctx.lAndExp(i))).getOperand();
-                cur = this.blockManager.current().alloc(Type.BIT);
-                BinaryOperator operator = BinaryOperator.OR;
-                this.blockManager.addToCurrent(new BinaryOperationStatement(cur, operand1, operand2, operator));
-                last = cur;
-            }
-            return new OperandExpression(last);
+        int size = ctx.lAndExp().size();
+        this.condCtx.setNextOr(new OperandExpression(this.condCtx.getBlockFalse().getBlockRegister()));
+        OperandExpression lastExp = (OperandExpression) visitLAndExp(ctx.lAndExp(size - 1));
+        for (int i = size - 2; i >= 0; i--) {
+            this.condCtx.setNextOr(lastExp);
+            lastExp = (OperandExpression) visitLAndExp(ctx.lAndExp(i));
         }
-        return expression;
+        return lastExp;
     }
 
     /* 使用左值时访问，赋值不需要 */

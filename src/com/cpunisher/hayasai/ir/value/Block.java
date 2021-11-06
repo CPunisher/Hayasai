@@ -90,14 +90,6 @@ public final class Block extends Value implements IRegisterAllocator {
         return blockHeader + joiner;
     }
 
-    public Register getRegister(Ident ident) {
-        Register register =  this.getVar(ident);
-        if (register == null) {
-            register = this.getConst(ident);
-        }
-        return register;
-    }
-
     public Pair<Register, Boolean> compute(Ident ident) {
         Register register = this.getConst(ident);
         boolean immutable = true;
