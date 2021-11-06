@@ -1,5 +1,6 @@
 package com.cpunisher.hayasai.ir.value.stmt;
 
+import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
@@ -12,6 +13,8 @@ public class BrCondStatement extends Statement {
     private final Operand label2;
 
     public BrCondStatement(OperandExpression cond, Operand label1, Operand label2) {
+        assert cond.getOperand().getType() == Type.BIT;
+
         this.cond = cond;
         this.label1 = label1;
         this.label2 = label2;

@@ -301,13 +301,15 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                     operand1 = cur;
                 }
                 cur = this.blockManager.current().alloc(Type.BIT);
-                IcmpStatement.CompareType operator = IcmpStatement.CompareType.valueOf(ctx.compOp(i).getText()); // i1
+                IcmpStatement.CompareType operator = IcmpStatement.CompareType.valueOf(ctx.compOp(i).getText());
                 this.blockManager.addToCurrent(new IcmpStatement(cur, operand1, operand2, operator));
                 last = cur;
             }
             return new OperandExpression(last);
         }
-        return expression;
+        cur = this.blockManager.current().alloc(Type.BIT);
+        this.blockManager.addToCurrent(new IcmpStatement(cur, expression.getOperand(), Literal.INT_ZERO, IcmpStatement.CompareType.NE));
+        return new OperandExpression(cur);
     }
 
     @Override
