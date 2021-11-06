@@ -15,6 +15,9 @@ public class IcmpStatement extends Statement {
     private final CompareType compareType;
 
     public IcmpStatement(Operand receiver, Operand operand1, Operand operand2, CompareType compareType) {
+        assert receiver.getType() == Type.BIT;
+        assert operand1.getType() == operand2.getType();
+
         this.receiver = receiver;
         this.operand1 = operand1;
         this.operand2 = operand2;
@@ -23,8 +26,6 @@ public class IcmpStatement extends Statement {
 
     @Override
     public void build() {
-        assert this.receiver.getType() == Type.BIT;
-        assert this.operand1.getType() == this.operand2.getType();
         this.receiver.build();
     }
 

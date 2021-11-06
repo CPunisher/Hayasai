@@ -12,7 +12,7 @@ public class Type extends Value {
 
     private final String name;
 
-    public Type(String name) {
+    private Type(String name) {
         super("value_" + name);
         this.name = name;
     }

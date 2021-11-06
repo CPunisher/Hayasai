@@ -295,6 +295,11 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             for (int i = 0; i < ctx.compOp().size(); i++) {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 Operand operand2 = ((OperandExpression) visitAddExp(ctx.addExp(i + 1))).getOperand();
+                if (operand1.getType() == Type.BIT) {
+                    cur = this.blockManager.current().alloc(Type.INT);
+                    this.blockManager.addToCurrent(new ZextStatement(cur, new OperandExpression(operand1), Type.INT));
+                    operand1 = cur;
+                }
                 cur = this.blockManager.current().alloc(Type.BIT);
                 IcmpStatement.CompareType operator = IcmpStatement.CompareType.valueOf(ctx.compOp(i).getText()); // i1
                 this.blockManager.addToCurrent(new IcmpStatement(cur, operand1, operand2, operator));
@@ -307,7 +312,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 
     @Override
     public Value visitEqExp(MiniSysYParser.EqExpContext ctx) {
-        OperandExpression expression = (OperandExpression) visitRelExp(ctx.relExp(0)); // i32
+        OperandExpression expression = (OperandExpression) visitRelExp(ctx.relExp(0)); // i1
         Register last = null, cur;
         if (ctx.equalOp().size() > 0) {
             for (int i = 0; i < ctx.equalOp().size(); i++) {

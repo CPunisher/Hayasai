@@ -14,7 +14,10 @@ public class BinaryOperationStatement extends Statement {
     private final BinaryOperator operator;
 
     public BinaryOperationStatement(Operand receiver, Operand operand1, Operand operand2, BinaryOperator operator) {
-        // TODO operand type check
+        assert receiver.getType() == operand1.getType();
+        assert receiver.getType() == operand2.getType();
+        assert operand1.getType() == operand2.getType();
+
         this.receiver = receiver;
         this.operand1 = operand1;
         this.operand2 = operand2;
@@ -23,9 +26,6 @@ public class BinaryOperationStatement extends Statement {
 
     @Override
     public void build() {
-        assert this.receiver.getType() == this.operand1.getType();
-        assert this.receiver.getType() == this.operand2.getType();
-        assert this.operand1.getType() == this.operand2.getType();
         this.receiver.build();
     }
 
