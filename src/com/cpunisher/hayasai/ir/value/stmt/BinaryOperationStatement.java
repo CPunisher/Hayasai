@@ -23,6 +23,9 @@ public class BinaryOperationStatement extends Statement {
 
     @Override
     public void build() {
+        assert this.receiver.getType() == this.operand1.getType();
+        assert this.receiver.getType() == this.operand2.getType();
+        assert this.operand1.getType() == this.operand2.getType();
         this.receiver.build();
     }
 

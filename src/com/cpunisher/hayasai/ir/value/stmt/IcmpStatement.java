@@ -1,5 +1,6 @@
 package com.cpunisher.hayasai.ir.value.stmt;
 
+import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
@@ -22,6 +23,8 @@ public class IcmpStatement extends Statement {
 
     @Override
     public void build() {
+        assert this.receiver.getType() == Type.BIT;
+        assert this.operand1.getType() == this.operand2.getType();
         this.receiver.build();
     }
 

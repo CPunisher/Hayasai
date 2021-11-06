@@ -66,7 +66,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         OperandExpression condExp = (OperandExpression) visitCond(ctx.cond());
         if (condExp.getOperand().getType() != Type.BIT) {
             Register cur = this.blockManager.current().alloc(Type.BIT);
-            this.blockManager.addToCurrent(new IcmpStatement(cur, condExp.getOperand(), Literal.BIT_ZERO, IcmpStatement.CompareType.EQ));
+            this.blockManager.addToCurrent(new IcmpStatement(cur, condExp.getOperand(), Literal.BIT_ZERO, IcmpStatement.CompareType.NE));
             condExp = new OperandExpression(cur);
         }
 
@@ -322,7 +322,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             for (int i = 1; i < ctx.eqExp().size(); i++) {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 Operand operand2 = ((OperandExpression) visitEqExp(ctx.eqExp(i))).getOperand();
-                cur = this.blockManager.current().alloc();
+                cur = this.blockManager.current().alloc(Type.BIT);
                 BinaryOperator operator = BinaryOperator.AND;
                 this.blockManager.addToCurrent(new BinaryOperationStatement(cur, operand1, operand2, operator));
                 last = cur;
@@ -340,7 +340,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             for (int i = 1; i < ctx.lAndExp().size(); i++) {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 Operand operand2 = ((OperandExpression) visitLAndExp(ctx.lAndExp(i))).getOperand();
-                cur = this.blockManager.current().alloc();
+                cur = this.blockManager.current().alloc(Type.BIT);
                 BinaryOperator operator = BinaryOperator.OR;
                 this.blockManager.addToCurrent(new BinaryOperationStatement(cur, operand1, operand2, operator));
                 last = cur;
