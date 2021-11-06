@@ -15,10 +15,10 @@ public final class RetStatement extends Statement {
     }
 
     @Override
-    public String build() {
+    public String generate() {
         StringBuilder builder = new StringBuilder();
         builder.append(IrKeywords.RETURN).append(" ");
-        builder.append(Optional.of(expression).map(Value::build).orElse(""));
+        builder.append(Optional.of(expression).map(Value::generate).orElse(""));
         return builder.toString();
     }
 }

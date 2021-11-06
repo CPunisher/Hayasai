@@ -31,12 +31,18 @@ public final class IrKeywords {
     public static final String LOAD = "load";
     public static final String ZEXT = "zext";
     public static final String TO = "to";
-    public static final String AND = "and";
-    public static final String OR = "or";
     public static final String ICMP = "icmp";
     public static final String BR = "br";
     public static final String LABEL = "label";
     public static final String RETURN = "ret";
+
+    public static final String ADD = "add";
+    public static final String SUB = "sub";
+    public static final String MUL = "mul";
+    public static final String SDIV = "sdiv";
+    public static final String SREM = "srem";
+    public static final String AND = "and";
+    public static final String OR = "or";
 
     public static final String COMP_EQ = "eq";
     public static final String COMP_NE = "ne";

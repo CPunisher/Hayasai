@@ -22,7 +22,7 @@ public class Literal extends Operand {
     }
 
     @Override
-    public String build() {
+    public String generate() {
         return String.valueOf(this.value);
     }
 }

@@ -23,18 +23,19 @@ public final class Register extends Operand {
         return 0;
     }
 
-    public Ident getIdent() {
+    @Override
+    public void build() {
         if (this.ident == null) {
             this.ident = allocator.genIdent();
         }
+    }
+
+    public Ident getIdent() {
         return ident;
     }
 
     @Override
-    public String build() {
-        if (this.ident == null) {
-            this.ident = allocator.genIdent();
-        }
-        return IrKeywords.REG_IDENT + this.ident.build();
+    public String generate() {
+        return IrKeywords.REG_IDENT + this.ident.generate();
     }
 }

@@ -22,15 +22,20 @@ public class BinaryOperationStatement extends Statement {
     }
 
     @Override
-    public String build() {
+    public void build() {
+        this.receiver.build();
+    }
+
+    @Override
+    public String generate() {
         StringJoiner joiner = new StringJoiner(" ");
-        joiner.add(this.receiver.build());
+        joiner.add(this.receiver.generate());
         joiner.add(IrKeywords.ASSIGN);
-        joiner.add(this.operator.build());
-        joiner.add(this.receiver.getType().build());
-        joiner.add(this.operand1.build());
+        joiner.add(this.operator.generate());
+        joiner.add(this.operand1.getType().generate());
+        joiner.add(this.operand1.generate());
         joiner.add(IrKeywords.SEPARATOR);
-        joiner.add(this.operand2.build());
+        joiner.add(this.operand2.generate());
         return joiner.toString();
     }
 }

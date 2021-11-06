@@ -8,7 +8,7 @@ public final class Ident extends Value {
     }
 
     @Override
-    public String build() {
+    public String generate() {
         return this.ident;
     }
 

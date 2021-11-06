@@ -18,16 +18,16 @@ public class BrCondStatement extends Statement {
     }
 
     @Override
-    public String build() {
+    public String generate() {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add(IrKeywords.BR);
-        joiner.add(cond.build());
+        joiner.add(cond.generate());
         joiner.add(IrKeywords.SEPARATOR);
         joiner.add(IrKeywords.LABEL);
-        joiner.add(label1.build());
+        joiner.add(label1.generate());
         joiner.add(IrKeywords.SEPARATOR);
         joiner.add(IrKeywords.LABEL);
-        joiner.add(label2.build());
+        joiner.add(label2.generate());
         return joiner.toString();
     }
 }

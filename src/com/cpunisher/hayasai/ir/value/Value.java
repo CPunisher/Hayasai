@@ -14,5 +14,9 @@ public abstract class Value {
         return name;
     }
 
-    public abstract String build();
+    public void build() {
+
+    }
+
+    public abstract String generate();
 }

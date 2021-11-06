@@ -17,13 +17,13 @@ public class StoreStatement extends Statement {
     }
 
     @Override
-    public String build() {
+    public String generate() {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add(IrKeywords.STORE);
-        joiner.add(source.build());
+        joiner.add(source.generate());
         joiner.add(IrKeywords.SEPARATOR);
-        joiner.add(Type.ADDR.build());
-        joiner.add(addr.build());
+        joiner.add(Type.ADDR.generate());
+        joiner.add(addr.generate());
         return joiner.toString();
     }
 }

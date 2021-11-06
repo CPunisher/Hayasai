@@ -16,15 +16,20 @@ public class LoadStatement extends Statement {
     }
 
     @Override
-    public String build() {
+    public void build() {
+        this.receiver.build();
+    }
+
+    @Override
+    public String generate() {
         StringJoiner joiner = new StringJoiner(" ");
-        joiner.add(receiver.build());
+        joiner.add(receiver.generate());
         joiner.add(IrKeywords.ASSIGN);
         joiner.add(IrKeywords.LOAD);
-        joiner.add(receiver.getType().build());
+        joiner.add(receiver.getType().generate());
         joiner.add(IrKeywords.SEPARATOR);
-        joiner.add(Type.ADDR.build());
-        joiner.add(addr.build());
+        joiner.add(Type.ADDR.generate());
+        joiner.add(addr.generate());
         return joiner.toString();
     }
 }

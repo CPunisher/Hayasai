@@ -25,7 +25,12 @@ public class OperandExpression extends Expression {
     }
 
     @Override
-    public String build() {
-        return this.operand.getType().build() + " " + this.operand.build();
+    public void build() {
+        this.operand.build();
+    }
+
+    @Override
+    public String generate() {
+        return this.operand.getType().generate() + " " + this.operand.generate();
     }
 }

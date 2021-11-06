@@ -14,11 +14,11 @@ public class BrStatement extends Statement {
     }
 
     @Override
-    public String build() {
+    public String generate() {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add(IrKeywords.BR);
         joiner.add(IrKeywords.LABEL);
-        joiner.add(label1.build());
+        joiner.add(label1.generate());
         return joiner.toString();
     }
 }

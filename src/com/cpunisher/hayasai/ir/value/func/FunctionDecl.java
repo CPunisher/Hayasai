@@ -17,15 +17,15 @@ public final class FunctionDecl extends Function {
     }
 
     @Override
-    public String build() {
+    public String generate() {
         StringBuilder builder = new StringBuilder();
         builder.append(IrKeywords.DECLARE).append(" ");
-        builder.append(this.funcType.build()).append(" ");
+        builder.append(this.funcType.generate()).append(" ");
         builder.append(IrKeywords.FUNC_IDENT);
-        builder.append(this.ident.build());
+        builder.append(this.ident.generate());
         builder.append(this.param.getParams().stream()
                 .map(FunctionParams.FunctionParamDeclare::getArgType)
-                .map(Type::build)
+                .map(Type::generate)
                 .collect(Collectors.joining(IrKeywords.SEPARATOR + " ", IrKeywords.LBRACKET, IrKeywords.RBRACKET)));
         return builder.toString();
     }

@@ -12,7 +12,7 @@ public final class ArrayType extends Type {
     }
 
     @Override
-    public String build() {
-        return "[" + this.size + " x " + elementType.build() + "]";
+    public String generate() {
+        return "[" + this.size + " x " + elementType.generate() + "]";
     }
 }

@@ -19,14 +19,19 @@ public class ZextStatement extends Statement {
     }
 
     @Override
-    public String build() {
+    public void build() {
+        this.receiver.build();
+    }
+
+    @Override
+    public String generate() {
         StringJoiner joiner = new StringJoiner(" ");
-        joiner.add(receiver.build());
+        joiner.add(receiver.generate());
         joiner.add(IrKeywords.ASSIGN);
         joiner.add(IrKeywords.ZEXT);
-        joiner.add(origin.build());
+        joiner.add(origin.generate());
         joiner.add(IrKeywords.TO);
-        joiner.add(newType.build());
+        joiner.add(newType.generate());
         return joiner.toString();
     }
 }

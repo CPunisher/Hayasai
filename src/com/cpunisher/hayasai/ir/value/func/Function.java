@@ -16,6 +16,11 @@ public class Function extends Value {
     }
 
     @Override
+    public void build() {
+        this.param.build();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -41,7 +46,7 @@ public class Function extends Value {
     }
 
     @Override
-    public String build() {
+    public String generate() {
         return null;
     }
 }

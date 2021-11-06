@@ -11,7 +11,7 @@ public final class VoidExpression extends OperandExpression {
     }
 
     @Override
-    public String build() {
+    public String generate() {
         throw new SyntaxException("Operand expression is void.");
     }
 }

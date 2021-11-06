@@ -5,6 +5,7 @@ import com.cpunisher.hayasai.frontend.MiniSysYParser;
 import com.cpunisher.hayasai.frontend.Visitor;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.value.Ident;
+import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.util.IOUtils;
@@ -37,11 +38,13 @@ public class Main {
         SymbolTable symbolTable = SymbolTable.INSTANCE;
         Map<Ident, FunctionDecl> functionDeclMap = symbolTable.getFuncDeclTable();
         Map<Ident, FunctionDef> functionDefMap = symbolTable.getFuncDefTable();
+        functionDeclMap.values().forEach(Value::build);
+        functionDefMap.values().forEach(Value::build);
         System.out.println(functionDeclMap.values().stream()
-                .map(FunctionDecl::build)
+                .map(FunctionDecl::generate)
                 .collect(Collectors.joining(IrKeywords.LINE_SEPARATOR)));
         System.out.println(functionDefMap.values().stream()
-                .map(FunctionDef::build)
+                .map(FunctionDef::generate)
                 .collect(Collectors.joining(IrKeywords.LINE_SEPARATOR)));
     }
 }

@@ -25,7 +25,7 @@ public class Type extends Value {
         throw new SyntaxException("Unknown type.");
     }
 
-    public String build() {
+    public String generate() {
         return this.name;
     }
 }

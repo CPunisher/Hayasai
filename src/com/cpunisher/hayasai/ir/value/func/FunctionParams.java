@@ -33,9 +33,14 @@ public final class FunctionParams extends Value {
     }
 
     @Override
-    public String build() {
+    public void build() {
+        this.params.forEach(Value::build);
+    }
+
+    @Override
+    public String generate() {
         StringJoiner joiner = new StringJoiner(IrKeywords.SEPARATOR + " ", IrKeywords.LBRACKET, IrKeywords.RBRACKET);
-        params.stream().map(FunctionParamDeclare::build).forEach(joiner::add);
+        params.stream().map(FunctionParamDeclare::generate).forEach(joiner::add);
         return joiner.toString();
     }
 
@@ -65,8 +70,8 @@ public final class FunctionParams extends Value {
         }
 
         @Override
-        public String build() {
-            return this.argType.build();
+        public String generate() {
+            return this.argType.generate();
         }
 
         public Type getArgType() {
@@ -96,9 +101,14 @@ public final class FunctionParams extends Value {
         }
 
         @Override
-        public String build() {
+        public void build() {
+            this.expression.build();
+        }
+
+        @Override
+        public String generate() {
             StringBuilder builder = new StringBuilder();
-            builder.append(this.expression.build());
+            builder.append(this.expression.generate());
             return builder.toString();
         }
     }

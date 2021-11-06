@@ -20,15 +20,22 @@ public class CallStatement extends Statement {
     }
 
     @Override
-    public String build() {
+    public void build() {
+        if (receiver != null) {
+            this.receiver.build();
+        }
+    }
+
+    @Override
+    public String generate() {
         StringJoiner joiner = new StringJoiner(" ");
         if (receiver != null) {
-            joiner.add(this.receiver.build());
+            joiner.add(this.receiver.generate());
             joiner.add(IrKeywords.ASSIGN);
         }
         joiner.add(IrKeywords.CALL);
-        joiner.add(this.function.getFuncType().build());
-        joiner.add(IrKeywords.FUNC_IDENT + this.function.getIdent().build() + this.function.getParam().build());
+        joiner.add(this.function.getFuncType().generate());
+        joiner.add(IrKeywords.FUNC_IDENT + this.function.getIdent().generate() + this.function.getParam().generate());
         return joiner.toString();
     }
 }

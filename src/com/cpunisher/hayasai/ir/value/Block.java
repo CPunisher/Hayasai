@@ -4,8 +4,7 @@ import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.util.DefaultAllocator;
 import com.cpunisher.hayasai.ir.util.IRegisterAllocator;
 import com.cpunisher.hayasai.ir.value.operand.Register;
-import com.cpunisher.hayasai.ir.value.stmt.AllocaStatement;
-import com.cpunisher.hayasai.ir.value.stmt.Statement;
+import com.cpunisher.hayasai.ir.value.stmt.*;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 import org.antlr.v4.runtime.misc.Pair;
@@ -21,6 +20,8 @@ public final class Block extends Value implements IRegisterAllocator {
     private final IRegisterAllocator allocator;
     private final Map<Ident, Register> varTable;
     private final Map<Ident, Register> constTable;
+
+    private Block next;
 
     public Block(String name, Block parent) {
         super(name);
@@ -57,27 +58,38 @@ public final class Block extends Value implements IRegisterAllocator {
     }
 
     @Override
-    public String build() {
-        String blockHeader = "";
-        Ident ident = this.register.getIdent();
-        if (this.hasParent()) {
-            blockHeader += ident.build();
-            blockHeader += IrKeywords.COLON;
-            blockHeader += IrKeywords.LINE_SEPARATOR;
-        }
-        StringJoiner joiner = new StringJoiner(IrKeywords.LINE_SEPARATOR);
+    public void build() {
         this.constTable.values().stream()
                 .map(v -> new AllocaStatement(v, v.getType()))
                 .forEach(stmt -> this.subList.add(0, stmt));
         this.varTable.values().stream()
                 .map(v -> new AllocaStatement(v, v.getType()))
                 .forEach(stmt -> this.subList.add(0, stmt));
+        this.register.build();
+        this.subList.forEach(Value::build);
+        this.subBlockList.forEach(Value::build);
+    }
+
+    @Override
+    public String generate() {
+        String blockHeader = "";
+        Ident ident = this.register.getIdent();
+        if (this.hasParent()) {
+            blockHeader += ident.generate();
+            blockHeader += IrKeywords.COLON;
+            blockHeader += IrKeywords.LINE_SEPARATOR;
+        }
+        StringJoiner joiner = new StringJoiner(IrKeywords.LINE_SEPARATOR);
         for (Statement stmt : this.subList) {
-            joiner.add(IrKeywords.TAB_IDENT + stmt.build());
+            joiner.add(IrKeywords.TAB_IDENT + stmt.generate());
+            // TODO 聚合
+            if (stmt instanceof RetStatement || stmt instanceof BrCondStatement || stmt instanceof BrStatement) {
+//                break;
+            }
         }
 
         for (Block block : this.subBlockList) {
-            joiner.add(block.build());
+            joiner.add(block.generate());
         }
         return blockHeader + joiner;
     }
@@ -150,6 +162,18 @@ public final class Block extends Value implements IRegisterAllocator {
         return this.allocator.alloc(type);
     }
 
+    public boolean hasNext() {
+        return this.next != null;
+    }
+
+    public void setNext(Block next) {
+        this.next = next;
+    }
+
+    public Block getNext() {
+        return next;
+    }
+
     @Override
     public Ident genIdent() {
         return this.allocator.genIdent();
@@ -163,7 +187,11 @@ public final class Block extends Value implements IRegisterAllocator {
         return !this.hasParent();
     }
 
-    public Register getRegister() {
+    public boolean isEmpty() {
+        return this.subList.isEmpty() && this.subBlockList.isEmpty();
+    }
+
+    public Register getBlockRegister() {
         return register;
     }
 }
