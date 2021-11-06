@@ -64,9 +64,9 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitIfStmt(MiniSysYParser.IfStmtContext ctx) {
         OperandExpression condExp = (OperandExpression) visitCond(ctx.cond());
-        if (condExp.getOperand().getType() != Type.BIT) {
+        if (condExp.getOperand().getType() == Type.INT) {
             Register cur = this.blockManager.current().alloc(Type.BIT);
-            this.blockManager.addToCurrent(new IcmpStatement(cur, condExp.getOperand(), Literal.BIT_ZERO, IcmpStatement.CompareType.NE));
+            this.blockManager.addToCurrent(new IcmpStatement(cur, condExp.getOperand(), Literal.INT_ZERO, IcmpStatement.CompareType.NE));
             condExp = new OperandExpression(cur);
         }
 
@@ -222,8 +222,9 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                     last = cur;
                 } else if (validUnaryOpList.get(i).NOT() != null) {
                     cur = this.blockManager.current().alloc(Type.BIT);
-                    Operand operand = last != null ? last : expression.getOperand();
-                    this.blockManager.addToCurrent(new IcmpStatement(cur, operand, Literal.BIT_ZERO, IcmpStatement.CompareType.EQ));
+                    Operand operand1 = last != null ? last : expression.getOperand();
+                    Operand operand2 = operand1.getType() == Type.BIT ? Literal.BIT_ZERO : Literal.INT_ZERO;
+                    this.blockManager.addToCurrent(new IcmpStatement(cur, operand1, operand2, IcmpStatement.CompareType.EQ));
                     last = cur;
                 }
             }
