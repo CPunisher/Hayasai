@@ -82,6 +82,9 @@ public final class Block extends Value implements IRegisterAllocator {
         StringJoiner joiner = new StringJoiner(IrKeywords.LINE_SEPARATOR);
         for (Statement stmt : this.subList) {
             joiner.add(IrKeywords.TAB_IDENT + stmt.generate());
+            if (stmt instanceof RetStatement || stmt instanceof BrCondStatement || stmt instanceof BrStatement) {
+                break;
+            }
         }
 
         for (Block block : this.subBlockList) {
