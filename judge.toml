@@ -27,5 +27,5 @@ run = [
 image = { source = "dockerfile", path = "." }
 
 run = [
-    "java -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
+    "java -ea -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
 ]

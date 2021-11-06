@@ -31,11 +31,13 @@ public final class Register extends Operand {
     }
 
     public Ident getIdent() {
+        assert this.ident != null;
         return ident;
     }
 
     @Override
     public String generate() {
+        assert this.ident != null;
         return IrKeywords.REG_IDENT + this.ident.generate();
     }
 }

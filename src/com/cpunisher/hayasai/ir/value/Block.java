@@ -59,13 +59,13 @@ public final class Block extends Value implements IRegisterAllocator {
 
     @Override
     public void build() {
+        this.register.build();
         for (Register constRegister : this.constTable.values()) {
             this.subList.add(0, new AllocaStatement(constRegister, constRegister.getType()));
         }
-        for (Register constRegister : this.varTable.values()) {
-            this.subList.add(0, new AllocaStatement(constRegister, constRegister.getType()));
+        for (Register varRegister : this.varTable.values()) {
+            this.subList.add(0, new AllocaStatement(varRegister, varRegister.getType()));
         }
-        this.register.build();
         this.subList.forEach(Value::build);
         this.subBlockList.forEach(Value::build);
     }
