@@ -58,7 +58,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         for (MiniSysYParser.BlockItemContext blockItemContext : ctx.blockItem()) {
             this.blockManager.addToCurrent(visitBlockItem(blockItemContext));
         }
-        return this.blockManager.current();
+        return null;
     }
 
     @Override

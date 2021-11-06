@@ -59,12 +59,12 @@ public final class Block extends Value implements IRegisterAllocator {
 
     @Override
     public void build() {
-        this.constTable.values().stream()
-                .map(v -> new AllocaStatement(v, v.getType()))
-                .forEach(stmt -> this.subList.add(0, stmt));
-        this.varTable.values().stream()
-                .map(v -> new AllocaStatement(v, v.getType()))
-                .forEach(stmt -> this.subList.add(0, stmt));
+        for (Register constRegister : this.constTable.values()) {
+            this.subList.add(0, new AllocaStatement(constRegister, constRegister.getType()));
+        }
+        for (Register constRegister : this.varTable.values()) {
+            this.subList.add(0, new AllocaStatement(constRegister, constRegister.getType()));
+        }
         this.register.build();
         this.subList.forEach(Value::build);
         this.subBlockList.forEach(Value::build);
@@ -82,10 +82,6 @@ public final class Block extends Value implements IRegisterAllocator {
         StringJoiner joiner = new StringJoiner(IrKeywords.LINE_SEPARATOR);
         for (Statement stmt : this.subList) {
             joiner.add(IrKeywords.TAB_IDENT + stmt.generate());
-            // TODO 聚合
-            if (stmt instanceof RetStatement || stmt instanceof BrCondStatement || stmt instanceof BrStatement) {
-//                break;
-            }
         }
 
         for (Block block : this.subBlockList) {
