@@ -9,11 +9,11 @@ TEST_TARGET := MiniSysYTester
 
 .PHONY: test build clean
 
-test: build
-	javac -cp ".:$(LIB_DIR)/*:$(SRC_DIR)" -d $(OUT_DIR) "$(TEST_DIR)/$(TEST_TARGET).java"
-	java -classpath ".:$(LIB_DIR)/*:$(OUT_DIR)" $(TEST_TARGET)
+#test: build
+#	java -classpath ".:$(LIB_DIR)/*:$(OUT_DIR)" $(TEST_TARGET)
 
 build:
+	javac -cp ".:$(LIB_DIR)/*:$(SRC_DIR)" -d $(OUT_DIR) "$(TEST_DIR)/$(TEST_TARGET).java"
 	javac -cp ".:$(LIB_DIR)/*:$(SRC_DIR)" -d $(OUT_DIR) "$(SRC_DIR)/$(PACKAGE)/$(TARGET).java"
 
 generate:
