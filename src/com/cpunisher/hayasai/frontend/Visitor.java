@@ -43,7 +43,8 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         Type type = (Type) visitFuncType(ctx.funcType());
         Ident ident = Ident.valueOf(ctx.IDENT().getText());
         FunctionParams params = new FunctionParams();
-        Block block = this.blockManager.createAndSet("main");
+        Block block = this.blockManager.create("main", false);
+        this.blockManager.setCurrent(block);
         this.blockManager.setRoot(block);
         visitBlock(ctx.block());
         this.blockManager.setCurrent(null);
@@ -76,7 +77,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         if (hasElse) blockElse = this.blockManager.create("blockElse", false);
         else blockElse = blockAfter;
 
-        this.condCtx.setEnable(true);
+        this.condCtx.setParent(lastBlock);
         this.condCtx.setBlockTrue(blockTrue);
         this.condCtx.setBlockFalse(blockElse);
         OperandExpression condEntryExp = (OperandExpression) visitCond(ctx.cond());
@@ -344,7 +345,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         int size = ctx.eqExp().size();
         Block[] blocks = new Block[size + 1];
         for (int i = 0; i < size; i++) {
-            blocks[i] = this.blockManager.create("", false);
+            blocks[i] = this.blockManager.create("", false, this.condCtx.getParent());
         }
         blocks[size] = this.condCtx.getBlockTrue();
         for (int i = 0; i < ctx.eqExp().size(); i++) {

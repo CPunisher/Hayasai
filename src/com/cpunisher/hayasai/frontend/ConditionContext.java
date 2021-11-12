@@ -4,16 +4,16 @@ import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 
 public class ConditionContext {
-    private boolean enable;
+    private Block parent;
     private Block blockTrue, blockFalse;
     private OperandExpression nextOr;
 
-    public boolean isEnable() {
-        return enable;
+    public Block getParent() {
+        return parent;
     }
 
-    public void setEnable(boolean enable) {
-        this.enable = enable;
+    public void setParent(Block parent) {
+        this.parent = parent;
     }
 
     public Block getBlockTrue() {

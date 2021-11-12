@@ -17,6 +17,7 @@ public final class Block extends Value implements IRegisterAllocator {
     private final Register register;
     private final List<Statement> subList;
     private final List<Block> subBlockList;
+    private final List<Block> successorList;
     private final IRegisterAllocator allocator;
     private final Map<Ident, Register> varTable;
     private final Map<Ident, Register> constTable;
@@ -27,6 +28,7 @@ public final class Block extends Value implements IRegisterAllocator {
         super(name);
         this.subList = new LinkedList<>();
         this.subBlockList = new LinkedList<>();
+        this.successorList = new LinkedList<>();
         this.varTable = new HashMap<>();
         this.constTable = new HashMap<>();
 
@@ -39,6 +41,7 @@ public final class Block extends Value implements IRegisterAllocator {
         super(name);
         this.subList = new LinkedList<>();
         this.subBlockList = new LinkedList<>();
+        this.successorList = new LinkedList<>();
         this.varTable = new HashMap<>();
         this.constTable = new HashMap<>();
 
@@ -55,6 +58,10 @@ public final class Block extends Value implements IRegisterAllocator {
                 this.subList.add((Statement) sub);
             }
         }
+    }
+
+    public void addSuccessor(Block successor) {
+        this.successorList.add(successor);
     }
 
     @Override
@@ -172,14 +179,6 @@ public final class Block extends Value implements IRegisterAllocator {
 
     public boolean hasParent() {
         return this.parent != null;
-    }
-
-    public boolean isRoot() {
-        return !this.hasParent();
-    }
-
-    public boolean isEmpty() {
-        return this.subList.isEmpty() && this.subBlockList.isEmpty();
     }
 
     public Register getBlockRegister() {
