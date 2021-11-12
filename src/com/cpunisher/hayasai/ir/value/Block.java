@@ -24,8 +24,7 @@ public final class Block extends Value implements IRegisterAllocator {
 
     private Block next;
 
-    public Block(String name, Block parent) {
-        super(name);
+    public Block(Block parent) {
         this.subList = new LinkedList<>();
         this.subBlockList = new LinkedList<>();
         this.successorList = new LinkedList<>();
@@ -37,8 +36,7 @@ public final class Block extends Value implements IRegisterAllocator {
         this.register = this.alloc();
     }
 
-    public Block(String name) {
-        super(name);
+    public Block() {
         this.subList = new LinkedList<>();
         this.subBlockList = new LinkedList<>();
         this.successorList = new LinkedList<>();

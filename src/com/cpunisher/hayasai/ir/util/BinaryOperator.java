@@ -16,7 +16,6 @@ public final class BinaryOperator extends Value {
     private final String instruction;
 
     private BinaryOperator(String instruction) {
-        super("operator_" + instruction);
         this.instruction = instruction;
     }
 

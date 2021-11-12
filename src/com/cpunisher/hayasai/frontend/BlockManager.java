@@ -12,13 +12,12 @@ public final class BlockManager {
     private Block root;
     private Block current;
 
-    public Block create(String name, boolean isNext, Block parent) {
+    public Block create(boolean isNext, Block parent) {
         Block block;
         if (parent == null) {
-            block = new Block(name);
+            block = new Block();
         } else {
-            block = new Block(name, parent);
-            parent.addSuccessor(block);
+            block = new Block(parent);
         }
 
         if (root != null) {
@@ -34,8 +33,8 @@ public final class BlockManager {
         return block;
     }
 
-    public Block create(String name, boolean isNext) {
-        return this.create(name, isNext, this.current);
+    public Block create(boolean isNext) {
+        return this.create(isNext, this.current);
     }
 
     public void addToCurrent(Value sub) {

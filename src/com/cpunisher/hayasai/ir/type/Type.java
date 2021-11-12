@@ -12,8 +12,7 @@ public class Type extends Value {
 
     private final String name;
 
-    private Type(String name) {
-        super("value_" + name);
+    protected Type(String name) {
         this.name = name;
     }
 
