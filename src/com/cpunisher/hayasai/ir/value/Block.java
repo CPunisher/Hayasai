@@ -150,8 +150,20 @@ public final class Block extends Value implements IRegisterAllocator {
         throw new RuntimeException("Can't find sub block.");
     }
 
+    public List<Statement> getSubList() {
+        return Collections.unmodifiableList(this.subList);
+    }
+
+    public List<Block> getSubBlockList() {
+        return Collections.unmodifiableList(this.subBlockList);
+    }
+
     public boolean identExists(Ident ident) {
         return varTable.containsKey(ident) || constTable.containsKey(ident);
+    }
+
+    public Ident genIdent() {
+        return this.allocator.genIdent();
     }
 
     @Override
@@ -174,11 +186,6 @@ public final class Block extends Value implements IRegisterAllocator {
 
     public Block getNext() {
         return next;
-    }
-
-    @Override
-    public Ident genIdent() {
-        return this.allocator.genIdent();
     }
 
     public boolean hasParent() {

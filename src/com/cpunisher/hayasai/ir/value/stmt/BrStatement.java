@@ -1,8 +1,10 @@
 package com.cpunisher.hayasai.ir.value.stmt;
 
 import com.cpunisher.hayasai.ir.value.Block;
+import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.List;
 import java.util.StringJoiner;
 
 public class BrStatement extends Statement {
@@ -21,5 +23,10 @@ public class BrStatement extends Statement {
         joiner.add(IrKeywords.LABEL);
         joiner.add(this.block.getBlockRegister().generate());
         return joiner.toString();
+    }
+
+    @Override
+    public List<Operand> getOperands() {
+        return List.of(this.block.getBlockRegister());
     }
 }

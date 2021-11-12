@@ -17,11 +17,6 @@ public class Literal extends Operand {
     }
 
     @Override
-    public int getIntValue() {
-        return this.value;
-    }
-
-    @Override
     public String generate() {
         return String.valueOf(this.value);
     }

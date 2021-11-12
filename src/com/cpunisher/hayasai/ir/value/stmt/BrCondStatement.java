@@ -3,8 +3,10 @@ package com.cpunisher.hayasai.ir.value.stmt;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
+import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.List;
 import java.util.StringJoiner;
 
 public class BrCondStatement extends Statement {
@@ -34,5 +36,10 @@ public class BrCondStatement extends Statement {
         joiner.add(IrKeywords.LABEL);
         joiner.add(this.block2.getBlockRegister().generate());
         return joiner.toString();
+    }
+
+    @Override
+    public List<Operand> getOperands() {
+        return List.of(block1.getBlockRegister(), block2.getBlockRegister());
     }
 }

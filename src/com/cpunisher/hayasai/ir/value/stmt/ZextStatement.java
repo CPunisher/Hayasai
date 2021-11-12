@@ -5,6 +5,7 @@ import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.List;
 import java.util.StringJoiner;
 
 public class ZextStatement extends Statement {
@@ -33,5 +34,10 @@ public class ZextStatement extends Statement {
         joiner.add(IrKeywords.TO);
         joiner.add(newType.generate());
         return joiner.toString();
+    }
+
+    @Override
+    public List<Operand> getOperands() {
+        return List.of(this.origin.getOperand());
     }
 }

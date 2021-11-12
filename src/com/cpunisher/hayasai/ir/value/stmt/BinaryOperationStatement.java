@@ -4,6 +4,7 @@ import com.cpunisher.hayasai.ir.util.BinaryOperator;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.List;
 import java.util.StringJoiner;
 
 public class BinaryOperationStatement extends Statement {
@@ -40,5 +41,10 @@ public class BinaryOperationStatement extends Statement {
         joiner.add(IrKeywords.SEPARATOR);
         joiner.add(this.operand2.generate());
         return joiner.toString();
+    }
+
+    @Override
+    public List<Operand> getOperands() {
+        return List.of(operand1, operand2);
     }
 }

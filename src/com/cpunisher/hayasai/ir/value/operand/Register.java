@@ -19,11 +19,6 @@ public final class Register extends Operand {
     }
 
     @Override
-    public int getIntValue() {
-        return 0;
-    }
-
-    @Override
     public void build() {
         if (this.ident == null) {
             this.ident = allocator.genIdent();

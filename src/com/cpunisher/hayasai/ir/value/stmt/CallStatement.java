@@ -4,6 +4,7 @@ import com.cpunisher.hayasai.ir.value.func.Function;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.List;
 import java.util.StringJoiner;
 
 public class CallStatement extends Statement {
@@ -37,5 +38,10 @@ public class CallStatement extends Statement {
         joiner.add(this.function.getFuncType().generate());
         joiner.add(IrKeywords.FUNC_IDENT + this.function.getIdent().generate() + this.function.getParam().generate());
         return joiner.toString();
+    }
+
+    @Override
+    public List<Operand> getOperands() {
+        return List.of();
     }
 }

@@ -6,6 +6,7 @@ import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 
+import java.util.List;
 import java.util.StringJoiner;
 
 public class IcmpStatement extends Statement {
@@ -41,6 +42,11 @@ public class IcmpStatement extends Statement {
         joiner.add(IrKeywords.SEPARATOR);
         joiner.add(this.operand2.generate());
         return joiner.toString();
+    }
+
+    @Override
+    public List<Operand> getOperands() {
+        return List.of(this.operand1, this.operand2);
     }
 
     public static final class CompareType extends Value {

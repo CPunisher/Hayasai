@@ -5,6 +5,7 @@ import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.List;
 import java.util.StringJoiner;
 
 public class StoreStatement extends Statement {
@@ -25,5 +26,10 @@ public class StoreStatement extends Statement {
         joiner.add(Type.ADDR.generate());
         joiner.add(addr.generate());
         return joiner.toString();
+    }
+
+    @Override
+    public List<Operand> getOperands() {
+        return List.of(this.source.getOperand());
     }
 }

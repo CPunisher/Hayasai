@@ -2,8 +2,10 @@ package com.cpunisher.hayasai.ir.value.stmt;
 
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
+import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.List;
 import java.util.StringJoiner;
 
 public class AllocaStatement extends Statement {
@@ -28,5 +30,10 @@ public class AllocaStatement extends Statement {
         joiner.add(IrKeywords.ALLOCA);
         joiner.add(type.generate());
         return joiner.toString();
+    }
+
+    @Override
+    public List<Operand> getOperands() {
+        return List.of();
     }
 }

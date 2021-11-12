@@ -4,6 +4,8 @@ import com.cpunisher.hayasai.frontend.antlr.MiniSysYLexer;
 import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.frontend.Visitor;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
+import com.cpunisher.hayasai.ir.pass.IPass;
+import com.cpunisher.hayasai.ir.pass.UseGenerator;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
@@ -14,10 +16,15 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class Main {
+    private static final List<IPass> PASS_LIST = List.of(
+        new UseGenerator()
+    );
+
     public static void main(String[] args) throws IOException {
         String input = IOUtils.readFromStream(System.in);
         CharStream charStream = CharStreams.fromString(input);
@@ -40,6 +47,9 @@ public class Main {
         Map<Ident, FunctionDef> functionDefMap = symbolTable.getFuncDefTable();
         functionDeclMap.values().forEach(Value::build);
         functionDefMap.values().forEach(Value::build);
+
+        PASS_LIST.forEach(pass -> pass.pass(symbolTable));
+
         System.out.println(functionDeclMap.values().stream()
                 .map(FunctionDecl::generate)
                 .collect(Collectors.joining(IrKeywords.LINE_SEPARATOR)));
