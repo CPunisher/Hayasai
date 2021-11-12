@@ -6,7 +6,7 @@ import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 public class ConditionContext {
     private Block parent;
     private Block blockTrue, blockFalse;
-    private OperandExpression nextOr;
+    private Block nextOr;
 
     public Block getParent() {
         return parent;
@@ -32,11 +32,11 @@ public class ConditionContext {
         this.blockFalse = blockFalse;
     }
 
-    public OperandExpression getNextOr() {
+    public Block getNextOr() {
         return nextOr;
     }
 
-    public void setNextOr(OperandExpression nextOr) {
+    public void setNextOr(Block nextOr) {
         this.nextOr = nextOr;
     }
 }

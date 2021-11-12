@@ -1,23 +1,23 @@
 package com.cpunisher.hayasai.ir.value.stmt;
 
 import com.cpunisher.hayasai.ir.type.Type;
+import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
-import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.StringJoiner;
 
 public class BrCondStatement extends Statement {
     private final OperandExpression cond;
-    private final Operand label1;
-    private final Operand label2;
+    private final Block block1;
+    private final Block block2;
 
-    public BrCondStatement(OperandExpression cond, Operand label1, Operand label2) {
+    public BrCondStatement(OperandExpression cond, Block block1, Block block2) {
         assert cond.getOperand().getType() == Type.BIT;
 
         this.cond = cond;
-        this.label1 = label1;
-        this.label2 = label2;
+        this.block1 = block1;
+        this.block2 = block2;
     }
 
     @Override
@@ -27,10 +27,10 @@ public class BrCondStatement extends Statement {
         joiner.add(cond.generate());
         joiner.add(IrKeywords.SEPARATOR);
         joiner.add(IrKeywords.LABEL);
-        joiner.add(label1.generate());
+        joiner.add(this.block1.getBlockRegister().generate());
         joiner.add(IrKeywords.SEPARATOR);
         joiner.add(IrKeywords.LABEL);
-        joiner.add(label2.generate());
+        joiner.add(this.block2.getBlockRegister().generate());
         return joiner.toString();
     }
 }

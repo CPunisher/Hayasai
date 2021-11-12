@@ -1,16 +1,16 @@
 package com.cpunisher.hayasai.ir.value.stmt;
 
-import com.cpunisher.hayasai.ir.value.operand.Operand;
+import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.StringJoiner;
 
 public class BrStatement extends Statement {
 
-    private final Operand label1;
+    private final Block block;
 
-    public BrStatement(Operand label1) {
-        this.label1 = label1;
+    public BrStatement(Block block) {
+        this.block = block;
     }
 
     @Override
@@ -18,7 +18,7 @@ public class BrStatement extends Statement {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add(IrKeywords.BR);
         joiner.add(IrKeywords.LABEL);
-        joiner.add(label1.generate());
+        joiner.add(this.block.getBlockRegister().generate());
         return joiner.toString();
     }
 }

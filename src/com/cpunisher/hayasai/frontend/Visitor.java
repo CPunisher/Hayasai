@@ -106,7 +106,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             }
         }
 //        lastBlock.addSub(new BrCondStatement(condExp, blockTrue.getBlockRegister(), blockElse.getBlockRegister()));
-        lastBlock.addSub(new BrStatement(condEntryExp.getOperand()));
+        lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp)));
         this.blockManager.setCurrent(blockAfter);
         return null;
     }
@@ -351,7 +351,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         for (int i = 0; i < ctx.eqExp().size(); i++) {
             this.blockManager.setCurrent(blocks[i]);
             OperandExpression expression = (OperandExpression) visitEqExp(ctx.eqExp(i));
-            this.blockManager.addToCurrent(new BrCondStatement(expression, blocks[i + 1].getBlockRegister(), this.condCtx.getNextOr().getOperand()));
+            this.blockManager.addToCurrent(new BrCondStatement(expression, blocks[i + 1], this.condCtx.getNextOr()));
         }
         return new OperandExpression(blocks[0].getBlockRegister());
     }
@@ -359,10 +359,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitLOrExp(MiniSysYParser.LOrExpContext ctx) {
         int size = ctx.lAndExp().size();
-        this.condCtx.setNextOr(new OperandExpression(this.condCtx.getBlockFalse().getBlockRegister()));
+        this.condCtx.setNextOr(this.condCtx.getBlockFalse());
         OperandExpression lastExp = (OperandExpression) visitLAndExp(ctx.lAndExp(size - 1));
         for (int i = size - 2; i >= 0; i--) {
-            this.condCtx.setNextOr(lastExp);
+            this.condCtx.setNextOr(this.blockManager.getBlockByExp(lastExp));
             lastExp = (OperandExpression) visitLAndExp(ctx.lAndExp(i));
         }
         return lastExp;

@@ -2,6 +2,8 @@ package com.cpunisher.hayasai.frontend;
 
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.Value;
+import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
+import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.BrStatement;
 
 import java.util.Deque;
@@ -45,9 +47,14 @@ public final class BlockManager {
         this.root = block;
     }
 
+    public Block getBlockByExp(OperandExpression expression) {
+        assert expression.getOperand() instanceof Register;
+        return this.root.getSubBlock((Register) expression.getOperand());
+    }
+
     public void setCurrent(Block block) {
         if (this.current != null && this.current.hasNext()) {
-            this.current.addSub(new BrStatement(this.current.getNext().getBlockRegister()));
+            this.current.addSub(new BrStatement(this.current.getNext()));
         }
         this.current = block;
         if (!this.nextBlocks.isEmpty() && this.current == this.nextBlocks.getLast()) {

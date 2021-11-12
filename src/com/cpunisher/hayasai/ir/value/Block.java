@@ -144,6 +144,15 @@ public final class Block extends Value implements IRegisterAllocator {
         return register;
     }
 
+    public Block getSubBlock(Register register) {
+        for (Block block : this.subBlockList) {
+            if (block.getBlockRegister() == register) {
+                return block;
+            }
+        }
+        throw new RuntimeException("Can't find sub block.");
+    }
+
     public boolean identExists(Ident ident) {
         return varTable.containsKey(ident) || constTable.containsKey(ident);
     }
