@@ -5,6 +5,7 @@ import com.cpunisher.hayasai.ir.util.DefaultAllocator;
 import com.cpunisher.hayasai.ir.util.IRegisterAllocator;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.*;
+import com.cpunisher.hayasai.util.BlockCfg;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 import org.antlr.v4.runtime.misc.Pair;
@@ -17,17 +18,17 @@ public final class Block extends Value implements IRegisterAllocator {
     private final Register register;
     private final List<Statement> subList;
     private final List<Block> subBlockList;
-    private final List<Block> successorList;
     private final IRegisterAllocator allocator;
     private final Map<Ident, Register> varTable;
     private final Map<Ident, Register> constTable;
 
+    private final BlockCfg blockCfg;
     private Block next;
 
     public Block(Block parent) {
         this.subList = new LinkedList<>();
         this.subBlockList = new LinkedList<>();
-        this.successorList = new LinkedList<>();
+        this.blockCfg = new BlockCfg(this);
         this.varTable = new HashMap<>();
         this.constTable = new HashMap<>();
 
@@ -39,7 +40,7 @@ public final class Block extends Value implements IRegisterAllocator {
     public Block() {
         this.subList = new LinkedList<>();
         this.subBlockList = new LinkedList<>();
-        this.successorList = new LinkedList<>();
+        this.blockCfg = new BlockCfg(this);
         this.varTable = new HashMap<>();
         this.constTable = new HashMap<>();
 
@@ -56,10 +57,6 @@ public final class Block extends Value implements IRegisterAllocator {
                 this.subList.add((Statement) sub);
             }
         }
-    }
-
-    public void addSuccessor(Block successor) {
-        this.successorList.add(successor);
     }
 
     @Override
@@ -190,5 +187,9 @@ public final class Block extends Value implements IRegisterAllocator {
 
     public Register getBlockRegister() {
         return register;
+    }
+
+    public BlockCfg getBlockCfg() {
+        return blockCfg;
     }
 }

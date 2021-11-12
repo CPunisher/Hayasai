@@ -12,9 +12,11 @@ public class BrCondStatement extends Statement {
     private final Block block1;
     private final Block block2;
 
-    public BrCondStatement(OperandExpression cond, Block block1, Block block2) {
+    public BrCondStatement(OperandExpression cond, Block block1, Block block2, Block cur) {
         assert cond.getOperand().getType() == Type.BIT;
 
+        cur.getBlockCfg().addSuccessor(block1);
+        cur.getBlockCfg().addSuccessor(block2);
         this.cond = cond;
         this.block1 = block1;
         this.block2 = block2;

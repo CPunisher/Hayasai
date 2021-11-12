@@ -54,7 +54,7 @@ public final class BlockManager {
 
     public void setCurrent(Block block) {
         if (this.current != null && this.current.hasNext()) {
-            this.current.addSub(new BrStatement(this.current.getNext()));
+            this.current.addSub(new BrStatement(this.current.getNext(), this.current));
         }
         this.current = block;
         if (!this.nextBlocks.isEmpty() && this.current == this.nextBlocks.getLast()) {

@@ -106,7 +106,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             }
         }
 //        lastBlock.addSub(new BrCondStatement(condExp, blockTrue.getBlockRegister(), blockElse.getBlockRegister()));
-        lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp)));
+        lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), this.blockManager.current()));
         this.blockManager.setCurrent(blockAfter);
         return null;
     }
@@ -351,7 +351,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         for (int i = 0; i < ctx.eqExp().size(); i++) {
             this.blockManager.setCurrent(blocks[i]);
             OperandExpression expression = (OperandExpression) visitEqExp(ctx.eqExp(i));
-            this.blockManager.addToCurrent(new BrCondStatement(expression, blocks[i + 1], this.condCtx.getNextOr()));
+            this.blockManager.addToCurrent(new BrCondStatement(expression, blocks[i + 1], this.condCtx.getNextOr(), this.blockManager.current()));
         }
         return new OperandExpression(blocks[0].getBlockRegister());
     }
