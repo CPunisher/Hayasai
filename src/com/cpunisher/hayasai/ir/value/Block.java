@@ -101,7 +101,7 @@ public final class Block extends Value implements IRegisterAllocator {
         if (register == null) {
             register = this.getVar(ident);
             if (register == null)
-                throw new SyntaxException("Ident [" + ident  + "] is not declared.");
+                throw new SyntaxException("Ident [" + ident.getIdent()  + "] is not declared.");
             immutable = false;
         }
         return new Pair<>(register, immutable);
