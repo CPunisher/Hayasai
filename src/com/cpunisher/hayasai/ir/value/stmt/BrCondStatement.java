@@ -17,11 +17,14 @@ public class BrCondStatement extends Statement {
     public BrCondStatement(OperandExpression cond, Block block1, Block block2, Block cur) {
         assert cond.getOperand().getType() == Type.BIT;
 
-        cur.getBlockCfg().addSuccessor(block1);
-        cur.getBlockCfg().addSuccessor(block2);
         this.cond = cond;
         this.block1 = block1;
         this.block2 = block2;
+
+        cur.getBlockCfg().getSuccessorList().add(block1.getBlockCfg());
+        cur.getBlockCfg().getSuccessorList().add(block2.getBlockCfg());
+        block1.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
+        block2.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
     }
 
     @Override

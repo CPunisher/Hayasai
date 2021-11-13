@@ -12,8 +12,10 @@ public class BrStatement extends Statement {
     private final Block block;
 
     public BrStatement(Block block, Block cur) {
-        cur.getBlockCfg().addSuccessor(block);
         this.block = block;
+
+        block.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
+        cur.getBlockCfg().getSuccessorList().add(block.getBlockCfg());
     }
 
     @Override
