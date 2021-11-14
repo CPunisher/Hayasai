@@ -39,9 +39,4 @@ public class CallStatement extends Statement {
         joiner.add(IrKeywords.FUNC_IDENT + this.function.getIdent().generate() + this.function.getParam().generate());
         return joiner.toString();
     }
-
-    @Override
-    public List<Operand> getOperands() {
-        return List.of();
-    }
 }

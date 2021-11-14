@@ -5,10 +5,12 @@ public final class IrKeywords {
     public static final String DELIMITER = ";";
     public static final String COLON = ":";
     public static final String SEPARATOR = ",";
-    public static final String LBRACKET = "(";
-    public static final String RBRACKET = ")";
+    public static final String LPARENTHESE = "(";
+    public static final String RPARENTHESE = ")";
     public static final String LCURLY = "{";
     public static final String RCURLY = "}";
+    public static final String LBRACKET = "[";
+    public static final String RBRACKET = "]";
 
     public static final String TAB_IDENT = "    ";
 
@@ -33,6 +35,7 @@ public final class IrKeywords {
     public static final String TO = "to";
     public static final String ICMP = "icmp";
     public static final String BR = "br";
+    public static final String PHI = "phi";
     public static final String LABEL = "label";
     public static final String RETURN = "ret";
 

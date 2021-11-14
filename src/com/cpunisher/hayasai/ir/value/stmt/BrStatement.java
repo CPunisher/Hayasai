@@ -26,9 +26,4 @@ public class BrStatement extends Statement {
         joiner.add(this.block.getBlockRegister().generate());
         return joiner.toString();
     }
-
-    @Override
-    public List<Operand> getOperands() {
-        return List.of(this.block.getBlockRegister());
-    }
 }

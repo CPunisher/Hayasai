@@ -26,7 +26,7 @@ public final class FunctionDecl extends Function {
         builder.append(this.param.getParams().stream()
                 .map(FunctionParams.FunctionParamDeclare::getArgType)
                 .map(Type::generate)
-                .collect(Collectors.joining(IrKeywords.SEPARATOR + " ", IrKeywords.LBRACKET, IrKeywords.RBRACKET)));
+                .collect(Collectors.joining(IrKeywords.SEPARATOR + " ", IrKeywords.LPARENTHESE, IrKeywords.RPARENTHESE)));
         return builder.toString();
     }
 }

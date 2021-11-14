@@ -3,27 +3,93 @@ package com.cpunisher.hayasai.ir.pass;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
+import com.cpunisher.hayasai.ir.value.operand.Register;
+import com.cpunisher.hayasai.ir.value.stmt.LoadStatement;
+import com.cpunisher.hayasai.ir.value.stmt.PhiStatement;
+import com.cpunisher.hayasai.ir.value.stmt.Statement;
+import com.cpunisher.hayasai.ir.value.stmt.StoreStatement;
 import com.cpunisher.hayasai.util.BlockCfg;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MemToReg implements IPass {
     @Override
     public void pass(SymbolTable module) {
-        for (FunctionDef def : module.getFuncDefTable().values()) {
-            this.initDominance(def);
-            this.initDominanceFrontier(def);
+        for (FunctionDef functionDef : module.getFuncDefTable().values()) {
+            List<BlockCfg> blocks = new ArrayList<>();
+            blocks.add(functionDef.getBlock().getBlockCfg());
+            blocks.addAll(functionDef.getBlock().getSubBlockList().stream().map(Block::getBlockCfg).collect(Collectors.toList()));
+
+            this.initDominance(blocks);
+            this.initDominanceFrontier(blocks);
+
+            // init defs
+            Map<Register, List<BlockCfg>> defs = new HashMap<>();
+            for (BlockCfg blockCfg : blocks) {
+                for (Statement statement : blockCfg.getBlock().getSubList()) {
+                    if (statement instanceof StoreStatement storeStatement) {
+                        defs.merge((Register) storeStatement.getAddr(), new ArrayList<>(), (e1, e2) -> {
+                            e1.addAll(e2);
+                            return e1;
+                        });
+                    }
+                }
+            }
+
+            // Algorithm 3.1: Standard algorithm for inserting phi - functions
+            for (Register v : defs.keySet()) {
+                Set<BlockCfg> phiBlocks = new HashSet<>();
+                Queue<BlockCfg> blockToHandle = new LinkedList<>();
+                List<BlockCfg> defV = defs.get(v);
+                for (BlockCfg blockCfg : defV) {
+                    blockToHandle.offer(blockCfg);
+                }
+
+                while (!blockToHandle.isEmpty()) {
+                    BlockCfg blockCfg = blockToHandle.poll();
+                    for (BlockCfg df : blockCfg.getDomFrontiers()) {
+                        if (!phiBlocks.contains(df)) {
+                            // add v <- phi at entry of df
+                            df.getBlock().addSubToFront(new PhiStatement(df.getBlock().alloc()));
+                            phiBlocks.add(df);
+                            if (!defV.contains(df)) {
+                                blockToHandle.offer(df);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Algorithm 3.3: Renaming algorithm for second phase of SSA construction
+            Stack<BlockCfg> dfsStack = new Stack<>();
+            dfsStack.push(functionDef.getBlock().getBlockCfg());
+
+            while (!dfsStack.isEmpty()) {
+                BlockCfg cur = dfsStack.pop();
+
+                Iterator<Statement> iterator = cur.getBlock().getSubList().iterator();
+                while (iterator.hasNext()) {
+                    Statement statement = iterator.next();
+                    if (statement instanceof LoadStatement loadStatement) {
+
+                        iterator.remove();
+                    } else if (statement instanceof StoreStatement storeStatement) {
+
+                        iterator.remove();
+                    } else if (statement instanceof PhiStatement phiStatement) {
+
+                    }
+                }
+
+                for (BlockCfg successor : cur.getSuccessorList()) {
+                    dfsStack.push(successor);
+                }
+            }
         }
     }
 
-    private void initDominance(FunctionDef functionDef) {
-        // blocks of function
-        List<BlockCfg> blocks = new ArrayList<>();
-        blocks.add(functionDef.getBlock().getBlockCfg());
-        blocks.addAll(functionDef.getBlock().getSubBlockList().stream().map(Block::getBlockCfg).collect(Collectors.toList()));
+    private void initDominance(List<BlockCfg> blocks) {
         int n = blocks.size();
 
         // FIGURE 9.1 Iterative Solver for Dominance, Page 479
@@ -89,13 +155,7 @@ public class MemToReg implements IPass {
         }
     }
 
-    private void initDominanceFrontier(FunctionDef functionDef) {
-        // blocks of function
-        List<BlockCfg> blocks = new ArrayList<>();
-        blocks.add(functionDef.getBlock().getBlockCfg());
-        blocks.addAll(functionDef.getBlock().getSubBlockList().stream().map(Block::getBlockCfg).collect(Collectors.toList()));
-        int n = blocks.size();
-
+    private void initDominanceFrontier(List<BlockCfg> blocks) {
         // Algorithm 3.2: Algorithm for computing the dominance frontier of each CFG node
         for (BlockCfg a : blocks) {
             for (BlockCfg b : a.getSuccessorList()) {

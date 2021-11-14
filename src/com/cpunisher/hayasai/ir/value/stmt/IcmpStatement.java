@@ -6,13 +6,12 @@ import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 
 public class IcmpStatement extends Statement {
     private final Operand receiver;
-    private final Operand operand1;
-    private final Operand operand2;
     private final CompareType compareType;
 
     public IcmpStatement(Operand receiver, Operand operand1, Operand operand2, CompareType compareType) {
@@ -20,9 +19,8 @@ public class IcmpStatement extends Statement {
         assert operand1.getType() == operand2.getType();
 
         this.receiver = receiver;
-        this.operand1 = operand1;
-        this.operand2 = operand2;
         this.compareType = compareType;
+        this.operands = Arrays.asList(operand1, operand2);
     }
 
     @Override
@@ -37,16 +35,11 @@ public class IcmpStatement extends Statement {
         joiner.add(IrKeywords.ASSIGN);
         joiner.add(IrKeywords.ICMP);
         joiner.add(this.compareType.generate());
-        joiner.add(this.operand1.getType().generate());
-        joiner.add(this.operand1.generate());
+        joiner.add(this.operands.get(0).getType().generate());
+        joiner.add(this.operands.get(0).generate());
         joiner.add(IrKeywords.SEPARATOR);
-        joiner.add(this.operand2.generate());
+        joiner.add(this.operands.get(1).generate());
         return joiner.toString();
-    }
-
-    @Override
-    public List<Operand> getOperands() {
-        return List.of(this.operand1, this.operand2);
     }
 
     public static final class CompareType extends Value {

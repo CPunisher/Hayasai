@@ -31,9 +31,4 @@ public class AllocaStatement extends Statement {
         joiner.add(type.generate());
         return joiner.toString();
     }
-
-    @Override
-    public List<Operand> getOperands() {
-        return List.of();
-    }
 }

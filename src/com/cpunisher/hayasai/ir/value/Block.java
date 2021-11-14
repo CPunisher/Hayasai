@@ -49,6 +49,12 @@ public final class Block extends Value implements IRegisterAllocator {
         this.register = this.alloc();
     }
 
+    public void addSubToFront(Statement sub) {
+        if (sub != null) {
+            this.subList.add(0, sub);
+        }
+    }
+
     public void addSub(Value sub) {
         if (sub != null) {
             if (sub instanceof Block) {

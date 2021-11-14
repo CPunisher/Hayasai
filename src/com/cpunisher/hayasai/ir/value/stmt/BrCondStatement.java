@@ -40,9 +40,4 @@ public class BrCondStatement extends Statement {
         joiner.add(this.block2.getBlockRegister().generate());
         return joiner.toString();
     }
-
-    @Override
-    public List<Operand> getOperands() {
-        return List.of(block1.getBlockRegister(), block2.getBlockRegister());
-    }
 }

@@ -5,27 +5,28 @@ import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 public final class RetStatement extends Statement {
 
-    private final OperandExpression expression;
 
     public RetStatement(OperandExpression expression) {
-        this.expression = expression;
+        this.operands = Arrays.asList(expression.getOperand());
     }
 
     @Override
     public String generate() {
-        StringBuilder builder = new StringBuilder();
-        builder.append(IrKeywords.RETURN).append(" ");
-        builder.append(Optional.of(expression).map(Value::generate).orElse(""));
-        return builder.toString();
-    }
+        StringJoiner joiner = new StringJoiner(" ");
+        joiner.add(IrKeywords.RETURN);
 
-    @Override
-    public List<Operand> getOperands() {
-        return List.of(expression.getOperand());
+        Operand operand = this.operands.get(0);
+        if (operand != null) {
+            joiner.add(operand.getType().generate());
+            joiner.add(operand.generate());
+        }
+        return joiner.toString();
     }
 }

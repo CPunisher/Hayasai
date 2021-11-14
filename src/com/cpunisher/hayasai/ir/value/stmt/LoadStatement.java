@@ -4,16 +4,16 @@ import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 
 public class LoadStatement extends Statement {
     private final Operand receiver;
-    private final Operand addr;
 
     public LoadStatement(Operand receiver, Operand addr) {
         this.receiver = receiver;
-        this.addr = addr;
+        this.operands = Arrays.asList(addr);
     }
 
     @Override
@@ -30,12 +30,7 @@ public class LoadStatement extends Statement {
         joiner.add(receiver.getType().generate());
         joiner.add(IrKeywords.SEPARATOR);
         joiner.add(Type.ADDR.generate());
-        joiner.add(addr.generate());
+        joiner.add(this.operands.get(0).generate());
         return joiner.toString();
-    }
-
-    @Override
-    public List<Operand> getOperands() {
-        return List.of(this.addr);
     }
 }

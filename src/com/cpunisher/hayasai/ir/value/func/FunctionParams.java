@@ -39,7 +39,7 @@ public final class FunctionParams extends Value {
 
     @Override
     public String generate() {
-        StringJoiner joiner = new StringJoiner(IrKeywords.SEPARATOR + " ", IrKeywords.LBRACKET, IrKeywords.RBRACKET);
+        StringJoiner joiner = new StringJoiner(IrKeywords.SEPARATOR + " ", IrKeywords.LPARENTHESE, IrKeywords.RPARENTHESE);
         params.stream().map(FunctionParamDeclare::generate).forEach(joiner::add);
         return joiner.toString();
     }
