@@ -4,6 +4,7 @@ import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.Value;
 
+// TODO reconstruct function system
 public class Function extends Value {
     protected final Type funcType;
     protected final Ident ident;

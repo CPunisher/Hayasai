@@ -100,6 +100,10 @@ public final class FunctionParams extends Value {
             this.expression = expression;
         }
 
+        public OperandExpression getExpression() {
+            return expression;
+        }
+
         @Override
         public void build() {
             this.expression.build();
