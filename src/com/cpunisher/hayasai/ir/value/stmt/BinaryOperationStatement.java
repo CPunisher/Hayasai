@@ -2,6 +2,7 @@ package com.cpunisher.hayasai.ir.value.stmt;
 
 import com.cpunisher.hayasai.ir.util.BinaryOperator;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
+import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.Arrays;
@@ -9,10 +10,10 @@ import java.util.StringJoiner;
 
 public class BinaryOperationStatement extends Statement {
 
-    private final Operand receiver;
+    private final Register receiver;
     private final BinaryOperator operator;
 
-    public BinaryOperationStatement(Operand receiver, Operand operand1, Operand operand2, BinaryOperator operator) {
+    public BinaryOperationStatement(Register receiver, Operand operand1, Operand operand2, BinaryOperator operator) {
         assert receiver.getType() == operand1.getType();
         assert receiver.getType() == operand2.getType();
         assert operand1.getType() == operand2.getType();

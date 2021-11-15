@@ -2,6 +2,7 @@ package com.cpunisher.hayasai.ir.value.stmt;
 
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
+import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.Arrays;
@@ -9,11 +10,15 @@ import java.util.List;
 import java.util.StringJoiner;
 
 public class LoadStatement extends Statement {
-    private final Operand receiver;
+    private final Register receiver;
 
-    public LoadStatement(Operand receiver, Operand addr) {
+    public LoadStatement(Register receiver, Operand addr) {
         this.receiver = receiver;
         this.operands = Arrays.asList(addr);
+    }
+
+    public Register getReceiver() {
+        return receiver;
     }
 
     @Override

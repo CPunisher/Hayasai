@@ -2,23 +2,33 @@ package com.cpunisher.hayasai.ir.value.stmt;
 
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
+import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
 public class PhiStatement extends Statement {
-    private final Operand receiver;
+    private final Register receiver;
     private final Map<Block, Operand> values;
 
-    public PhiStatement(Operand receiver) {
+    public PhiStatement(Register receiver) {
         this.receiver = receiver;
         this.values = new HashMap<>();
     }
 
+    public Register getReceiver() {
+        return receiver;
+    }
+
     public void putValue(Block block, Operand operand) {
         this.values.put(block, operand);
+    }
+
+    public Map<Block, Operand> getValues() {
+        return Collections.unmodifiableMap(this.values);
     }
 
     @Override

@@ -2,20 +2,21 @@ package com.cpunisher.hayasai.ir.value.stmt;
 
 import com.cpunisher.hayasai.ir.value.func.Function;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
+import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.List;
 import java.util.StringJoiner;
 
 public class CallStatement extends Statement {
-    private final Operand receiver;
+    private final Register receiver;
     private final Function function;
 
     public CallStatement(Function function) {
         this(null, function);
     }
 
-    public CallStatement(Operand receiver, Function function) {
+    public CallStatement(Register receiver, Function function) {
         this.receiver = receiver;
         this.function = function;
     }

@@ -1,8 +1,10 @@
 package com.cpunisher.hayasai.ir.pass;
 
 import com.cpunisher.hayasai.ir.global.SymbolTable;
+import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
+import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.LoadStatement;
 import com.cpunisher.hayasai.ir.value.stmt.PhiStatement;
@@ -29,7 +31,9 @@ public class MemToReg implements IPass {
             for (BlockCfg blockCfg : blocks) {
                 for (Statement statement : blockCfg.getBlock().getSubList()) {
                     if (statement instanceof StoreStatement storeStatement) {
-                        defs.merge((Register) storeStatement.getAddr(), new ArrayList<>(), (e1, e2) -> {
+                        List<BlockCfg> list = new ArrayList<>();
+                        list.add(blockCfg);
+                        defs.merge((Register) storeStatement.getAddr(), list, (e1, e2) -> {
                             e1.addAll(e2);
                             return e1;
                         });
@@ -38,6 +42,7 @@ public class MemToReg implements IPass {
             }
 
             // Algorithm 3.1: Standard algorithm for inserting phi - functions
+            Map<PhiStatement, Register> phiMap = new HashMap<>();
             for (Register v : defs.keySet()) {
                 Set<BlockCfg> phiBlocks = new HashSet<>();
                 Queue<BlockCfg> blockToHandle = new LinkedList<>();
@@ -51,7 +56,9 @@ public class MemToReg implements IPass {
                     for (BlockCfg df : blockCfg.getDomFrontiers()) {
                         if (!phiBlocks.contains(df)) {
                             // add v <- phi at entry of df
-                            df.getBlock().addSubToFront(new PhiStatement(df.getBlock().alloc()));
+                            PhiStatement statement = new PhiStatement(df.getBlock().alloc());
+                            df.getBlock().addSubToFront(statement);
+                            phiMap.put(statement, v);
                             phiBlocks.add(df);
                             if (!defV.contains(df)) {
                                 blockToHandle.offer(df);
@@ -62,30 +69,45 @@ public class MemToReg implements IPass {
             }
 
             // Algorithm 3.3: Renaming algorithm for second phase of SSA construction
-            Stack<BlockCfg> dfsStack = new Stack<>();
-            dfsStack.push(functionDef.getBlock().getBlockCfg());
+            Set<BlockCfg> visitSet = new HashSet<>();
+            this.renameDfs(functionDef.getBlock().getBlockCfg(), null, new HashMap<>(), phiMap, visitSet);
+        }
+    }
 
-            while (!dfsStack.isEmpty()) {
-                BlockCfg cur = dfsStack.pop();
+    private void renameDfs(BlockCfg cur, BlockCfg prev, Map<Register, Operand> renameMap, Map<PhiStatement, Register> phiMap, Set<BlockCfg> visitSet) {
+        Map<Register, Operand> curMap = new HashMap<>(renameMap);
+        // update phi
 
-                Iterator<Statement> iterator = cur.getBlock().getSubList().iterator();
-                while (iterator.hasNext()) {
-                    Statement statement = iterator.next();
-                    if (statement instanceof LoadStatement loadStatement) {
 
-                        iterator.remove();
-                    } else if (statement instanceof StoreStatement storeStatement) {
+        boolean visited = visitSet.contains(cur);
+        if (visited) {
+            return;
+        }
 
-                        iterator.remove();
-                    } else if (statement instanceof PhiStatement phiStatement) {
-
-                    }
+        // handle load, store
+        visitSet.add(cur);
+        Iterator<Statement> iterator = cur.getBlock().getSubList().iterator();
+        while (iterator.hasNext()) {
+            Statement statement = iterator.next();
+            // TODO type check
+            if (statement instanceof LoadStatement loadStatement) {
+                if (!(loadStatement.getOperands().get(0) instanceof Register)) continue;
+                Operand operand = curMap.get((Register) loadStatement.getOperands().get(0));
+                Operand origin = loadStatement.getReceiver();
+                for (Operand.Use use : origin.getUses()) {
+                    use.getUser().replace(origin, operand);
                 }
-
-                for (BlockCfg successor : cur.getSuccessorList()) {
-                    dfsStack.push(successor);
-                }
+                iterator.remove();
+            } else if (statement instanceof StoreStatement storeStatement) {
+                curMap.put((Register) storeStatement.getAddr(), storeStatement.getSource());
+                iterator.remove();
+            } else if (statement instanceof PhiStatement phiStatement) {
+                curMap.put(phiMap.get(phiStatement), phiStatement.getReceiver());
             }
+        }
+
+        for (BlockCfg successor : cur.getSuccessorList()) {
+            this.renameDfs(successor, cur, curMap, phiMap, visitSet);
         }
     }
 

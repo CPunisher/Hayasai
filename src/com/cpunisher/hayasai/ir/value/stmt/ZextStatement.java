@@ -3,6 +3,7 @@ package com.cpunisher.hayasai.ir.value.stmt;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
+import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.Arrays;
@@ -10,10 +11,10 @@ import java.util.List;
 import java.util.StringJoiner;
 
 public class ZextStatement extends Statement {
-    private final Operand receiver;
+    private final Register receiver;
     private final Type newType;
 
-    public ZextStatement(Operand receiver, OperandExpression origin, Type newType) {
+    public ZextStatement(Register receiver, OperandExpression origin, Type newType) {
         this.receiver = receiver;
         this.newType = newType;
         this.operands = Arrays.asList(origin.getOperand());

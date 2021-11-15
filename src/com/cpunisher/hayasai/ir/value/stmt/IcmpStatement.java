@@ -3,6 +3,7 @@ package com.cpunisher.hayasai.ir.value.stmt;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
+import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 
@@ -11,10 +12,10 @@ import java.util.List;
 import java.util.StringJoiner;
 
 public class IcmpStatement extends Statement {
-    private final Operand receiver;
+    private final Register receiver;
     private final CompareType compareType;
 
-    public IcmpStatement(Operand receiver, Operand operand1, Operand operand2, CompareType compareType) {
+    public IcmpStatement(Register receiver, Operand operand1, Operand operand2, CompareType compareType) {
         assert receiver.getType() == Type.BIT;
         assert operand1.getType() == operand2.getType();
 
