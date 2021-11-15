@@ -13,7 +13,7 @@ public abstract class Statement extends Value implements IUser {
     protected List<Operand> operands = Arrays.asList();
 
     public void replace(Operand oldOperand, Operand newOperand) {
-        this.operands.replaceAll(operand -> operand.equals(oldOperand) ? newOperand : oldOperand);
+        this.operands.replaceAll(operand -> operand.equals(oldOperand) ? newOperand : operand);
     }
 
     @Override

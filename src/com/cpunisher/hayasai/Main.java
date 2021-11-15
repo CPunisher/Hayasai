@@ -5,6 +5,7 @@ import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.frontend.Visitor;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.pass.IPass;
+import com.cpunisher.hayasai.ir.pass.MemToReg;
 import com.cpunisher.hayasai.ir.pass.UseGenerator;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.Value;
@@ -22,7 +23,8 @@ import java.util.stream.Collectors;
 
 public class Main {
     private static final List<IPass> PASS_LIST = List.of(
-        new UseGenerator()
+        new UseGenerator(),
+        new MemToReg()
     );
 
     public static void main(String[] args) throws IOException {
@@ -45,10 +47,11 @@ public class Main {
         SymbolTable symbolTable = SymbolTable.INSTANCE;
         Map<Ident, FunctionDecl> functionDeclMap = symbolTable.getFuncDeclTable();
         Map<Ident, FunctionDef> functionDefMap = symbolTable.getFuncDefTable();
-        functionDeclMap.values().forEach(Value::build);
-        functionDefMap.values().forEach(Value::build);
 
         PASS_LIST.forEach(pass -> pass.pass(symbolTable));
+
+        functionDeclMap.values().forEach(Value::build);
+        functionDefMap.values().forEach(Value::build);
 
         System.out.println(functionDeclMap.values().stream()
                 .map(FunctionDecl::generate)

@@ -106,7 +106,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             }
         }
 //        lastBlock.addSub(new BrCondStatement(condExp, blockTrue.getBlockRegister(), blockElse.getBlockRegister()));
-        lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), this.blockManager.current()));
+        lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), lastBlock));
         this.blockManager.setCurrent(blockAfter);
         return null;
     }

@@ -17,7 +17,7 @@ public class UseGenerator implements IPass {
     }
 
     private void genUse(Block root) {
-        for (Statement statement : root.getSubList()) {
+        for (Statement statement : root.getUnmodifiableSubList()) {
             List<Operand> operands = statement.getOperands();
             for (int i = 0; i < operands.size(); i++) {
                 operands.get(i).addUser(new Operand.Use(statement, i));

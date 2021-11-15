@@ -1,7 +1,6 @@
 package com.cpunisher.hayasai.ir.pass;
 
 import com.cpunisher.hayasai.ir.global.SymbolTable;
-import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
@@ -29,7 +28,7 @@ public class MemToReg implements IPass {
             // init defs
             Map<Register, List<BlockCfg>> defs = new HashMap<>();
             for (BlockCfg blockCfg : blocks) {
-                for (Statement statement : blockCfg.getBlock().getSubList()) {
+                for (Statement statement : blockCfg.getBlock().getUnmodifiableSubList()) {
                     if (statement instanceof StoreStatement storeStatement) {
                         List<BlockCfg> list = new ArrayList<>();
                         list.add(blockCfg);
@@ -77,7 +76,13 @@ public class MemToReg implements IPass {
     private void renameDfs(BlockCfg cur, BlockCfg prev, Map<Register, Operand> renameMap, Map<PhiStatement, Register> phiMap, Set<BlockCfg> visitSet) {
         Map<Register, Operand> curMap = new HashMap<>(renameMap);
         // update phi
-
+        for (Statement statement : cur.getBlock().getUnmodifiableSubList()) {
+            if (statement instanceof PhiStatement phiStatement) {
+                Register origin = phiMap.get(phiStatement);
+                Operand replace = renameMap.get(origin);
+                phiStatement.putValue(prev.getBlock(), replace);
+            }
+        }
 
         boolean visited = visitSet.contains(cur);
         if (visited) {

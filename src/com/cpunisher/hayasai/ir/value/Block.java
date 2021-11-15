@@ -156,8 +156,12 @@ public final class Block extends Value implements IRegisterAllocator {
         throw new RuntimeException("Can't find sub block.");
     }
 
-    public List<Statement> getSubList() {
+    public List<Statement> getUnmodifiableSubList() {
         return Collections.unmodifiableList(this.subList);
+    }
+
+    public List<Statement> getSubList() {
+        return this.subList;
     }
 
     public List<Block> getSubBlockList() {
