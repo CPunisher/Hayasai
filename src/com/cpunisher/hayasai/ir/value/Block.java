@@ -90,6 +90,7 @@ public final class Block extends Value implements IRegisterAllocator {
         StringJoiner joiner = new StringJoiner(IrKeywords.LINE_SEPARATOR);
         for (Statement stmt : this.subList) {
             joiner.add(IrKeywords.TAB_IDENT + stmt.generate());
+            // TODO terminator judge
             if (stmt instanceof RetStatement || stmt instanceof BrCondStatement || stmt instanceof BrStatement) {
                 break;
             }
@@ -154,6 +155,14 @@ public final class Block extends Value implements IRegisterAllocator {
             }
         }
         throw new RuntimeException("Can't find sub block.");
+    }
+
+    public boolean terminated() {
+        if (this.subList.isEmpty()) {
+            return false;
+        }
+        Statement statement = this.subList.get(this.subList.size() - 1);
+        return statement instanceof RetStatement || statement instanceof BrStatement || statement instanceof BrCondStatement;
     }
 
     public List<Statement> getUnmodifiableSubList() {

@@ -14,8 +14,10 @@ public class BrStatement extends Statement {
     public BrStatement(Block block, Block cur) {
         this.block = block;
 
-        block.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
-        cur.getBlockCfg().getSuccessorList().add(block.getBlockCfg());
+        if (!cur.terminated()) {
+            block.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
+            cur.getBlockCfg().getSuccessorList().add(block.getBlockCfg());
+        }
     }
 
     @Override

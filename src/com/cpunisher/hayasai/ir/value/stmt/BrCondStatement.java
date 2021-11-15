@@ -19,10 +19,12 @@ public class BrCondStatement extends Statement {
         this.block1 = block1;
         this.block2 = block2;
 
-        cur.getBlockCfg().getSuccessorList().add(block1.getBlockCfg());
-        cur.getBlockCfg().getSuccessorList().add(block2.getBlockCfg());
-        block1.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
-        block2.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
+        if (!cur.terminated()) {
+            cur.getBlockCfg().getSuccessorList().add(block1.getBlockCfg());
+            cur.getBlockCfg().getSuccessorList().add(block2.getBlockCfg());
+            block1.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
+            block2.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
+        }
     }
 
     @Override
