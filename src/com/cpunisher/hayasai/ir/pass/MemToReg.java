@@ -80,7 +80,9 @@ public class MemToReg implements IPass {
             if (statement instanceof PhiStatement phiStatement) {
                 Register origin = phiMap.get(phiStatement);
                 Operand replace = renameMap.get(origin);
-                phiStatement.putValue(prev.getBlock(), replace);
+                if (replace != null) {
+                    phiStatement.putValue(prev.getBlock(), replace);
+                }
             }
         }
 
@@ -102,6 +104,7 @@ public class MemToReg implements IPass {
                 for (Operand.Use use : origin.getUses()) {
                     use.getUser().replace(origin, operand);
                 }
+                operand.clearUse();
                 iterator.remove();
             } else if (statement instanceof StoreStatement storeStatement) {
                 curMap.put((Register) storeStatement.getAddr(), storeStatement.getSource());
