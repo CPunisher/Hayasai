@@ -3,6 +3,7 @@ package com.cpunisher.hayasai.ir.pass;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
+import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.LoadStatement;
@@ -81,8 +82,9 @@ public class MemToReg implements IPass {
                 Register origin = phiMap.get(phiStatement);
                 Operand replace = renameMap.get(origin);
                 if (replace != null) {
-                    phiStatement.putValue(prev.getBlock(), replace);
+                    replace = Literal.INT_ZERO;
                 }
+                phiStatement.putValue(prev.getBlock(), replace);
             }
         }
 
