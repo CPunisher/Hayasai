@@ -81,7 +81,7 @@ public class MemToReg implements IPass {
             if (statement instanceof PhiStatement phiStatement) {
                 Register origin = phiMap.get(phiStatement);
                 Operand replace = renameMap.get(origin);
-                if (replace != null) {
+                if (replace == null) { // phi 必须要包含所有先前 Block
                     replace = Literal.INT_ZERO;
                 }
                 phiStatement.putValue(prev.getBlock(), replace);
