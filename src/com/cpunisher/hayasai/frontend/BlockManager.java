@@ -8,11 +8,14 @@ import com.cpunisher.hayasai.ir.value.stmt.BrStatement;
 import com.cpunisher.hayasai.ir.value.stmt.Statement;
 
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 public final class BlockManager {
     private final FunctionDef functionDef;
     private final Deque<Block> nextBlocks = new LinkedList<>();
+    private final Map<Block, Block> nextTable = new HashMap<>();
     private Block current;
 
     public BlockManager(FunctionDef functionDef) {
@@ -31,7 +34,7 @@ public final class BlockManager {
 
         if (isNext) {
             if (!this.nextBlocks.isEmpty()) {
-                block.setNext(this.nextBlocks.getLast());
+                this.setNext(block, this.nextBlocks.getLast());
             }
             this.nextBlocks.addLast(block);
         }
@@ -52,12 +55,20 @@ public final class BlockManager {
     }
 
     public void setCurrent(Block block) {
-        if (this.current != null && this.current.hasNext()) {
-            this.current.addSub(new BrStatement(this.current.getNext(), this.current));
+        if (this.current != null && this.nextTable.containsKey(this.current)) {
+            this.current.addSub(new BrStatement(this.nextTable.get(this.current), this.current));
         }
         this.current = block;
         if (!this.nextBlocks.isEmpty() && this.current == this.nextBlocks.getLast()) {
             this.nextBlocks.removeLast();
+        }
+    }
+
+    public void setNext(Block origin, Block next) {
+        if (next != null) {
+            this.nextTable.put(origin, next);
+        } else {
+            this.nextTable.remove(origin);
         }
     }
 

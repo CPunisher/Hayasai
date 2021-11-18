@@ -7,7 +7,6 @@ import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.util.BinaryOperator;
 import com.cpunisher.hayasai.ir.value.expr.VoidExpression;
 import com.cpunisher.hayasai.ir.value.func.Function;
-import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
 import com.cpunisher.hayasai.ir.value.stmt.*;
 import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.Block;
@@ -72,7 +71,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitIfStmt(MiniSysYParser.IfStmtContext ctx) {
         Block lastBlock = this.blockManager.current();
-        lastBlock.setNext(null);
+        this.blockManager.setNext(lastBlock, null);
 
         boolean hasElse = ctx.stmt().size() > 1;
         Block blockAfter = this.blockManager.create(true);
@@ -92,7 +91,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 //        }
 
         this.blockManager.setCurrent(blockTrue);
-        blockTrue.setNext(blockAfter);
+        this.blockManager.setNext(blockTrue, blockAfter);
         if (ctx.stmt(0).block() != null) {
             visitBlock(ctx.stmt(0).block());
         } else {
@@ -102,7 +101,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         if (hasElse) {
             // else
             this.blockManager.setCurrent(blockElse);
-            blockElse.setNext(blockAfter);
+            this.blockManager.setNext(blockElse, blockAfter);
             if (ctx.stmt(1).block() != null) {
                 visitBlock(ctx.stmt(1).block());
             } else {

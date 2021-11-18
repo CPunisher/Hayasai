@@ -20,7 +20,6 @@ public final class Block extends Value {
     private final Map<Ident, Register> constTable;
 
     private final BlockCfg blockCfg;
-    private Block next;
 
     public Block(FunctionDef functionDef, Block parent) {
         this.subList = new LinkedList<>();
@@ -146,18 +145,6 @@ public final class Block extends Value {
 
     public boolean identExists(Ident ident) {
         return varTable.containsKey(ident) || constTable.containsKey(ident);
-    }
-
-    public boolean hasNext() {
-        return this.next != null;
-    }
-
-    public void setNext(Block next) {
-        this.next = next;
-    }
-
-    public Block getNext() {
-        return next;
     }
 
     public boolean hasParent() {
