@@ -1,6 +1,6 @@
 grammar MiniSysY;
 
-compUnit: funcDef;
+compUnit: decl* funcDef;
 decl: constDecl | varDecl;
 btype: 'int';
 constDecl: 'const' btype constDef (',' constDef)* ';';

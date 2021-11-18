@@ -14,7 +14,7 @@ public final class IrKeywords {
 
     public static final String TAB_IDENT = "    ";
 
-    public static final String FUNC_IDENT = "@";
+    public static final String GLOBAL_IDENT = "@";
     public static final String REG_IDENT = "%";
 
     public static final String ASSIGN = "=";

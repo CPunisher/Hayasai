@@ -8,7 +8,6 @@ import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,7 +34,7 @@ public final class FunctionDef extends Function implements IRegisterAllocator {
         builder.append(IrKeywords.DEFINE).append(" ");
         builder.append(IrKeywords.DSO_LOCAL).append(" ");
         builder.append(this.funcType.generate()).append(" ");
-        builder.append(IrKeywords.FUNC_IDENT);
+        builder.append(IrKeywords.GLOBAL_IDENT);
         builder.append(this.ident.generate());
         builder.append(this.params.stream()
                 .map(FunctionParam::getArgType)

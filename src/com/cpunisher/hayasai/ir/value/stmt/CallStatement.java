@@ -3,7 +3,6 @@ package com.cpunisher.hayasai.ir.value.stmt;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
-import com.cpunisher.hayasai.ir.value.func.Function;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
@@ -50,7 +49,7 @@ public class CallStatement extends Statement {
         for (Operand operand : this.operands) {
             paramJoiner.add(operand.getType().generate() + " " + operand.generate());
         }
-        joiner.add(IrKeywords.FUNC_IDENT + this.funcIdent.generate() + paramJoiner);
+        joiner.add(IrKeywords.GLOBAL_IDENT + this.funcIdent.generate() + paramJoiner);
         return joiner.toString();
     }
 }

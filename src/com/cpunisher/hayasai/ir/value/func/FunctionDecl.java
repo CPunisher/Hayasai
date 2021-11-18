@@ -18,7 +18,7 @@ public final class FunctionDecl extends Function {
         StringBuilder builder = new StringBuilder();
         builder.append(IrKeywords.DECLARE).append(" ");
         builder.append(this.funcType.generate()).append(" ");
-        builder.append(IrKeywords.FUNC_IDENT);
+        builder.append(IrKeywords.GLOBAL_IDENT);
         builder.append(this.ident.generate());
         builder.append(this.params.stream()
                         .map(FunctionParam::getArgType)

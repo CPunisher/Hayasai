@@ -16,6 +16,7 @@ public final class SymbolTable {
 
     private final Hashtable<Ident, FunctionDecl> funcDeclTable = new Hashtable<>();
     private final Hashtable<Ident, FunctionDef> funcDefTable = new Hashtable<>();
+    private final IVariableTable globalVars = new VariableTable();
 
     private SymbolTable() {
         this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getint"), Function.EMPTY_ARGS));
@@ -53,5 +54,9 @@ public final class SymbolTable {
 
     public Map<Ident, FunctionDef> getFuncDefTable() {
         return Collections.unmodifiableMap(this.funcDefTable);
+    }
+
+    public IVariableTable getGlobalVars() {
+        return globalVars;
     }
 }
