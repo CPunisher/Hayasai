@@ -39,6 +39,11 @@ public class VariableTable<T extends Operand, U extends Operand> implements IVar
         this.constTable.put(ident, constValue);
     }
 
+    public void merge(VariableTable<T, U> variableTable) {
+        this.varTable.putAll(variableTable.varTable);
+        this.constTable.putAll(variableTable.constTable);
+    }
+
     private boolean identExists(Ident ident) {
         return varTable.containsKey(ident) || constTable.containsKey(ident);
     }

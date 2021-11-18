@@ -28,7 +28,7 @@ public class BlockMerge implements IPass {
                 Block toMerge = blockStack.pop();
                 merged.getBlockCfg().getPredecessorList().clear();
                 toMerge.getBlockCfg().getSuccessorList().clear();
-                toMerge.merge(merged);
+                toMerge.mergeIr(merged);
                 blockStack.push(toMerge);
                 functionDef.getAllBlocks().remove(merged);
             }

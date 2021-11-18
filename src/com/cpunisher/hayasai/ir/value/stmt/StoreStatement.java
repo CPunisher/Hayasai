@@ -2,17 +2,17 @@ package com.cpunisher.hayasai.ir.value.stmt;
 
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
+import com.cpunisher.hayasai.ir.value.operand.GlobalOperand;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.StringJoiner;
 
 public class StoreStatement extends Statement {
     public StoreStatement(OperandExpression source, Operand addr) {
-        assert addr instanceof Register;
+        assert addr instanceof Register || addr instanceof GlobalOperand;
         this.operands = Arrays.asList(source.getOperand(), addr);
     }
 

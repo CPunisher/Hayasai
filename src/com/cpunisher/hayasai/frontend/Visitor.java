@@ -39,7 +39,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     public Value visitCompUnit(MiniSysYParser.CompUnitContext ctx) {
         this.isGlobal = true;
         this.blockManager = new BlockManager(FunctionDef.createEmpty());
-        this.blockManager.setCurrent(this.blockManager.create(false));
+        this.blockManager.setCurrent(this.blockManager.create(false, null));
         for (MiniSysYParser.DeclContext declContext : ctx.decl()) {
             visitDecl(declContext);
         }
@@ -55,7 +55,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         symbolTable.putFunctionDef(functionDef);
 
         this.blockManager = new BlockManager(functionDef);
-        Block block = this.blockManager.create(false);
+        Block block = this.blockManager.create(false, null);
         this.blockManager.setCurrent(block);
         visitBlock(ctx.block());
         this.blockManager = null;
@@ -74,8 +74,9 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 Block lastBlock = this.blockManager.current();
                 this.blockManager.setNext(lastBlock, null);
                 Block blockIn = this.blockManager.create(false);
-                Block blockAfter = this.blockManager.create(true);
+                Block blockAfter = this.blockManager.create(true, lastBlock.getParent());
 
+                blockAfter.mergeTable(lastBlock);
                 this.blockManager.setCurrent(blockIn);
                 this.blockManager.setNext(blockIn, blockAfter);
                 visitBlockItem(blockItemContext);
@@ -95,12 +96,13 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         this.blockManager.setNext(lastBlock, null);
 
         boolean hasElse = ctx.stmt().size() > 1;
-        Block blockAfter = this.blockManager.create(true);
+        Block blockAfter = this.blockManager.create(true, lastBlock.getParent());
         Block blockTrue = this.blockManager.create(false);
         Block blockElse;
         if (hasElse) blockElse = this.blockManager.create(false);
         else blockElse = blockAfter;
 
+        blockAfter.mergeTable(lastBlock);
         this.condCtx.setParent(lastBlock);
         this.condCtx.setBlockTrue(blockTrue);
         this.condCtx.setBlockFalse(blockElse);

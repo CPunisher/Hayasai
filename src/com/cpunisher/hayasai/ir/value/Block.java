@@ -21,7 +21,7 @@ public final class Block extends Value implements IVariableTable<Register, Liter
     private final FunctionDef functionDef;
     private final Register register;
     private final List<Statement> subList;
-    private final IVariableTable<Register, Literal> localVars;
+    private final VariableTable<Register, Literal> localVars;
     private final BlockCfg blockCfg;
 
     public Block(FunctionDef functionDef, Block parent) {
@@ -145,7 +145,11 @@ public final class Block extends Value implements IVariableTable<Register, Liter
         return statement instanceof TerminateStatement;
     }
 
-    public void merge(Block block) {
+    public void mergeTable(Block block) {
+        this.localVars.merge(block.localVars);
+    }
+
+    public void mergeIr(Block block) {
         if (this.terminated()) {
             this.subList.remove(this.subList.size() - 1);
         }
@@ -163,6 +167,10 @@ public final class Block extends Value implements IVariableTable<Register, Liter
 
     public boolean hasParent() {
         return this.parent != null;
+    }
+
+    public Block getParent() {
+        return parent;
     }
 
     public Register getBlockRegister() {
