@@ -15,9 +15,10 @@ funcDef: funcType IDENT '(' ')' block;
 funcType: 'int';
 block: '{' blockItem* '}';
 blockItem: decl | stmt;
-stmt: assignStmt | block | ifStmt | expStmt | retStmt;
+stmt: assignStmt | block | ifStmt | whileStmt | expStmt | retStmt;
 assignStmt: lVal '=' exp ';';
 ifStmt: 'if' '(' cond ')' stmt ('else' stmt)?;
+whileStmt: 'while' '(' cond ')' stmt;
 retStmt: 'return' exp ';';
 expStmt: exp? ';';
 

@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 public class Main {
     private static final List<IPass> PASS_LIST = List.of(
-        new BlockMerge(),
+//        new BlockMerge(),
         new UseGenerator(),
         new MemToReg()
     );

@@ -137,6 +137,33 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         return null;
     }
 
+    @Override
+    public Value visitWhileStmt(MiniSysYParser.WhileStmtContext ctx) {
+        Block lastBlock = this.blockManager.current();
+        this.blockManager.setNext(lastBlock, null);
+
+        Block blockAfter = this.blockManager.create(false, lastBlock.getParent());
+        Block blockBody = this.blockManager.create(false);
+
+        blockAfter.mergeTable(lastBlock);
+        this.condCtx.setParent(lastBlock);
+        this.condCtx.setBlockTrue(blockBody);
+        this.condCtx.setBlockFalse(blockAfter);
+        OperandExpression condEntryExp = (OperandExpression) visitCond(ctx.cond());
+
+        this.blockManager.setCurrent(blockBody);
+        if (ctx.stmt().block() != null) {
+            visitBlock(ctx.stmt().block());
+        } else {
+            this.blockManager.addToCurrent((Statement) ctx.stmt().children.get(0).accept(this));
+        }
+
+        blockBody.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), blockBody));
+        lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), lastBlock));
+        this.blockManager.setCurrent(blockAfter);
+        return null;
+    }
+
     /* visitStmt 和 declare 系列必须返回 Statement 或 Block */
     @Override
     public Value visitRetStmt(MiniSysYParser.RetStmtContext ctx) {

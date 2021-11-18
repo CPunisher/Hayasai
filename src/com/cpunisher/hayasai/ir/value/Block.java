@@ -66,7 +66,7 @@ public final class Block extends Value implements IVariableTable<Register, Liter
     public String generate() {
         String blockHeader = "";
         Ident ident = this.register.getIdent();
-        if (this.hasParent()) {
+        if (functionDef.getEntry() != this) {
             blockHeader += ident.generate();
             blockHeader += IrKeywords.COLON;
             blockHeader += IrKeywords.LINE_SEPARATOR;

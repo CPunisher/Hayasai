@@ -112,6 +112,12 @@ public interface MiniSysYVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitIfStmt(MiniSysYParser.IfStmtContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link MiniSysYParser#whileStmt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWhileStmt(MiniSysYParser.WhileStmtContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link MiniSysYParser#retStmt}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
