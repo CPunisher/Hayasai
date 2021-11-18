@@ -17,8 +17,11 @@ import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.SyntaxException;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Pair;
+import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,7 +31,6 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     private final SymbolTable symbolTable = SymbolTable.INSTANCE;
 
     private final ConditionContext condCtx = new ConditionContext();
-    private boolean visitingConstExp;
     private BlockManager blockManager;
 
     @Override
@@ -133,7 +135,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitAssignStmt(MiniSysYParser.AssignStmtContext ctx) {
         Ident target = Ident.valueOf(ctx.lVal().IDENT().getText());
-        Pair<Register, Boolean> pair = this.blockManager.current().compute(target);
+        Pair<Operand, Boolean> pair = this.blockManager.current().compute(target);
         if (pair.b) {
             throw new SyntaxException("Cannot assign to constant [" + ctx.lVal().IDENT().getText() + "].");
         }
@@ -153,18 +155,12 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     public Value visitConstDef(MiniSysYParser.ConstDefContext ctx) {
         Ident ident = Ident.valueOf(ctx.IDENT().getText());
         OperandExpression expression = (OperandExpression) visitConstInitVal(ctx.constInitVal());
-        Register register = this.blockManager.current().putConst(ident);
-        return new StoreStatement(expression, register);
-    }
-
-    @Override
-    public Value visitConstInitVal(MiniSysYParser.ConstInitValContext ctx) {
-        if (ctx.constExp() != null) {
-            this.visitingConstExp = true;
-            Value expression = visitConstExp(ctx.constExp());
-            this.visitingConstExp = false;
-            return expression;
+        if (!expression.isImmutable()) {
+            throw new SyntaxException("Assign a variable to constant.");
         }
+
+        this.blockManager.current().putConst(ident, (Literal) expression.getOperand());
+//        return new StoreStatement(expression, register);
         return null;
     }
 
@@ -188,17 +184,29 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     }
 
     /* visitExp 系列必须返回 OperandExpression */
-    @Override
-    public Value visitAddExp(MiniSysYParser.AddExpContext ctx) {
-        OperandExpression expression = (OperandExpression) visitMulExp(ctx.mulExp(0));
+    private <T extends ParseTree> OperandExpression handleBinaryExp(List<T> expCtx, List<String> opList, java.util.function.Function<T, Value> visit) {
+        List<OperandExpression> exps = new LinkedList<>();
+        for (int i = 0; i < expCtx.size(); i++) {
+            exps.add((OperandExpression) visit(expCtx.get(i)));
+        }
+
+        OperandExpression expression = exps.get(0);
+        if (exps.stream().allMatch(OperandExpression::isImmutable)) {
+            int value = ((Literal) expression.getOperand()).getValue();
+            for (int i = 1; i < exps.size(); i++) {
+                int operand = ((Literal) exps.get(i).getOperand()).getValue();
+                value = BinaryOperator.valueOf(opList.get(i - 1)).apply(value, operand);
+            }
+            return new OperandExpression(new Literal(value), true);
+        }
+
         Register last = null, cur;
-        if (ctx.unaryOp().size() > 0) {
-            for (int i = 0; i < ctx.unaryOp().size(); i++) {
+        if (opList.size() > 0) {
+            for (int i = 1; i < exps.size(); i++) {
                 Operand operand1 = last != null ? last : expression.getOperand();
-                Operand operand2 = ((OperandExpression) visitMulExp(ctx.mulExp(i + 1))).getOperand();
                 cur = this.blockManager.currentFunc().alloc();
-                BinaryOperator operator = BinaryOperator.valueOf(ctx.unaryOp(i).getText());
-                this.blockManager.addToCurrent(new BinaryOperationStatement(cur, operand1, operand2, operator));
+                BinaryOperator operator = BinaryOperator.valueOf(opList.get(i - 1));
+                this.blockManager.addToCurrent(new BinaryOperationStatement(cur, operand1, exps.get(i).getOperand(), operator));
                 last = cur;
             }
             return new OperandExpression(last);
@@ -207,21 +215,14 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     }
 
     @Override
+    public Value visitAddExp(MiniSysYParser.AddExpContext ctx) {
+        return handleBinaryExp(ctx.mulExp(), ctx.unaryOp().stream().map(RuleContext::getText).collect(Collectors.toList()), this::visitMulExp);
+    }
+
+
+    @Override
     public Value visitMulExp(MiniSysYParser.MulExpContext ctx) {
-        OperandExpression expression = (OperandExpression) visitUnaryExp(ctx.unaryExp(0));
-        Register last = null, cur;
-        if (ctx.binaryOp().size() > 0) {
-            for (int i = 0; i < ctx.binaryOp().size(); i++) {
-                Operand operand1 = last != null ? last : expression.getOperand();
-                Operand operand2 = ((OperandExpression) visitUnaryExp(ctx.unaryExp(i + 1))).getOperand();
-                cur = this.blockManager.currentFunc().alloc();
-                BinaryOperator operator = BinaryOperator.valueOf(ctx.binaryOp(i).getText());
-                this.blockManager.addToCurrent(new BinaryOperationStatement(cur, operand1, operand2, operator));
-                last = cur;
-            }
-            return new OperandExpression(last);
-        }
-        return expression;
+        return handleBinaryExp(ctx.unaryExp(), ctx.binaryOp().stream().map(RuleContext::getText).collect(Collectors.toList()), this::visitUnaryExp);
     }
 
     @Override
@@ -230,6 +231,18 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         List<MiniSysYParser.UnaryOpContext> validUnaryOpList = ctx.unaryOp().stream()
                 .filter(unaryOpContext -> unaryOpContext.MINUS() != null || unaryOpContext.NOT() != null)
                 .collect(Collectors.toList());
+        if (expression.isImmutable()) {
+            int value = ((Literal) expression.getOperand()).getValue();
+            for (int i = validUnaryOpList.size() - 1; i >= 0; i--) {
+                if (validUnaryOpList.get(i).NOT() != null) {
+                    value = value == 0 ? 1 : 0;
+                } else if (validUnaryOpList.get(i).MINUS() != null) {
+                    value = -value;
+                }
+            }
+            return new OperandExpression(new Literal(value), true);
+        }
+
         Register last = null, cur;
         if (validUnaryOpList.size() > 0) {
             for (int i = validUnaryOpList.size() - 1; i >= 0; i--) {
@@ -289,9 +302,6 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             return visitExp(ctx.exp());
         } else if (ctx.lVal() != null) {
             OperandExpression expression = (OperandExpression) visitLVal(ctx.lVal());
-            if (this.visitingConstExp && !expression.isImmutable()) {
-                throw new SyntaxException("Assign a variable to constant.");
-            }
             return expression;
         } else if (ctx.number() != null) {
             return visitNumber(ctx.number());
@@ -383,7 +393,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitLVal(MiniSysYParser.LValContext ctx) {
         Ident target = Ident.valueOf(ctx.IDENT().getText());
-        Pair<Register, Boolean> pair = this.blockManager.current().compute(target);
+        Pair<Operand, Boolean> pair = this.blockManager.current().compute(target);
+        if (pair.b) { // Literal
+            return new OperandExpression(pair.a, true);
+        }
         Register tmpRegister = this.blockManager.currentFunc().alloc();
         this.blockManager.addToCurrent(new LoadStatement(tmpRegister, pair.a));
         return new OperandExpression(tmpRegister, pair.b);

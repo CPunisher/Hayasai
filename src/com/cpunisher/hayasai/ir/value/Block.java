@@ -1,6 +1,8 @@
 package com.cpunisher.hayasai.ir.value;
 
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
+import com.cpunisher.hayasai.ir.value.operand.Literal;
+import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.*;
 import com.cpunisher.hayasai.util.BlockCfg;
@@ -17,7 +19,7 @@ public final class Block extends Value {
     private final Register register;
     private final List<Statement> subList;
     private final Map<Ident, Register> varTable;
-    private final Map<Ident, Register> constTable;
+    private final Map<Ident, Literal> constTable;
 
     private final BlockCfg blockCfg;
 
@@ -80,16 +82,16 @@ public final class Block extends Value {
         return blockHeader + joiner;
     }
 
-    public Pair<Register, Boolean> compute(Ident ident) {
-        Register register = this.getConst(ident);
+    public Pair<Operand, Boolean> compute(Ident ident) {
+        Operand operand = this.getConst(ident);
         boolean immutable = true;
-        if (register == null) {
-            register = this.getVar(ident);
-            if (register == null)
+        if (operand == null) {
+            operand = this.getVar(ident);
+            if (operand == null)
                 throw new SyntaxException("Ident [" + ident.getIdent()  + "] is not declared.");
             immutable = false;
         }
-        return new Pair<>(register, immutable);
+        return new Pair<>(operand, immutable);
     }
 
     public Register getVar(Ident ident) {
@@ -100,12 +102,12 @@ public final class Block extends Value {
         return register;
     }
 
-    public Register getConst(Ident ident) {
-        Register register =  this.constTable.get(ident);
-        if (register == null && this.hasParent()) {
-            register = this.parent.getConst(ident);
+    public Literal getConst(Ident ident) {
+        Literal value =  this.constTable.get(ident);
+        if (value == null && this.hasParent()) {
+            value = this.parent.getConst(ident);
         }
-        return register;
+        return value;
     }
 
     public Register putVar(Ident ident) {
@@ -117,13 +119,12 @@ public final class Block extends Value {
         return register;
     }
 
-    public Register putConst(Ident ident) {
+    public Literal putConst(Ident ident, Literal constValue) {
         if (this.identExists(ident)) {
             throw new SyntaxException("Ident [" + ident.getIdent() + "] exists.");
         }
-        Register register = this.functionDef.alloc();
-        this.constTable.put(ident, register);
-        return register;
+        this.constTable.put(ident, constValue);
+        return constValue;
     }
 
     public boolean terminated() {
