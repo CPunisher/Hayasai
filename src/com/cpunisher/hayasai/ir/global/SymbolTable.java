@@ -7,18 +7,20 @@ import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.GlobalOperand;
 import com.cpunisher.hayasai.ir.value.operand.Literal;
+import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.StringJoiner;
 
 public final class SymbolTable {
     public static final SymbolTable INSTANCE = new SymbolTable();
 
     private final Hashtable<Ident, FunctionDecl> funcDeclTable = new Hashtable<>();
     private final Hashtable<Ident, FunctionDef> funcDefTable = new Hashtable<>();
-    private final IVariableTable<GlobalOperand, Literal> globalVars = new VariableTable<>();
+    private final VariableTable<GlobalOperand, Literal> globalVars = new VariableTable<>();
 
     private SymbolTable() {
         this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getint"), Function.EMPTY_ARGS));
@@ -58,7 +60,37 @@ public final class SymbolTable {
         return Collections.unmodifiableMap(this.funcDefTable);
     }
 
-    public IVariableTable getGlobalVars() {
+    public VariableTable<GlobalOperand, Literal> getGlobalVars() {
         return globalVars;
+    }
+
+    public String generateVars() {
+        Map<Ident, GlobalOperand> globalVarsMap = this.getGlobalVars().getVarTable();
+        Map<Ident, Literal> globalConstMap = this.getGlobalVars().getConstTable();
+        StringJoiner result = new StringJoiner(IrKeywords.LINE_SEPARATOR);
+
+        for (Map.Entry<Ident, GlobalOperand> entry : globalVarsMap.entrySet()) {
+            StringJoiner joiner = new StringJoiner(" ");
+            joiner.add(IrKeywords.GLOBAL_IDENT + entry.getKey().generate());
+            joiner.add(IrKeywords.ASSIGN);
+            joiner.add(IrKeywords.DSO_LOCAL);
+            joiner.add(IrKeywords.GLOBAL);
+            joiner.add(entry.getValue().getType().generate());
+            joiner.add(String.valueOf(entry.getValue().getInitValue()));
+            result.add(joiner.toString());
+        }
+
+        for (Map.Entry<Ident, Literal> entry : globalConstMap.entrySet()) {
+            StringJoiner joiner = new StringJoiner(" ");
+            joiner.add(IrKeywords.GLOBAL_IDENT + entry.getKey().generate());
+            joiner.add(IrKeywords.ASSIGN);
+            joiner.add(IrKeywords.DSO_LOCAL);
+            joiner.add(IrKeywords.GLOBAL);
+            joiner.add(entry.getValue().getType().generate());
+            joiner.add(String.valueOf(entry.getValue().generate()));
+            result.add(joiner.toString());
+        }
+
+        return result.toString();
     }
 }

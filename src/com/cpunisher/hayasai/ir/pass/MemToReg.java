@@ -28,7 +28,7 @@ public class MemToReg implements IPass {
             Map<Register, List<BlockCfg>> defs = new HashMap<>();
             for (BlockCfg blockCfg : blocks) {
                 for (Statement statement : blockCfg.getBlock().getUnmodifiableSubList()) {
-                    if (statement instanceof StoreStatement storeStatement) {
+                    if (statement instanceof StoreStatement storeStatement && storeStatement.getAddr() instanceof Register) {
                         List<BlockCfg> list = new ArrayList<>();
                         list.add(blockCfg);
                         defs.merge((Register) storeStatement.getAddr(), list, (e1, e2) -> {

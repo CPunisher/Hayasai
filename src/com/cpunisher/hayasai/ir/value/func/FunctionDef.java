@@ -8,6 +8,7 @@ import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +21,10 @@ public final class FunctionDef extends Function implements IRegisterAllocator {
         super(funcType, ident, params);
         this.blocks = new LinkedList<>();
         this.allocator = new DefaultAllocator();
+    }
+
+    public static FunctionDef createEmpty() {
+        return new FunctionDef(Type.VOID, Ident.EMPTY_IDENT, List.of());
     }
 
     @Override

@@ -1,6 +1,8 @@
 package com.cpunisher.hayasai.ir.value;
 
 public final class Ident extends Value {
+    public static final Ident EMPTY_IDENT = Ident.valueOf("");
+
     private final String ident;
 
     private Ident(String ident) {

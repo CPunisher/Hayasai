@@ -47,6 +47,7 @@ public class Main {
         visitor.visit(tree);
 
         SymbolTable symbolTable = SymbolTable.INSTANCE;
+
         Map<Ident, FunctionDecl> functionDeclMap = symbolTable.getFuncDeclTable();
         Map<Ident, FunctionDef> functionDefMap = symbolTable.getFuncDefTable();
 
@@ -55,6 +56,7 @@ public class Main {
         functionDeclMap.values().forEach(Value::build);
         functionDefMap.values().forEach(Value::build);
 
+        System.out.println(symbolTable.generateVars());
         System.out.println(functionDeclMap.values().stream()
                 .map(FunctionDecl::generate)
                 .collect(Collectors.joining(IrKeywords.LINE_SEPARATOR)));

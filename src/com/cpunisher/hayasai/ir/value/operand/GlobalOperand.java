@@ -5,10 +5,17 @@ import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 public final class GlobalOperand extends Operand {
-    private Ident ident;
+    private final Ident ident;
+    private final int initValue;
 
-    public GlobalOperand(Type type) {
+    public GlobalOperand(Type type, Ident ident, int initValue) {
         super(type);
+        this.ident = ident;
+        this.initValue = initValue;
+    }
+
+    public int getInitValue() {
+        return initValue;
     }
 
     @Override

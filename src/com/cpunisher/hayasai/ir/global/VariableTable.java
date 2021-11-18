@@ -4,6 +4,7 @@ import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.SyntaxException;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,5 +41,13 @@ public class VariableTable<T extends Operand, U extends Operand> implements IVar
 
     private boolean identExists(Ident ident) {
         return varTable.containsKey(ident) || constTable.containsKey(ident);
+    }
+
+    public Map<Ident, T> getVarTable() {
+        return Collections.unmodifiableMap(varTable);
+    }
+
+    public Map<Ident, U> getConstTable() {
+        return Collections.unmodifiableMap(constTable);
     }
 }

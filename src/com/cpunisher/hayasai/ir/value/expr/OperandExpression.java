@@ -1,5 +1,6 @@
 package com.cpunisher.hayasai.ir.value.expr;
 
+import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 
 public class OperandExpression extends Expression {
@@ -22,6 +23,10 @@ public class OperandExpression extends Expression {
 
     public boolean isImmutable() {
         return immutable;
+    }
+
+    public Literal getLiteral() {
+        return (Literal) this.operand;
     }
 
     @Override
