@@ -2,10 +2,7 @@ package com.cpunisher.hayasai.util;
 
 import com.cpunisher.hayasai.ir.value.Block;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public final class BlockCfg {
     private final Block block;
@@ -54,4 +51,11 @@ public final class BlockCfg {
     }
 
     public List<BlockCfg> getSuccessorList() { return this.successorList; }
+
+    public void merge(BlockCfg blockCfg) {
+        this.successorList.addAll(blockCfg.getSuccessorList());
+        for (BlockCfg successor : blockCfg.getSuccessorList()) {
+            Collections.replaceAll(successor.predecessorList, blockCfg, this);
+        }
+    }
 }

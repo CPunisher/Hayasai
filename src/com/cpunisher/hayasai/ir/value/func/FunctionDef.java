@@ -55,7 +55,7 @@ public final class FunctionDef extends Function implements IRegisterAllocator {
     }
 
     public List<Block> getAllBlocks() {
-        return Collections.unmodifiableList(this.blocks);
+        return this.blocks;
     }
 
     public Block getBlockOfRegister(Register register) {

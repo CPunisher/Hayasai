@@ -4,6 +4,7 @@ import com.cpunisher.hayasai.frontend.antlr.MiniSysYLexer;
 import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.frontend.Visitor;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
+import com.cpunisher.hayasai.ir.pass.BlockMerge;
 import com.cpunisher.hayasai.ir.pass.IPass;
 import com.cpunisher.hayasai.ir.pass.MemToReg;
 import com.cpunisher.hayasai.ir.pass.UseGenerator;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 
 public class Main {
     private static final List<IPass> PASS_LIST = List.of(
+        new BlockMerge(),
         new UseGenerator(),
         new MemToReg()
     );

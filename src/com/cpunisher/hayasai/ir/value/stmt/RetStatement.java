@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-public final class RetStatement extends Statement {
+public final class RetStatement extends TerminateStatement {
 
 
     public RetStatement(OperandExpression expression) {

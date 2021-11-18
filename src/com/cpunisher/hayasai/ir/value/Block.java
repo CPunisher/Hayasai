@@ -43,7 +43,7 @@ public final class Block extends Value {
     }
 
     public void addSub(Statement sub) {
-        if (sub != null) {
+        if (sub != null && !this.terminated()) {
             this.subList.add(sub);
         }
     }
@@ -72,8 +72,7 @@ public final class Block extends Value {
         StringJoiner joiner = new StringJoiner(IrKeywords.LINE_SEPARATOR);
         for (Statement stmt : this.subList) {
             joiner.add(IrKeywords.TAB_IDENT + stmt.generate());
-            // TODO terminator judge
-            if (stmt instanceof RetStatement || stmt instanceof BrCondStatement || stmt instanceof BrStatement) {
+            if (stmt instanceof TerminateStatement) {
                 break;
             }
         }
@@ -132,7 +131,15 @@ public final class Block extends Value {
             return false;
         }
         Statement statement = this.subList.get(this.subList.size() - 1);
-        return statement instanceof RetStatement || statement instanceof BrStatement || statement instanceof BrCondStatement;
+        return statement instanceof TerminateStatement;
+    }
+
+    public void merge(Block block) {
+        if (this.terminated()) {
+            this.subList.remove(this.subList.size() - 1);
+        }
+        this.subList.addAll(block.getSubList());
+        this.blockCfg.merge(block.getBlockCfg());
     }
 
     public List<Statement> getUnmodifiableSubList() {

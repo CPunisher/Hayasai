@@ -7,7 +7,7 @@ import com.cpunisher.hayasai.util.IrKeywords;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class BrStatement extends Statement {
+public class BrStatement extends TerminateStatement {
 
     private final Block block;
 
