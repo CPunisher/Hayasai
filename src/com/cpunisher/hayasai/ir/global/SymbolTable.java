@@ -5,6 +5,8 @@ import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.func.Function;
 import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
+import com.cpunisher.hayasai.ir.value.operand.GlobalOperand;
+import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.util.SyntaxException;
 
 import java.util.Collections;
@@ -16,7 +18,7 @@ public final class SymbolTable {
 
     private final Hashtable<Ident, FunctionDecl> funcDeclTable = new Hashtable<>();
     private final Hashtable<Ident, FunctionDef> funcDefTable = new Hashtable<>();
-    private final IVariableTable globalVars = new VariableTable();
+    private final IVariableTable<GlobalOperand, Literal> globalVars = new VariableTable<>();
 
     private SymbolTable() {
         this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getint"), Function.EMPTY_ARGS));

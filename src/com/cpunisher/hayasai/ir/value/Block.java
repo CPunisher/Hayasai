@@ -4,6 +4,7 @@ import com.cpunisher.hayasai.ir.global.IVariableTable;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.global.VariableTable;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
+import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.*;
@@ -14,19 +15,19 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.*;
 
-public final class Block extends Value implements IVariableTable {
+public final class Block extends Value implements IVariableTable<Register, Literal> {
 
     private final Block parent;
     private final FunctionDef functionDef;
     private final Register register;
     private final List<Statement> subList;
-    private final IVariableTable localVars;
+    private final IVariableTable<Register, Literal> localVars;
     private final BlockCfg blockCfg;
 
     public Block(FunctionDef functionDef, Block parent) {
         this.subList = new LinkedList<>();
         this.blockCfg = new BlockCfg(this);
-        this.localVars = new VariableTable();
+        this.localVars = new VariableTable<>();
 
         this.parent = parent;
         this.functionDef = functionDef;
@@ -86,41 +87,42 @@ public final class Block extends Value implements IVariableTable {
         boolean immutable = true;
         if (operand == null) {
             operand = this.getVar(ident);
+            immutable = false;
+        }
+
+        if (operand == null) {
+            operand = SymbolTable.INSTANCE.getGlobalVars().getConst(ident);
+            immutable = true;
+            if (operand == null) {
+                operand = SymbolTable.INSTANCE.getGlobalVars().getVar(ident);
+                immutable = false;
+            }
             if (operand == null)
                 throw new SyntaxException("Ident [" + ident.getIdent()  + "] is not declared.");
-            immutable = false;
         }
         return new Pair<>(operand, immutable);
     }
 
     @Override
-    public Operand getVar(Ident ident) {
-        Operand register = this.localVars.getVar(ident);
+    public Register getVar(Ident ident) {
+        Register register = this.localVars.getVar(ident);
         if (register == null && this.hasParent()) {
             register = this.parent.getVar(ident);
-        }
-
-        if (register == null) {
-            register = SymbolTable.INSTANCE.getGlobalVars().getVar(ident);
         }
         return register;
     }
 
     @Override
-    public Operand getConst(Ident ident) {
-        Operand value =  this.localVars.getConst(ident);
+    public Literal getConst(Ident ident) {
+        Literal value =  this.localVars.getConst(ident);
         if (value == null && this.hasParent()) {
             value = this.parent.getConst(ident);
-        }
-
-        if (value == null) {
-            value = SymbolTable.INSTANCE.getGlobalVars().getConst(ident);
         }
         return value;
     }
 
     @Override
-    public void putVar(Ident ident, Operand value) {
+    public void putVar(Ident ident, Register value) {
         this.localVars.putVar(ident, value);
     }
 
@@ -131,7 +133,7 @@ public final class Block extends Value implements IVariableTable {
     }
 
     @Override
-    public void putConst(Ident ident, Operand constValue) {
+    public void putConst(Ident ident, Literal constValue) {
         this.localVars.putConst(ident, constValue);
     }
 
