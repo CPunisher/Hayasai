@@ -107,6 +107,7 @@ public class MemToReg implements IPass {
                 operand.clearUse();
                 iterator.remove();
             } else if (statement instanceof StoreStatement storeStatement) {
+                if (!(storeStatement.getAddr() instanceof Register)) continue;
                 curMap.put((Register) storeStatement.getAddr(), storeStatement.getSource());
                 iterator.remove();
             } else if (statement instanceof PhiStatement phiStatement) {
