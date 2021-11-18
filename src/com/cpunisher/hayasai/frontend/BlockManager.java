@@ -1,30 +1,33 @@
 package com.cpunisher.hayasai.frontend;
 
 import com.cpunisher.hayasai.ir.value.Block;
-import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
+import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.BrStatement;
+import com.cpunisher.hayasai.ir.value.stmt.Statement;
 
 import java.util.Deque;
 import java.util.LinkedList;
 
 public final class BlockManager {
+    private final FunctionDef functionDef;
     private final Deque<Block> nextBlocks = new LinkedList<>();
-    private Block root;
     private Block current;
+
+    public BlockManager(FunctionDef functionDef) {
+        this.functionDef = functionDef;
+    }
 
     public Block create(boolean isNext, Block parent) {
         Block block;
         if (parent == null) {
-            block = new Block();
+            block = new Block(functionDef);
         } else {
-            block = new Block(parent);
+            block = new Block(functionDef, parent);
         }
 
-        if (root != null) {
-            root.addSub(block);
-        }
+        this.functionDef.addBlock(block);
 
         if (isNext) {
             if (!this.nextBlocks.isEmpty()) {
@@ -39,17 +42,13 @@ public final class BlockManager {
         return this.create(isNext, this.current);
     }
 
-    public void addToCurrent(Value sub) {
+    public void addToCurrent(Statement sub) {
         this.current().addSub(sub);
-    }
-
-    public void setRoot(Block block) {
-        this.root = block;
     }
 
     public Block getBlockByExp(OperandExpression expression) {
         assert expression.getOperand() instanceof Register;
-        return this.root.getSubBlock((Register) expression.getOperand());
+        return this.functionDef.getBlockOfRegister((Register) expression.getOperand());
     }
 
     public void setCurrent(Block block) {
@@ -64,5 +63,9 @@ public final class BlockManager {
 
     public Block current() {
         return this.current;
+    }
+
+    public FunctionDef currentFunc() {
+        return this.functionDef;
     }
 }

@@ -1,8 +1,6 @@
 package com.cpunisher.hayasai.ir.value;
 
-import com.cpunisher.hayasai.ir.type.Type;
-import com.cpunisher.hayasai.ir.util.DefaultAllocator;
-import com.cpunisher.hayasai.ir.util.IRegisterAllocator;
+import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.*;
 import com.cpunisher.hayasai.util.BlockCfg;
@@ -12,41 +10,31 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.*;
 
-public final class Block extends Value implements IRegisterAllocator {
+public final class Block extends Value {
 
     private final Block parent;
+    private final FunctionDef functionDef;
     private final Register register;
     private final List<Statement> subList;
-    private final List<Block> subBlockList;
-    private final IRegisterAllocator allocator;
     private final Map<Ident, Register> varTable;
     private final Map<Ident, Register> constTable;
 
     private final BlockCfg blockCfg;
     private Block next;
 
-    public Block(Block parent) {
+    public Block(FunctionDef functionDef, Block parent) {
         this.subList = new LinkedList<>();
-        this.subBlockList = new LinkedList<>();
         this.blockCfg = new BlockCfg(this);
         this.varTable = new HashMap<>();
         this.constTable = new HashMap<>();
 
         this.parent = parent;
-        this.allocator = parent.allocator;
-        this.register = this.alloc();
+        this.functionDef = functionDef;
+        this.register = functionDef.alloc();
     }
 
-    public Block() {
-        this.subList = new LinkedList<>();
-        this.subBlockList = new LinkedList<>();
-        this.blockCfg = new BlockCfg(this);
-        this.varTable = new HashMap<>();
-        this.constTable = new HashMap<>();
-
-        this.parent = null;
-        this.allocator = new DefaultAllocator();
-        this.register = this.alloc();
+    public Block(FunctionDef functionDef) {
+        this(functionDef, null);
     }
 
     public void addSubToFront(Statement sub) {
@@ -55,13 +43,9 @@ public final class Block extends Value implements IRegisterAllocator {
         }
     }
 
-    public void addSub(Value sub) {
+    public void addSub(Statement sub) {
         if (sub != null) {
-            if (sub instanceof Block) {
-                this.subBlockList.add((Block) sub);
-            } else if (sub instanceof Statement) {
-                this.subList.add((Statement) sub);
-            }
+            this.subList.add(sub);
         }
     }
 
@@ -75,7 +59,6 @@ public final class Block extends Value implements IRegisterAllocator {
 //            this.subList.add(0, new AllocaStatement(varRegister, varRegister.getType()));
 //        }
         this.subList.forEach(Value::build);
-        this.subBlockList.forEach(Value::build);
     }
 
     @Override
@@ -96,9 +79,6 @@ public final class Block extends Value implements IRegisterAllocator {
             }
         }
 
-        for (Block block : this.subBlockList) {
-            joiner.add(block.generate());
-        }
         return blockHeader + joiner;
     }
 
@@ -134,7 +114,7 @@ public final class Block extends Value implements IRegisterAllocator {
         if (this.identExists(ident)) {
             throw new SyntaxException("Ident [" + ident.getIdent() + "] exists.");
         }
-        Register register = this.alloc();
+        Register register = this.functionDef.alloc();
         this.varTable.put(ident, register);
         return register;
     }
@@ -143,18 +123,9 @@ public final class Block extends Value implements IRegisterAllocator {
         if (this.identExists(ident)) {
             throw new SyntaxException("Ident [" + ident.getIdent() + "] exists.");
         }
-        Register register = this.alloc();
+        Register register = this.functionDef.alloc();
         this.constTable.put(ident, register);
         return register;
-    }
-
-    public Block getSubBlock(Register register) {
-        for (Block block : this.subBlockList) {
-            if (block.getBlockRegister() == register) {
-                return block;
-            }
-        }
-        throw new RuntimeException("Can't find sub block.");
     }
 
     public boolean terminated() {
@@ -173,26 +144,8 @@ public final class Block extends Value implements IRegisterAllocator {
         return this.subList;
     }
 
-    public List<Block> getSubBlockList() {
-        return Collections.unmodifiableList(this.subBlockList);
-    }
-
     public boolean identExists(Ident ident) {
         return varTable.containsKey(ident) || constTable.containsKey(ident);
-    }
-
-    public Ident genIdent() {
-        return this.allocator.genIdent();
-    }
-
-    @Override
-    public Register alloc() {
-        return this.allocator.alloc();
-    }
-
-    @Override
-    public Register alloc(Type type) {
-        return this.allocator.alloc(type);
     }
 
     public boolean hasNext() {

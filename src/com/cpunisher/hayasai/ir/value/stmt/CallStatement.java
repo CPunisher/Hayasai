@@ -4,11 +4,11 @@ import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.func.Function;
-import com.cpunisher.hayasai.ir.value.func.FunctionParams;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
@@ -17,20 +17,16 @@ public class CallStatement extends Statement {
     private final Type funcType;
     private final Ident funcIdent;
 
-    public CallStatement(Function function) {
-        this(null, function);
+    public CallStatement(Type funcType, Ident funcIdent, List<OperandExpression> args) {
+        this(null, funcType, funcIdent, args);
     }
 
-    public CallStatement(Register receiver, Function function) {
+    public CallStatement(Register receiver, Type funcType, Ident funcIdent, List<OperandExpression> args) {
         this.receiver = receiver;
-        this.funcType = function.getFuncType();
-        this.funcIdent = function.getIdent();
+        this.funcType = funcType;
+        this.funcIdent = funcIdent;
 
-        this.operands = function.getParam().getParams()
-                .stream()
-                .map(FunctionParams.FunctionParam.class::cast)
-                .map(FunctionParams.FunctionParam::getExpression)
-                .map(OperandExpression::getOperand).collect(Collectors.toList());
+        this.operands = args.stream().map(OperandExpression::getOperand).collect(Collectors.toList());
     }
 
     @Override

@@ -19,9 +19,7 @@ public class MemToReg implements IPass {
     @Override
     public void pass(SymbolTable module) {
         for (FunctionDef functionDef : module.getFuncDefTable().values()) {
-            List<BlockCfg> blocks = new ArrayList<>();
-            blocks.add(functionDef.getBlock().getBlockCfg());
-            blocks.addAll(functionDef.getBlock().getSubBlockList().stream().map(Block::getBlockCfg).collect(Collectors.toList()));
+            List<BlockCfg> blocks = functionDef.getAllBlocks().stream().map(Block::getBlockCfg).collect(Collectors.toList());
 
             this.initDominance(blocks);
             this.initDominanceFrontier(blocks);
@@ -56,7 +54,7 @@ public class MemToReg implements IPass {
                     for (BlockCfg df : blockCfg.getDomFrontiers()) {
                         if (!phiBlocks.contains(df)) {
                             // add v <- phi at entry of df
-                            PhiStatement statement = new PhiStatement(df.getBlock().alloc());
+                            PhiStatement statement = new PhiStatement(functionDef.alloc());
                             df.getBlock().addSubToFront(statement);
                             phiMap.put(statement, v);
                             phiBlocks.add(df);
@@ -70,7 +68,7 @@ public class MemToReg implements IPass {
 
             // Algorithm 3.3: Renaming algorithm for second phase of SSA construction
             Set<BlockCfg> visitSet = new HashSet<>();
-            this.renameDfs(functionDef.getBlock().getBlockCfg(), null, new HashMap<>(), phiMap, visitSet);
+            this.renameDfs(functionDef.getEntry().getBlockCfg(), null, new HashMap<>(), phiMap, visitSet);
         }
     }
 

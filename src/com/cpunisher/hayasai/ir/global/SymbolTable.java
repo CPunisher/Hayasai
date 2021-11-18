@@ -5,7 +5,6 @@ import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.func.Function;
 import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
-import com.cpunisher.hayasai.ir.value.func.FunctionParams;
 import com.cpunisher.hayasai.util.SyntaxException;
 
 import java.util.Collections;
@@ -19,10 +18,10 @@ public final class SymbolTable {
     private final Hashtable<Ident, FunctionDef> funcDefTable = new Hashtable<>();
 
     private SymbolTable() {
-        this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getint"), new FunctionParams()));
-        this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getch"), new FunctionParams()));
-        this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putint"), new FunctionParams(Type.INT)));
-        this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putch"), new FunctionParams(Type.INT)));
+        this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getint"), Function.EMPTY_ARGS));
+        this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getch"), Function.EMPTY_ARGS));
+        this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putint"), Function.parseParam(Type.INT)));
+        this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putch"), Function.parseParam(Type.INT)));
     }
 
     public void putFunctionDecl(FunctionDecl functionDecl) {

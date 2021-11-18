@@ -15,7 +15,6 @@ import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
-import com.cpunisher.hayasai.ir.value.func.FunctionParams;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.SyntaxException;
@@ -29,9 +28,9 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 
     private final SymbolTable symbolTable = SymbolTable.INSTANCE;
 
-    private final BlockManager blockManager = new BlockManager();
     private final ConditionContext condCtx = new ConditionContext();
     private boolean visitingConstExp;
+    private BlockManager blockManager;
 
     @Override
     public Value visitCompUnit(MiniSysYParser.CompUnitContext ctx) {
@@ -42,13 +41,14 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     public Value visitFuncDef(MiniSysYParser.FuncDefContext ctx) {
         Type type = (Type) visitFuncType(ctx.funcType());
         Ident ident = Ident.valueOf(ctx.IDENT().getText());
-        FunctionParams params = new FunctionParams();
+        FunctionDef functionDef = new FunctionDef(type, ident, Function.EMPTY_ARGS);
+        symbolTable.putFunctionDef(functionDef);
+
+        this.blockManager = new BlockManager(functionDef);
         Block block = this.blockManager.create(false);
         this.blockManager.setCurrent(block);
-        this.blockManager.setRoot(block);
         visitBlock(ctx.block());
         this.blockManager.setCurrent(null);
-        symbolTable.putFunctionDef(new FunctionDef(type, ident, params, block));
         return null;
     }
 
@@ -60,7 +60,11 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitBlock(MiniSysYParser.BlockContext ctx) {
         for (MiniSysYParser.BlockItemContext blockItemContext : ctx.blockItem()) {
-            this.blockManager.addToCurrent(visitBlockItem(blockItemContext));
+            if (blockItemContext.stmt() != null && blockItemContext.stmt().block() != null) {
+                visitBlockItem(blockItemContext);
+            } else {
+                this.blockManager.addToCurrent((Statement) visitBlockItem(blockItemContext));
+            }
         }
         return null;
     }
@@ -92,7 +96,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         if (ctx.stmt(0).block() != null) {
             visitBlock(ctx.stmt(0).block());
         } else {
-            this.blockManager.addToCurrent(ctx.stmt(0).children.get(0).accept(this));
+            this.blockManager.addToCurrent((Statement) ctx.stmt(0).children.get(0).accept(this));
         }
 
         if (hasElse) {
@@ -102,7 +106,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             if (ctx.stmt(1).block() != null) {
                 visitBlock(ctx.stmt(1).block());
             } else {
-                this.blockManager.addToCurrent(ctx.stmt(1).children.get(0).accept(this));
+                this.blockManager.addToCurrent((Statement) ctx.stmt(1).children.get(0).accept(this));
             }
         }
 //        lastBlock.addSub(new BrCondStatement(condExp, blockTrue.getBlockRegister(), blockElse.getBlockRegister()));
@@ -131,7 +135,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitConstDecl(MiniSysYParser.ConstDeclContext ctx) {
         for (var constDef : ctx.constDef()) {
-            this.blockManager.addToCurrent(visitConstDef(constDef));
+            this.blockManager.addToCurrent((Statement) visitConstDef(constDef));
         }
         return null;
     }
@@ -158,7 +162,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitVarDecl(MiniSysYParser.VarDeclContext ctx) {
         for (var varDef: ctx.varDef()) {
-            this.blockManager.addToCurrent(visitVarDef(varDef));
+            this.blockManager.addToCurrent((Statement) visitVarDef(varDef));
         }
         return null;
     }
@@ -183,7 +187,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             for (int i = 0; i < ctx.unaryOp().size(); i++) {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 Operand operand2 = ((OperandExpression) visitMulExp(ctx.mulExp(i + 1))).getOperand();
-                cur = this.blockManager.current().alloc();
+                cur = this.blockManager.currentFunc().alloc();
                 BinaryOperator operator = BinaryOperator.valueOf(ctx.unaryOp(i).getText());
                 this.blockManager.addToCurrent(new BinaryOperationStatement(cur, operand1, operand2, operator));
                 last = cur;
@@ -201,7 +205,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             for (int i = 0; i < ctx.binaryOp().size(); i++) {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 Operand operand2 = ((OperandExpression) visitUnaryExp(ctx.unaryExp(i + 1))).getOperand();
-                cur = this.blockManager.current().alloc();
+                cur = this.blockManager.currentFunc().alloc();
                 BinaryOperator operator = BinaryOperator.valueOf(ctx.binaryOp(i).getText());
                 this.blockManager.addToCurrent(new BinaryOperationStatement(cur, operand1, operand2, operator));
                 last = cur;
@@ -223,15 +227,15 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 if (validUnaryOpList.get(i).MINUS() != null) {
                     Operand operand = last != null ? last : expression.getOperand();
                     if (operand.getType() != Type.INT) {
-                        cur = this.blockManager.current().alloc();
+                        cur = this.blockManager.currentFunc().alloc();
                         this.blockManager.addToCurrent(new ZextStatement(cur, new OperandExpression(operand), Type.INT));
                         operand = cur;
                     }
-                    cur = this.blockManager.current().alloc();
+                    cur = this.blockManager.currentFunc().alloc();
                     this.blockManager.addToCurrent(new BinaryOperationStatement(cur, Literal.INT_ZERO, operand, BinaryOperator.SUB));
                     last = cur;
                 } else if (validUnaryOpList.get(i).NOT() != null) {
-                    cur = this.blockManager.current().alloc(Type.BIT);
+                    cur = this.blockManager.currentFunc().alloc(Type.BIT);
                     Operand operand1 = last != null ? last : expression.getOperand();
                     Operand operand2 = operand1.getType() == Type.BIT ? Literal.BIT_ZERO : Literal.INT_ZERO;
                     this.blockManager.addToCurrent(new IcmpStatement(cur, operand1, operand2, IcmpStatement.CompareType.EQ));
@@ -246,29 +250,27 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitFuncCall(MiniSysYParser.FuncCallContext ctx) {
         Ident ident = Ident.valueOf(ctx.IDENT().getText());
-        FunctionParams params = new FunctionParams(Optional.ofNullable(ctx.funcRParams())
+        List<OperandExpression> args = Optional.ofNullable(ctx.funcRParams())
                 .stream()
                 .flatMap(paramsCtx -> paramsCtx.exp().stream())
                 .map(this::visitExp)
                 .map(OperandExpression.class::cast)
-                .map(FunctionParams.FunctionParam::new)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
         Function f = this.symbolTable.getFunctionByIdent(ident);
         if (f == null) {
             throw new SyntaxException("Function [" + ident.getIdent() + "] is not declared.");
         }
 
-        if (!f.getParam().equals(params)) {
+        if (!f.checkArgs(args)) {
             throw new SyntaxException("Function [" + ident.getIdent() + "] arguments error.");
         }
 
-        f = new FunctionDecl(f.getFuncType(), ident, params);
         if (f.getFuncType() != Type.VOID) {
-            Register register = this.blockManager.current().alloc(f.getFuncType());
-            this.blockManager.addToCurrent(new CallStatement(register, f));
+            Register register = this.blockManager.currentFunc().alloc(f.getFuncType());
+            this.blockManager.addToCurrent(new CallStatement(register, f.getFuncType(), ident, args));
             return new OperandExpression(register);
         }
-        this.blockManager.addToCurrent(new CallStatement(f));
+        this.blockManager.addToCurrent(new CallStatement(f.getFuncType(), ident, args));
         return VoidExpression.VOID_EXPRESSION;
     }
 
@@ -297,11 +299,11 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 Operand operand2 = ((OperandExpression) visitAddExp(ctx.addExp(i + 1))).getOperand();
                 if (operand1.getType() == Type.BIT) {
-                    cur = this.blockManager.current().alloc(Type.INT);
+                    cur = this.blockManager.currentFunc().alloc(Type.INT);
                     this.blockManager.addToCurrent(new ZextStatement(cur, new OperandExpression(operand1), Type.INT));
                     operand1 = cur;
                 }
-                cur = this.blockManager.current().alloc(Type.BIT);
+                cur = this.blockManager.currentFunc().alloc(Type.BIT);
                 IcmpStatement.CompareType operator = IcmpStatement.CompareType.valueOf(ctx.compOp(i).getText());
                 this.blockManager.addToCurrent(new IcmpStatement(cur, operand1, operand2, operator));
                 last = cur;
@@ -320,11 +322,11 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 Operand operand2 = ((OperandExpression) visitRelExp(ctx.relExp(i + 1))).getOperand();
                 if (operand1.getType() == Type.BIT) {
-                    cur = this.blockManager.current().alloc(Type.INT);
+                    cur = this.blockManager.currentFunc().alloc(Type.INT);
                     this.blockManager.addToCurrent(new ZextStatement(cur, new OperandExpression(operand1), Type.INT));
                     operand1 = cur;
                 }
-                cur = this.blockManager.current().alloc(Type.BIT);
+                cur = this.blockManager.currentFunc().alloc(Type.BIT);
                 IcmpStatement.CompareType operator = IcmpStatement.CompareType.valueOf(ctx.equalOp(i).getText()); // (i32, i32) to i1
                 this.blockManager.addToCurrent(new IcmpStatement(cur, operand1, operand2, operator));
                 last = cur;
@@ -333,7 +335,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         }
 
         if (expression.getOperand().getType() == Type.INT) {
-            cur = this.blockManager.current().alloc(Type.BIT);
+            cur = this.blockManager.currentFunc().alloc(Type.BIT);
             this.blockManager.addToCurrent(new IcmpStatement(cur, expression.getOperand(), Literal.INT_ZERO, IcmpStatement.CompareType.NE));
             expression = new OperandExpression(cur);
         }
@@ -373,7 +375,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     public Value visitLVal(MiniSysYParser.LValContext ctx) {
         Ident target = Ident.valueOf(ctx.IDENT().getText());
         Pair<Register, Boolean> pair = this.blockManager.current().compute(target);
-        Register tmpRegister = this.blockManager.current().alloc();
+        Register tmpRegister = this.blockManager.currentFunc().alloc();
         this.blockManager.addToCurrent(new LoadStatement(tmpRegister, pair.a));
         return new OperandExpression(tmpRegister, pair.b);
     }

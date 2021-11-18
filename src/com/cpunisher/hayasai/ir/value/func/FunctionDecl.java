@@ -4,16 +4,13 @@ import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 public final class FunctionDecl extends Function {
 
-    public FunctionDecl(Ident ident, FunctionParams param) {
-        this(null, ident, param);
-    }
-
-    public FunctionDecl(Type funcType, Ident ident, FunctionParams param) {
-        super(funcType, ident, param);
+    public FunctionDecl(Type funcType, Ident ident, List<? extends FunctionParam> params) {
+        super(funcType, ident, params);
     }
 
     @Override
@@ -23,10 +20,10 @@ public final class FunctionDecl extends Function {
         builder.append(this.funcType.generate()).append(" ");
         builder.append(IrKeywords.FUNC_IDENT);
         builder.append(this.ident.generate());
-        builder.append(this.param.getParams().stream()
-                .map(FunctionParams.FunctionParamDeclare::getArgType)
-                .map(Type::generate)
-                .collect(Collectors.joining(IrKeywords.SEPARATOR + " ", IrKeywords.LPARENTHESE, IrKeywords.RPARENTHESE)));
+        builder.append(this.params.stream()
+                        .map(FunctionParam::getArgType)
+                        .map(Type::generate)
+                        .collect(Collectors.joining(IrKeywords.SEPARATOR + " ", IrKeywords.LPARENTHESE, IrKeywords.RPARENTHESE)));
         return builder.toString();
     }
 }
