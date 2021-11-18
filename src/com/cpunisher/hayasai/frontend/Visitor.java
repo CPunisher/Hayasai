@@ -60,7 +60,17 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     public Value visitBlock(MiniSysYParser.BlockContext ctx) {
         for (MiniSysYParser.BlockItemContext blockItemContext : ctx.blockItem()) {
             if (blockItemContext.stmt() != null && blockItemContext.stmt().block() != null) {
+                Block lastBlock = this.blockManager.current();
+                this.blockManager.setNext(lastBlock, null);
+                Block blockIn = this.blockManager.create(false);
+                Block blockAfter = this.blockManager.create(true);
+
+                this.blockManager.setCurrent(blockIn);
+                this.blockManager.setNext(blockIn, blockAfter);
                 visitBlockItem(blockItemContext);
+
+                this.blockManager.setCurrent(blockAfter);
+                lastBlock.addSub(new BrStatement(blockIn, lastBlock));
             } else {
                 this.blockManager.addToCurrent((Statement) visitBlockItem(blockItemContext));
             }
