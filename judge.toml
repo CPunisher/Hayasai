@@ -29,3 +29,35 @@ image = { source = "dockerfile", path = "." }
 run = [
     "java -ea -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
 ]
+
+[jobs.lab5]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+    "java -ea -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
+]
+
+[jobs.lab6]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+    "java -ea -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
+]
+
+[jobs.lab7]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+    "java -ea -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
+]
+
+[jobs.lab8]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+    "java -ea -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
+]
