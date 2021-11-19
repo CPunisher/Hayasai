@@ -143,7 +143,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         Block lastBlock = this.blockManager.current();
         this.blockManager.setNext(lastBlock, null);
 
-        Block blockAfter = this.blockManager.create(false, lastBlock.getParent());
+        Block blockAfter = this.blockManager.create(true, lastBlock.getParent());
         Block blockBody = this.blockManager.create(false);
 
         blockAfter.mergeTable(lastBlock);
