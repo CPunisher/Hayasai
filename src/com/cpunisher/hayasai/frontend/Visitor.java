@@ -158,7 +158,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             this.blockManager.addToCurrent((Statement) ctx.stmt().children.get(0).accept(this));
         }
 
-        blockBody.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), blockBody));
+        this.blockManager.addToCurrent(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), this.blockManager.current()));
         lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), lastBlock));
         this.blockManager.setCurrent(blockAfter);
         return null;
@@ -186,7 +186,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         for (var constDef : ctx.constDef()) {
             Statement statement = (Statement) visitConstDef(constDef);
             if (!this.isGlobal)
-                this.blockManager.addToCurrent((Statement) visitConstDef(constDef));
+                this.blockManager.addToCurrent(statement);
         }
         return null;
     }
