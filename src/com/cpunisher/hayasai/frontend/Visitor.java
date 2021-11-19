@@ -34,6 +34,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 
     private final ConditionContext condCtx = new ConditionContext();
     private final LoopContext loopCtx = new LoopContext();
+    private final DeclContext declCtx = new DeclContext();
     private BlockManager blockManager;
     private boolean isGlobal = false;
 
@@ -205,6 +206,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitConstDecl(MiniSysYParser.ConstDeclContext ctx) {
         for (var constDef : ctx.constDef()) {
+            this.declCtx.setDeclType(Type.valueOf(ctx.btype().getText()));
             Statement statement = (Statement) visitConstDef(constDef);
             if (!this.isGlobal)
                 this.blockManager.addToCurrent(statement);
@@ -231,6 +233,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitVarDecl(MiniSysYParser.VarDeclContext ctx) {
         for (var varDef: ctx.varDef()) {
+            this.declCtx.setDeclType(Type.valueOf(ctx.btype().getText()));
             Statement statement = (Statement) visitVarDef(varDef);
             if (!this.isGlobal)
                 this.blockManager.addToCurrent(statement);
@@ -241,7 +244,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitVarDef(MiniSysYParser.VarDefContext ctx) {
         Ident ident = Ident.valueOf(ctx.IDENT().getText());
-
+        Type type = this.declCtx.getDeclType();
         if (this.isGlobal) {
             OperandExpression expression;
             if (ctx.initVal() != null) {
@@ -253,12 +256,13 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             if (!expression.isImmutable()) {
                 throw new SyntaxException("initializer element is not a compile-time constant.");
             }
-
-            this.symbolTable.getGlobalVars().putVar(ident, new GlobalOperand(expression.getOperand().getType().getPointer(), ident, expression.getLiteral().getValue()));
+            assert type.equals(expression.getOperand().getType());
+            this.symbolTable.getGlobalVars().putVar(ident, new GlobalOperand(type.getPointer(), ident, expression.getLiteral().getValue()));
         } else {
+            Register register = this.blockManager.current().putVar(ident, type);
             if (ctx.initVal() != null) {
                 OperandExpression expression = (OperandExpression) visitInitVal(ctx.initVal());
-                Register register = this.blockManager.current().putVar(ident, expression.getOperand().getType());
+                assert type.equals(expression.getOperand().getType());
                 return new StoreStatement(expression, register);
             }
         }
