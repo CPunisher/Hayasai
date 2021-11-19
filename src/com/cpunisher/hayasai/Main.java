@@ -4,10 +4,7 @@ import com.cpunisher.hayasai.frontend.antlr.MiniSysYLexer;
 import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.frontend.Visitor;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
-import com.cpunisher.hayasai.ir.pass.BlockMerge;
-import com.cpunisher.hayasai.ir.pass.IPass;
-import com.cpunisher.hayasai.ir.pass.MemToReg;
-import com.cpunisher.hayasai.ir.pass.UseGenerator;
+import com.cpunisher.hayasai.ir.pass.*;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
@@ -24,6 +21,7 @@ import java.util.stream.Collectors;
 
 public class Main {
     private static final List<IPass> PASS_LIST = List.of(
+        new DeadCodeRemove(),
         new BlockMerge(),
         new UseGenerator(),
         new MemToReg()
