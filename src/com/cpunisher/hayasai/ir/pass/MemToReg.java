@@ -1,34 +1,46 @@
 package com.cpunisher.hayasai.ir.pass;
 
 import com.cpunisher.hayasai.ir.global.SymbolTable;
+import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
-import com.cpunisher.hayasai.ir.value.stmt.LoadStatement;
-import com.cpunisher.hayasai.ir.value.stmt.PhiStatement;
-import com.cpunisher.hayasai.ir.value.stmt.Statement;
-import com.cpunisher.hayasai.ir.value.stmt.StoreStatement;
+import com.cpunisher.hayasai.ir.value.stmt.*;
 import com.cpunisher.hayasai.util.BlockCfg;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class MemToReg implements IPass {
+
+    private final Map<PhiStatement, Register> phiMap = new HashMap<>();
+
     @Override
     public void pass(SymbolTable module) {
         for (FunctionDef functionDef : module.getFuncDefTable().values()) {
             List<BlockCfg> blocks = functionDef.getAllBlocks().stream().map(Block::getBlockCfg).collect(Collectors.toList());
+            phiMap.clear();
 
             this.initDominance(blocks);
             this.initDominanceFrontier(blocks);
+
+            // init allocate statement set
+            Set<Register> allocateSet = new HashSet<>();
+            for (BlockCfg blockCfg : blocks) {
+                for (Statement statement : blockCfg.getBlock().getUnmodifiableSubList()) {
+                    if (statement instanceof AllocaStatement allocaStatement && allocaStatement.getReceiver().getType().equals(Type.INT)) {
+                        allocateSet.add(allocaStatement.getReceiver());
+                    }
+                }
+            }
 
             // init defs
             Map<Register, List<BlockCfg>> defs = new HashMap<>();
             for (BlockCfg blockCfg : blocks) {
                 for (Statement statement : blockCfg.getBlock().getUnmodifiableSubList()) {
-                    if (statement instanceof StoreStatement storeStatement && storeStatement.getAddr() instanceof Register) {
+                    if (statement instanceof StoreStatement storeStatement && allocateSet.contains(storeStatement.getAddr())) {
                         List<BlockCfg> list = new ArrayList<>();
                         list.add(blockCfg);
                         defs.merge((Register) storeStatement.getAddr(), list, (e1, e2) -> {
@@ -40,7 +52,6 @@ public class MemToReg implements IPass {
             }
 
             // Algorithm 3.1: Standard algorithm for inserting phi - functions
-            Map<PhiStatement, Register> phiMap = new HashMap<>();
             for (Register v : defs.keySet()) {
                 Set<BlockCfg> phiBlocks = new HashSet<>();
                 Queue<BlockCfg> blockToHandle = new LinkedList<>();
@@ -68,11 +79,11 @@ public class MemToReg implements IPass {
 
             // Algorithm 3.3: Renaming algorithm for second phase of SSA construction
             Set<BlockCfg> visitSet = new HashSet<>();
-            this.renameDfs(functionDef.getEntry().getBlockCfg(), null, new HashMap<>(), phiMap, visitSet);
+            this.renameDfs(functionDef.getEntry().getBlockCfg(), null, new HashMap<>(), visitSet);
         }
     }
 
-    private void renameDfs(BlockCfg cur, BlockCfg prev, Map<Register, Operand> renameMap, Map<PhiStatement, Register> phiMap, Set<BlockCfg> visitSet) {
+    private void renameDfs(BlockCfg cur, BlockCfg prev, Map<Register, Operand> renameMap, Set<BlockCfg> visitSet) {
         Map<Register, Operand> curMap = new HashMap<>(renameMap);
         // update phi
         for (Statement statement : cur.getBlock().getUnmodifiableSubList()) {
@@ -96,9 +107,10 @@ public class MemToReg implements IPass {
         Iterator<Statement> iterator = cur.getBlock().getSubList().iterator();
         while (iterator.hasNext()) {
             Statement statement = iterator.next();
-            // TODO type check
-            if (statement instanceof LoadStatement loadStatement) {
-                if (!(loadStatement.getOperands().get(0) instanceof Register)) continue;
+            if (statement instanceof AllocaStatement) {
+                iterator.remove();
+            } else if (statement instanceof LoadStatement loadStatement) {
+                if (!shouldHandle(loadStatement.getOperands().get(0))) continue;
                 Operand operand = curMap.get((Register) loadStatement.getOperands().get(0));
                 Operand origin = loadStatement.getReceiver();
                 for (Operand.Use use : origin.getUses()) {
@@ -107,7 +119,7 @@ public class MemToReg implements IPass {
                 operand.clearUse();
                 iterator.remove();
             } else if (statement instanceof StoreStatement storeStatement) {
-                if (!(storeStatement.getAddr() instanceof Register)) continue;
+                if (!shouldHandle(((StoreStatement) statement).getAddr())) continue;
                 curMap.put((Register) storeStatement.getAddr(), storeStatement.getSource());
                 iterator.remove();
             } else if (statement instanceof PhiStatement phiStatement) {
@@ -116,8 +128,12 @@ public class MemToReg implements IPass {
         }
 
         for (BlockCfg successor : cur.getSuccessorList()) {
-            this.renameDfs(successor, cur, curMap, phiMap, visitSet);
+            this.renameDfs(successor, cur, curMap, visitSet);
         }
+    }
+
+    private boolean shouldHandle(Operand operand) {
+        return operand instanceof Register register && this.phiMap.containsValue(register);
     }
 
     private void initDominance(List<BlockCfg> blocks) {

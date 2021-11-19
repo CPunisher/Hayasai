@@ -53,12 +53,6 @@ public final class Block extends Value implements IVariableTable<Register, Liter
     @Override
     public void build() {
         this.register.build();
-//        for (Register constRegister : this.constTable.values()) {
-//            this.subList.add(0, new AllocaStatement(constRegister, constRegister.getType()));
-//        }
-//        for (Register varRegister : this.varTable.values()) {
-//            this.subList.add(0, new AllocaStatement(varRegister, varRegister.getType()));
-//        }
         this.subList.forEach(Value::build);
     }
 
@@ -129,6 +123,7 @@ public final class Block extends Value implements IVariableTable<Register, Liter
     public Register putVar(Ident ident) {
         Register register = this.functionDef.alloc();
         this.localVars.putVar(ident, register);
+        this.addSubToFront(new AllocaStatement(register));
         return register;
     }
 

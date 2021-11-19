@@ -1,7 +1,5 @@
 package com.cpunisher.hayasai.ir.value.stmt;
 
-import com.cpunisher.hayasai.ir.type.Type;
-import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
@@ -9,12 +7,14 @@ import java.util.List;
 import java.util.StringJoiner;
 
 public class AllocaStatement extends Statement {
-    private final Operand receiver;
-    private final Type type;
+    private final Register receiver;
 
-    public AllocaStatement(Operand receiver, Type type) {
+    public AllocaStatement(Register receiver) {
         this.receiver = receiver;
-        this.type = type;
+    }
+
+    public Register getReceiver() {
+        return receiver;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class AllocaStatement extends Statement {
         joiner.add(receiver.generate());
         joiner.add(IrKeywords.ASSIGN);
         joiner.add(IrKeywords.ALLOCA);
-        joiner.add(type.generate());
+        joiner.add(receiver.getType().generate());
         return joiner.toString();
     }
 }
