@@ -32,6 +32,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     private final SymbolTable symbolTable = SymbolTable.INSTANCE;
 
     private final ConditionContext condCtx = new ConditionContext();
+    private final LoopContext loopCtx = new LoopContext();
     private BlockManager blockManager;
     private boolean isGlobal = false;
 
@@ -150,18 +151,37 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         this.condCtx.setBlockTrue(blockBody);
         this.condCtx.setBlockFalse(blockAfter);
         OperandExpression condEntryExp = (OperandExpression) visitCond(ctx.cond());
+        Block blockCond = this.blockManager.getBlockByExp(condEntryExp);
 
+        this.loopCtx.push(blockCond, blockAfter);
         this.blockManager.setCurrent(blockBody);
         if (ctx.stmt().block() != null) {
             visitBlock(ctx.stmt().block());
         } else {
             this.blockManager.addToCurrent((Statement) ctx.stmt().children.get(0).accept(this));
         }
+        this.loopCtx.pop();
 
-        this.blockManager.addToCurrent(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), this.blockManager.current()));
         lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), lastBlock));
+        this.blockManager.addToCurrent(new BrStatement(blockCond, this.blockManager.current()));
         this.blockManager.setCurrent(blockAfter);
         return null;
+    }
+
+    @Override
+    public Value visitBreakStmt(MiniSysYParser.BreakStmtContext ctx) {
+        if (this.loopCtx.peekAfter() == null) {
+            throw new SyntaxException("'break' statement not in loop or switch statement");
+        }
+        return new BrStatement(this.loopCtx.peekAfter(), this.blockManager.current());
+    }
+
+    @Override
+    public Value visitContinueStmt(MiniSysYParser.ContinueStmtContext ctx) {
+        if (this.loopCtx.peekCondition() == null) {
+            throw new SyntaxException("'continue' statement not in loop statement");
+        }
+        return new BrStatement(this.loopCtx.peekCondition(), this.blockManager.current());
     }
 
     /* visitStmt 和 declare 系列必须返回 Statement 或 Block */
