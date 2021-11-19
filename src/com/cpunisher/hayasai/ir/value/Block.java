@@ -125,7 +125,7 @@ public final class Block extends Value implements IVariableTable<Register, Liter
     public Register putVar(Ident ident, Type type) {
         Register register = this.functionDef.alloc(type.getPointer());
         this.localVars.putVar(ident, register);
-        this.addSubToFront(new AllocaStatement(register, register.getType()));
+        this.addSubToFront(new AllocaStatement(register, type));
         return register;
     }
 
