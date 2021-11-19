@@ -1,6 +1,7 @@
-package com.cpunisher.hayasai.ir.value.stmt;
+package com.cpunisher.hayasai.ir.value.stmt.impl;
 
 import com.cpunisher.hayasai.ir.value.operand.Register;
+import com.cpunisher.hayasai.ir.value.stmt.Statement;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.StringJoiner;

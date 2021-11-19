@@ -8,6 +8,10 @@ import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.*;
+import com.cpunisher.hayasai.ir.value.stmt.impl.AllocaStatement;
+import com.cpunisher.hayasai.ir.value.stmt.impl.LoadStatement;
+import com.cpunisher.hayasai.ir.value.stmt.impl.PhiStatement;
+import com.cpunisher.hayasai.ir.value.stmt.impl.StoreStatement;
 import com.cpunisher.hayasai.util.BlockCfg;
 
 import java.util.*;

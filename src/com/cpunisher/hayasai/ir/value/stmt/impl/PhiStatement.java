@@ -1,8 +1,11 @@
-package com.cpunisher.hayasai.ir.value.stmt;
+package com.cpunisher.hayasai.ir.value.stmt.impl;
 
+import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
+import com.cpunisher.hayasai.ir.value.stmt.ReceiverStatement;
+import com.cpunisher.hayasai.ir.value.stmt.Statement;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.Collections;
@@ -10,13 +13,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
 
-public class PhiStatement extends Statement {
-    private final Register receiver;
+public class PhiStatement extends ReceiverStatement {
     private final Map<Block, Operand> values;
 
     public PhiStatement(Register receiver) {
-        this.receiver = receiver;
+        super(receiver);
         this.values = new HashMap<>();
+        this.setReceiverType();
     }
 
     public Register getReceiver() {
@@ -42,7 +45,7 @@ public class PhiStatement extends Statement {
         joiner.add(receiver.generate());
         joiner.add(IrKeywords.ASSIGN);
         joiner.add(IrKeywords.PHI);
-        joiner.add(this.receiver.getType().generate());
+        joiner.add(Type.INT.generate());
 
         StringJoiner valueJoiner = new StringJoiner(", ");
         for (Map.Entry<Block, Operand> entry : this.values.entrySet()) {
@@ -56,5 +59,10 @@ public class PhiStatement extends Statement {
         }
         joiner.add(valueJoiner.toString());
         return joiner.toString();
+    }
+
+    @Override
+    public void setReceiverType() {
+        this.receiver.setType(Type.INT);
     }
 }

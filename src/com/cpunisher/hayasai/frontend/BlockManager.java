@@ -4,7 +4,7 @@ import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.Register;
-import com.cpunisher.hayasai.ir.value.stmt.BrStatement;
+import com.cpunisher.hayasai.ir.value.stmt.impl.BrStatement;
 import com.cpunisher.hayasai.ir.value.stmt.Statement;
 
 import java.util.Deque;

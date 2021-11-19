@@ -15,6 +15,11 @@ public final class ArrayType extends Type {
     }
 
     @Override
+    public Type getWrappedType() {
+        return this.elementType;
+    }
+
+    @Override
     public String generate() {
         StringBuilder builder = new StringBuilder();
         for (int j : this.size) {

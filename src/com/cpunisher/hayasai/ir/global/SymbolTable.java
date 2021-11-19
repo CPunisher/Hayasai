@@ -27,6 +27,7 @@ public final class SymbolTable {
         this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getch"), Function.EMPTY_ARGS));
         this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putint"), Function.parseParam(Type.INT)));
         this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putch"), Function.parseParam(Type.INT)));
+        this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("memset"), Function.parseParam(Type.INT.getPointer(), Type.INT, Type.INT)));
     }
 
     public void putFunctionDecl(FunctionDecl functionDecl) {

@@ -1,9 +1,11 @@
-package com.cpunisher.hayasai.ir.value.stmt;
+package com.cpunisher.hayasai.ir.value.stmt.impl;
 
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
+import com.cpunisher.hayasai.ir.value.stmt.ReceiverStatement;
+import com.cpunisher.hayasai.ir.value.stmt.Statement;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 
@@ -11,17 +13,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class IcmpStatement extends Statement {
-    private final Register receiver;
+public class IcmpStatement extends ReceiverStatement {
     private final CompareType compareType;
 
     public IcmpStatement(Register receiver, Operand operand1, Operand operand2, CompareType compareType) {
-        assert receiver.getType() == Type.BIT;
+        super(receiver);
         assert operand1.getType() == operand2.getType();
 
-        this.receiver = receiver;
         this.compareType = compareType;
         this.operands = Arrays.asList(operand1, operand2);
+        this.setReceiverType();
     }
 
     @Override
@@ -41,6 +42,11 @@ public class IcmpStatement extends Statement {
         joiner.add(IrKeywords.SEPARATOR);
         joiner.add(this.operands.get(1).generate());
         return joiner.toString();
+    }
+
+    @Override
+    public void setReceiverType() {
+        this.receiver.setType(Type.BIT);
     }
 
     public static final class CompareType extends Value {

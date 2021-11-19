@@ -24,6 +24,11 @@ public final class Pointer extends Type {
     }
 
     @Override
+    public Type getWrappedType() {
+        return this.elementType;
+    }
+
+    @Override
     public String generate() {
         return elementType.generate() + "*";
     }

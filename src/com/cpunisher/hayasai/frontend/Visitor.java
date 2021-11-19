@@ -17,6 +17,7 @@ import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
+import com.cpunisher.hayasai.ir.value.stmt.impl.*;
 import com.cpunisher.hayasai.util.SyntaxException;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Pair;

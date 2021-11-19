@@ -1,7 +1,8 @@
-package com.cpunisher.hayasai.ir.value.stmt;
+package com.cpunisher.hayasai.ir.value.stmt.impl;
 
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
+import com.cpunisher.hayasai.ir.value.stmt.TerminateStatement;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.Arrays;

@@ -130,7 +130,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_compUnit; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitCompUnit(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitCompUnit(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -186,7 +186,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_decl; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitDecl(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitDecl(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -234,7 +234,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_btype; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitBtype(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitBtype(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -276,7 +276,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_constDecl; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitConstDecl(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitConstDecl(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -336,7 +336,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_constDef; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitConstDef(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitConstDef(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -376,7 +376,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_constInitVal; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitConstInitVal(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitConstInitVal(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -412,7 +412,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_constExp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitConstExp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitConstExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -454,7 +454,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_varDecl; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitVarDecl(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitVarDecl(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -512,7 +512,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_varDef; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitVarDef(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitVarDef(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -565,7 +565,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_initVal; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitInitVal(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitInitVal(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -605,7 +605,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_funcDef; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitFuncDef(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitFuncDef(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -646,7 +646,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_funcType; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitFuncType(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitFuncType(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -685,7 +685,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_block; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitBlock(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitBlock(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -741,7 +741,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_blockItem; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitBlockItem(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitBlockItem(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -828,7 +828,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_stmt; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitStmt(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitStmt(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -922,7 +922,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_assignStmt; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitAssignStmt(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitAssignStmt(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -970,7 +970,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_ifStmt; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitIfStmt(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitIfStmt(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1029,7 +1029,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_whileStmt; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitWhileStmt(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitWhileStmt(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1070,7 +1070,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_breakStmt; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitBreakStmt(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitBreakStmt(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1105,7 +1105,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_continueStmt; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitContinueStmt(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitContinueStmt(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1143,7 +1143,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_retStmt; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitRetStmt(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitRetStmt(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1183,7 +1183,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_expStmt; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitExpStmt(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitExpStmt(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1228,7 +1228,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_lVal; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitLVal(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitLVal(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1264,7 +1264,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_exp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitExp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1300,7 +1300,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_cond; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitCond(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitCond(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1345,7 +1345,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_addExp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitAddExp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitAddExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1407,7 +1407,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_mulExp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitMulExp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitMulExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1463,7 +1463,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_unaryExp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitUnaryExp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitUnaryExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1518,7 +1518,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_basicUnaryExp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitBasicUnaryExp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitBasicUnaryExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1570,7 +1570,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_funcCall; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitFuncCall(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitFuncCall(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1624,7 +1624,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_funcRParams; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitFuncRParams(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitFuncRParams(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1683,7 +1683,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_primaryExp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitPrimaryExp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitPrimaryExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1756,7 +1756,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_relExp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitRelExp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitRelExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1818,7 +1818,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_eqExp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitEqExp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitEqExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1878,7 +1878,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_lAndExp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitLAndExp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitLAndExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1938,7 +1938,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_lOrExp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitLOrExp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitLOrExp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -1991,7 +1991,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_number; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitNumber(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitNumber(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2037,7 +2037,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_compOp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitCompOp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitCompOp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2081,7 +2081,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_equalOp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitEqualOp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitEqualOp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2126,7 +2126,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_unaryOp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitUnaryOp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitUnaryOp(this);
 			else return visitor.visitChildren(this);
 		}
 	}
@@ -2171,7 +2171,7 @@ public class MiniSysYParser extends Parser {
 		@Override public int getRuleIndex() { return RULE_binaryOp; }
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof MiniSysYVisitor ) return ((MiniSysYVisitor<? extends T>)visitor).visitBinaryOp(this);
+			if ( visitor instanceof MiniSysYVisitor) return ((MiniSysYVisitor<? extends T>)visitor).visitBinaryOp(this);
 			else return visitor.visitChildren(this);
 		}
 	}

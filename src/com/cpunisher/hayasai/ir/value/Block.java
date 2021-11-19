@@ -8,6 +8,7 @@ import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.*;
+import com.cpunisher.hayasai.ir.value.stmt.impl.AllocaStatement;
 import com.cpunisher.hayasai.util.BlockCfg;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;

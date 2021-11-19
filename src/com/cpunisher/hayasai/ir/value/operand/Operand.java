@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class Operand extends Value {
-    private final Type type;
+    private Type type;
     private final List<Use> uses;
 
     protected Operand(Type type) {
@@ -35,6 +35,10 @@ public abstract class Operand extends Value {
 
     public Type getType() {
         return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public static final class Use {

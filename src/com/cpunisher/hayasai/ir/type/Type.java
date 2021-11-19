@@ -44,6 +44,10 @@ public class Type extends Value {
         return this.cache;
     }
 
+    public Type getWrappedType() {
+        return this;
+    }
+
     protected String getName() {
         return name;
     }

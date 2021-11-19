@@ -1,18 +1,19 @@
-package com.cpunisher.hayasai.ir.value.stmt;
+package com.cpunisher.hayasai.ir.value.stmt.impl;
 
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
+import com.cpunisher.hayasai.ir.value.stmt.ReceiverStatement;
+import com.cpunisher.hayasai.ir.value.stmt.Statement;
 import com.cpunisher.hayasai.util.IrKeywords;
 
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
-public class CallStatement extends Statement {
-    private final Register receiver;
+public class CallStatement extends ReceiverStatement {
     private final Type funcType;
     private final Ident funcIdent;
 
@@ -21,11 +22,12 @@ public class CallStatement extends Statement {
     }
 
     public CallStatement(Register receiver, Type funcType, Ident funcIdent, List<OperandExpression> args) {
-        this.receiver = receiver;
+        super(receiver);
         this.funcType = funcType;
         this.funcIdent = funcIdent;
 
         this.operands = args.stream().map(OperandExpression::getOperand).collect(Collectors.toList());
+        this.setReceiverType();
     }
 
     @Override
@@ -51,5 +53,12 @@ public class CallStatement extends Statement {
         }
         joiner.add(IrKeywords.GLOBAL_IDENT + this.funcIdent.generate() + paramJoiner);
         return joiner.toString();
+    }
+
+    @Override
+    public void setReceiverType() {
+        if (this.receiver != null) {
+            this.receiver.setType(this.funcType);
+        }
     }
 }
