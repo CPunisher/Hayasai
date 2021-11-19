@@ -3,6 +3,7 @@ package com.cpunisher.hayasai.ir.value;
 import com.cpunisher.hayasai.ir.global.IVariableTable;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.global.VariableTable;
+import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
@@ -121,10 +122,10 @@ public final class Block extends Value implements IVariableTable<Register, Liter
         this.localVars.putVar(ident, value);
     }
 
-    public Register putVar(Ident ident) {
-        Register register = this.functionDef.alloc();
+    public Register putVar(Ident ident, Type type) {
+        Register register = this.functionDef.alloc(type);
         this.localVars.putVar(ident, register);
-        this.addSubToFront(new AllocaStatement(register));
+        this.addSubToFront(new AllocaStatement(register, register.getType()));
         return register;
     }
 

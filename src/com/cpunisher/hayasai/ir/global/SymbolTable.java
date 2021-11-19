@@ -76,7 +76,7 @@ public final class SymbolTable {
             joiner.add(IrKeywords.ASSIGN);
             joiner.add(IrKeywords.DSO_LOCAL);
             joiner.add(IrKeywords.GLOBAL);
-            joiner.add(entry.getValue().getType().generate());
+            joiner.add(entry.getValue().getType().getWrappedType().generate());
             joiner.add(String.valueOf(entry.getValue().getInitValue()));
             result.add(joiner.toString());
         }

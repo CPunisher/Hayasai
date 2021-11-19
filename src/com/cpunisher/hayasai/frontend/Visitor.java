@@ -254,11 +254,11 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 throw new SyntaxException("initializer element is not a compile-time constant.");
             }
 
-            this.symbolTable.getGlobalVars().putVar(ident, new GlobalOperand(expression.getOperand().getType(), ident, expression.getLiteral().getValue()));
+            this.symbolTable.getGlobalVars().putVar(ident, new GlobalOperand(expression.getOperand().getType().getPointer(), ident, expression.getLiteral().getValue()));
         } else {
-            Register register = this.blockManager.current().putVar(ident);
             if (ctx.initVal() != null) {
                 OperandExpression expression = (OperandExpression) visitInitVal(ctx.initVal());
+                Register register = this.blockManager.current().putVar(ident, expression.getOperand().getType());
                 return new StoreStatement(expression, register);
             }
         }

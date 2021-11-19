@@ -35,7 +35,7 @@ public class MemToReg implements IPass {
             // init allocate statement set
             for (BlockCfg blockCfg : blocks) {
                 for (Statement statement : blockCfg.getBlock().getUnmodifiableSubList()) {
-                    if (statement instanceof AllocaStatement allocaStatement && allocaStatement.getReceiver().getType().equals(Type.INT)) {
+                    if (statement instanceof AllocaStatement allocaStatement && allocaStatement.getType().equals(Type.INT)) {
                         allocateSet.add(allocaStatement.getReceiver());
                     }
                 }
