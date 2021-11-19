@@ -4,12 +4,12 @@ compUnit: decl* funcDef;
 decl: constDecl | varDecl;
 btype: 'int';
 constDecl: 'const' btype constDef (',' constDef)* ';';
-constDef: IDENT '=' constInitVal;
-constInitVal: constExp;
+constDef: IDENT ('[' constExp ']')* '=' constInitVal;
+constInitVal: constExp | '{' (constInitVal (',' constInitVal)*)? '}';
 constExp: addExp;
 varDecl: btype varDef (',' varDef)* ';';
-varDef: IDENT | IDENT '=' initVal;
-initVal: exp;
+varDef: IDENT ('[' constExp ']')* | IDENT ('[' constExp ']')* '=' initVal;
+initVal: exp | '{' (initVal (',' initVal)*)? '}';
 
 funcDef: funcType IDENT '(' ')' block;
 funcType: 'int';
@@ -24,7 +24,7 @@ continueStmt: 'continue' ';';
 retStmt: 'return' exp ';';
 expStmt: exp? ';';
 
-lVal: IDENT;
+lVal: IDENT ('[' exp ']')*;
 exp: addExp;
 cond: lOrExp;
 addExp: mulExp (unaryOp mulExp)*;

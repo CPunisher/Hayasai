@@ -34,7 +34,7 @@ public class LoadStatement extends Statement {
         joiner.add(IrKeywords.LOAD);
         joiner.add(receiver.getType().generate());
         joiner.add(IrKeywords.SEPARATOR);
-        joiner.add(Type.ADDR.generate());
+        joiner.add(Type.INT.getPointer().generate());
         joiner.add(this.operands.get(0).generate());
         return joiner.toString();
     }

@@ -23,7 +23,7 @@ public class StoreStatement extends Statement {
         joiner.add(this.operands.get(0).getType().generate());
         joiner.add(this.operands.get(0).generate());
         joiner.add(IrKeywords.SEPARATOR);
-        joiner.add(Type.ADDR.generate());
+        joiner.add(Type.INT.getPointer().generate());
         joiner.add(this.operands.get(1).generate());
         return joiner.toString();
     }
