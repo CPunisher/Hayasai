@@ -19,7 +19,16 @@ public class DeadCodeRemove implements IPass {
             this.validBlock.clear();
             this.visit(def.getEntry().getBlockCfg());
 
-            def.getAllBlocks().removeIf(block -> !validBlock.contains(block));
+            Iterator<Block> iterator = def.getAllBlocks().iterator();
+            while (iterator.hasNext()) {
+                Block block = iterator.next();
+                if (!validBlock.contains(block)) {
+                    for (BlockCfg successor : block.getBlockCfg().getSuccessorList()) {
+                        successor.getPredecessorList().remove(block.getBlockCfg());
+                    }
+                    iterator.remove();
+                }
+            }
         }
     }
 
