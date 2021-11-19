@@ -1,5 +1,6 @@
 int main() {
     int x, cond = 1;
+    int cc = 123;
     if (cond > 0)
         x = 1;
     else

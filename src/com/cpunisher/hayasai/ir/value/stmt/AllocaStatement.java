@@ -3,7 +3,6 @@ package com.cpunisher.hayasai.ir.value.stmt;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.util.IrKeywords;
 
-import java.util.List;
 import java.util.StringJoiner;
 
 public class AllocaStatement extends Statement {

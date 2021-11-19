@@ -15,19 +15,20 @@ import java.util.stream.Collectors;
 
 public class MemToReg implements IPass {
 
+    private final Set<Register> allocateSet = new HashSet<>();
     private final Map<PhiStatement, Register> phiMap = new HashMap<>();
 
     @Override
     public void pass(SymbolTable module) {
         for (FunctionDef functionDef : module.getFuncDefTable().values()) {
             List<BlockCfg> blocks = functionDef.getAllBlocks().stream().map(Block::getBlockCfg).collect(Collectors.toList());
+            allocateSet.clear();
             phiMap.clear();
 
             this.initDominance(blocks);
             this.initDominanceFrontier(blocks);
 
             // init allocate statement set
-            Set<Register> allocateSet = new HashSet<>();
             for (BlockCfg blockCfg : blocks) {
                 for (Statement statement : blockCfg.getBlock().getUnmodifiableSubList()) {
                     if (statement instanceof AllocaStatement allocaStatement && allocaStatement.getReceiver().getType().equals(Type.INT)) {
@@ -133,7 +134,7 @@ public class MemToReg implements IPass {
     }
 
     private boolean shouldHandle(Operand operand) {
-        return operand instanceof Register register && this.phiMap.containsValue(register);
+        return operand instanceof Register register && this.allocateSet.contains(register);
     }
 
     private void initDominance(List<BlockCfg> blocks) {
