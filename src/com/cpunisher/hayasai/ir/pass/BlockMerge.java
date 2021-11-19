@@ -7,6 +7,9 @@ import com.cpunisher.hayasai.util.BlockCfg;
 
 import java.util.*;
 
+/**
+ * 1. 只有一个子块的块合并其子节点
+ */
 public class BlockMerge implements IPass {
     private List<Stack<Block>> singleLink = new ArrayList<>();
     private Set<BlockCfg> visitSet = new HashSet<>();
@@ -33,6 +36,8 @@ public class BlockMerge implements IPass {
                 functionDef.getAllBlocks().remove(merged);
             }
         }
+
+        Iterator<Block> iterator = functionDef.getAllBlocks().iterator();
     }
 
     private void findSingleLink(BlockCfg cur, Stack<Block> linkStack) {

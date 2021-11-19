@@ -4,16 +4,14 @@ import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
 
 public class BrStatement extends TerminateStatement {
 
-    private final Block block;
-
     public BrStatement(Block block, Block cur) {
-        this.block = block;
-
+        this.operands = Arrays.asList(block.getBlockRegister());
         if (!cur.terminated()) {
             block.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
             cur.getBlockCfg().getSuccessorList().add(block.getBlockCfg());
@@ -25,7 +23,7 @@ public class BrStatement extends TerminateStatement {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add(IrKeywords.BR);
         joiner.add(IrKeywords.LABEL);
-        joiner.add(this.block.getBlockRegister().generate());
+        joiner.add(this.operands.get(0).generate());
         return joiner.toString();
     }
 }

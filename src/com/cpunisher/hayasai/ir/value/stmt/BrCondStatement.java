@@ -5,20 +5,14 @@ import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.util.IrKeywords;
 
+import java.util.Arrays;
 import java.util.StringJoiner;
 
 public class BrCondStatement extends TerminateStatement {
-    private final OperandExpression cond;
-    private final Block block1;
-    private final Block block2;
-
     public BrCondStatement(OperandExpression cond, Block block1, Block block2, Block cur) {
         assert cond.getOperand().getType() == Type.BIT;
 
-        this.cond = cond;
-        this.block1 = block1;
-        this.block2 = block2;
-
+        this.operands = Arrays.asList(cond.getOperand(), block1.getBlockRegister(), block2.getBlockRegister());
         if (!cur.terminated()) {
             cur.getBlockCfg().getSuccessorList().add(block1.getBlockCfg());
             cur.getBlockCfg().getSuccessorList().add(block2.getBlockCfg());
@@ -31,13 +25,14 @@ public class BrCondStatement extends TerminateStatement {
     public String generate() {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add(IrKeywords.BR);
-        joiner.add(cond.generate());
+        joiner.add(this.operands.get(0).getType().generate());
+        joiner.add(this.operands.get(0).generate());
         joiner.add(IrKeywords.SEPARATOR);
         joiner.add(IrKeywords.LABEL);
-        joiner.add(this.block1.getBlockRegister().generate());
+        joiner.add(this.operands.get(1).generate());
         joiner.add(IrKeywords.SEPARATOR);
         joiner.add(IrKeywords.LABEL);
-        joiner.add(this.block2.getBlockRegister().generate());
+        joiner.add(this.operands.get(2).generate());
         return joiner.toString();
     }
 }
