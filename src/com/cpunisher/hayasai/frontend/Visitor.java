@@ -225,7 +225,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         }
 
         if (this.isGlobal) {
-            this.symbolTable.getGlobalVars().putConst(ident, new GlobalOperand(type.getPointer(), ident, expression.getOperand()));
+            this.symbolTable.getGlobalVars().putConst(ident, new GlobalOperand(symbolTable, type.getPointer(), ident, expression.getOperand()));
         } else {
             Register register = this.blockManager.current().putConst(ident, type);
             assert type.equals(expression.getOperand().getType());
@@ -260,7 +260,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 throw new SyntaxException("initializer element [" + ident.getIdent() + "] is not a compile-time constant.");
             }
             assert type.equals(expression.getOperand().getType());
-            this.symbolTable.getGlobalVars().putVar(ident, new GlobalOperand(type.getPointer(), ident, expression.getOperand()));
+            this.symbolTable.getGlobalVars().putVar(ident, new GlobalOperand(symbolTable, type.getPointer(), ident, expression.getOperand()));
         } else {
             Register register = this.blockManager.current().putVar(ident, type);
             if (ctx.initVal() != null) {

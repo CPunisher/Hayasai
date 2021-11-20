@@ -70,6 +70,10 @@ public final class SymbolTable {
         return globalFunc;
     }
 
+    public boolean isGlobalConst(Ident ident) {
+        return this.globalVars.getConst(ident) != null;
+    }
+
     public String generateVars() {
         Map<Ident, GlobalOperand> globalVarsMap = this.getGlobalVars().getVarTable();
         Map<Ident, GlobalOperand> globalConstMap = this.getGlobalVars().getConstTable();
