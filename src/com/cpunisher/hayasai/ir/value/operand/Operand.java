@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+// TODO remove user
 public abstract class Operand extends Value {
     private Type type;
     private final List<Use> uses;
@@ -20,6 +21,8 @@ public abstract class Operand extends Value {
     protected Operand() {
         this(Type.INT);
     }
+
+    public abstract int getComputedValue();
 
     public void addUser(Use use) {
         this.uses.add(use);

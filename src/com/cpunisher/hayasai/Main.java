@@ -51,6 +51,7 @@ public class Main {
 
         PASS_LIST.forEach(pass -> pass.pass(symbolTable));
 
+        symbolTable.getGlobalFunc().build();
         functionDeclMap.values().forEach(Value::build);
         functionDefMap.values().forEach(Value::build);
 

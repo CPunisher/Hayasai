@@ -1,5 +1,7 @@
 package com.cpunisher.hayasai.ir.type;
 
+import com.cpunisher.hayasai.util.IrKeywords;
+
 public final class Pointer extends Type {
     private static final String PTR_PREFIX = "pointer_";
 
@@ -30,6 +32,6 @@ public final class Pointer extends Type {
 
     @Override
     public String generate() {
-        return elementType.generate() + "*";
+        return elementType.generate() + IrKeywords.POINTER;
     }
 }

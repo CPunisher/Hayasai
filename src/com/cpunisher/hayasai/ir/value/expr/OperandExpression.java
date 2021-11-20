@@ -2,6 +2,7 @@ package com.cpunisher.hayasai.ir.value.expr;
 
 import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
+import com.cpunisher.hayasai.util.SyntaxException;
 
 public class OperandExpression extends Expression {
     private final Operand operand;
@@ -25,8 +26,11 @@ public class OperandExpression extends Expression {
         return immutable;
     }
 
-    public Literal getLiteral() {
-        return (Literal) this.operand;
+    public int getIntValue() {
+        if (!this.isImmutable()) {
+            throw new SyntaxException("Mutable variable doesn't have definite value.");
+        }
+        return this.operand.getComputedValue();
     }
 
     @Override

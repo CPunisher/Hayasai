@@ -24,11 +24,13 @@ public final class IrKeywords {
     public static final String BIT = "i1";
     public static final String POINTER = "*";
 
+    public static final String GLOBAL = "global";
+    public static final String CONSTANT = "constant";
+
     public static final String CALL = "call";
     public static final String DEFINE = "define";
     public static final String DECLARE = "declare";
     public static final String DSO_LOCAL = "dso_local";
-    public static final String GLOBAL = "global";
     public static final String ALLOCA = "alloca";
     public static final String STORE = "store";
     public static final String LOAD = "load";

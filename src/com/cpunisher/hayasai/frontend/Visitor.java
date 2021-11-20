@@ -41,7 +41,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitCompUnit(MiniSysYParser.CompUnitContext ctx) {
         this.isGlobal = true;
-        this.blockManager = new BlockManager(FunctionDef.createEmpty());
+        this.blockManager = new BlockManager(symbolTable.getGlobalFunc());
         this.blockManager.setCurrent(this.blockManager.create(false, null));
         for (MiniSysYParser.DeclContext declContext : ctx.decl()) {
             visitDecl(declContext);
@@ -208,8 +208,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         for (var constDef : ctx.constDef()) {
             this.declCtx.setDeclType(Type.valueOf(ctx.btype().getText()));
             Statement statement = (Statement) visitConstDef(constDef);
-            if (!this.isGlobal)
-                this.blockManager.addToCurrent(statement);
+            this.blockManager.addToCurrent(statement);
         }
         return null;
     }
@@ -217,15 +216,18 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitConstDef(MiniSysYParser.ConstDefContext ctx) {
         Ident ident = Ident.valueOf(ctx.IDENT().getText());
+        Type type = this.declCtx.getDeclType();
         OperandExpression expression = (OperandExpression) visitConstInitVal(ctx.constInitVal());
         if (!expression.isImmutable()) {
             throw new SyntaxException("initializer element is not a compile-time constant.");
         }
 
         if (this.isGlobal) {
-            this.symbolTable.getGlobalVars().putConst(ident, expression.getLiteral());
+            this.symbolTable.getGlobalVars().putConst(ident, new GlobalOperand(type.getPointer(), ident, expression.getOperand()));
         } else {
-            this.blockManager.current().putConst(ident, expression.getLiteral());
+            Register register = this.blockManager.current().putConst(ident, type);
+            assert type.equals(expression.getOperand().getType());
+            return new StoreStatement(expression, register);
         }
         return null;
     }
@@ -235,8 +237,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         for (var varDef: ctx.varDef()) {
             this.declCtx.setDeclType(Type.valueOf(ctx.btype().getText()));
             Statement statement = (Statement) visitVarDef(varDef);
-            if (!this.isGlobal)
-                this.blockManager.addToCurrent(statement);
+            this.blockManager.addToCurrent(statement);
         }
         return null;
     }
@@ -254,10 +255,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             }
 
             if (!expression.isImmutable()) {
-                throw new SyntaxException("initializer element is not a compile-time constant.");
+                throw new SyntaxException("initializer element [" + ident.getIdent() + "] is not a compile-time constant.");
             }
             assert type.equals(expression.getOperand().getType());
-            this.symbolTable.getGlobalVars().putVar(ident, new GlobalOperand(type.getPointer(), ident, expression.getLiteral().getValue()));
+            this.symbolTable.getGlobalVars().putVar(ident, new GlobalOperand(type.getPointer(), ident, expression.getOperand()));
         } else {
             Register register = this.blockManager.current().putVar(ident, type);
             if (ctx.initVal() != null) {
@@ -277,25 +278,27 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         }
 
         OperandExpression expression = exps.get(0);
-        if (exps.stream().allMatch(OperandExpression::isImmutable)) {
-            int value = expression.getLiteral().getValue();
-            for (int i = 1; i < exps.size(); i++) {
-                int operand = ((Literal) exps.get(i).getOperand()).getValue();
-                value = BinaryOperator.valueOf(opList.get(i - 1)).apply(value, operand);
-            }
-            return new OperandExpression(new Literal(value), true);
-        }
+//        if (exps.stream().allMatch(OperandExpression::isImmutable)) {
+//            int value = expression.getLiteral().getValue();
+//            for (int i = 1; i < exps.size(); i++) {
+//                int operand = ((Literal) exps.get(i).getOperand()).getValue();
+//                value = BinaryOperator.valueOf(opList.get(i - 1)).apply(value, operand);
+//            }
+//            return new OperandExpression(new Literal(value), true);
+//        }
 
+        boolean immutable = expression.isImmutable();
         Register last = null, cur;
         if (opList.size() > 0) {
             for (int i = 1; i < exps.size(); i++) {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 cur = this.blockManager.currentFunc().alloc();
+                immutable = immutable && exps.get(i).isImmutable();
                 BinaryOperator operator = BinaryOperator.valueOf(opList.get(i - 1));
                 this.blockManager.addToCurrent(new BinaryOperationStatement(cur, operand1, exps.get(i).getOperand(), operator));
                 last = cur;
             }
-            return new OperandExpression(last);
+            return new OperandExpression(last, immutable);
         }
         return expression;
     }
@@ -317,17 +320,17 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         List<MiniSysYParser.UnaryOpContext> validUnaryOpList = ctx.unaryOp().stream()
                 .filter(unaryOpContext -> unaryOpContext.MINUS() != null || unaryOpContext.NOT() != null)
                 .collect(Collectors.toList());
-        if (expression.isImmutable()) {
-            int value = expression.getLiteral().getValue();
-            for (int i = validUnaryOpList.size() - 1; i >= 0; i--) {
-                if (validUnaryOpList.get(i).NOT() != null) {
-                    value = value == 0 ? 1 : 0;
-                } else if (validUnaryOpList.get(i).MINUS() != null) {
-                    value = -value;
-                }
-            }
-            return new OperandExpression(new Literal(value), true);
-        }
+//        if (expression.isImmutable()) {
+//            int value = expression.getLiteral().getValue();
+//            for (int i = validUnaryOpList.size() - 1; i >= 0; i--) {
+//                if (validUnaryOpList.get(i).NOT() != null) {
+//                    value = value == 0 ? 1 : 0;
+//                } else if (validUnaryOpList.get(i).MINUS() != null) {
+//                    value = -value;
+//                }
+//            }
+//            return new OperandExpression(new Literal(value), true);
+//        }
 
         Register last = null, cur;
         if (validUnaryOpList.size() > 0) {
@@ -350,7 +353,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                     last = cur;
                 }
             }
-            return new OperandExpression(last);
+            return new OperandExpression(last, expression.isImmutable());
         }
         return expression;
     }
@@ -479,9 +482,9 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     public Value visitLVal(MiniSysYParser.LValContext ctx) {
         Ident target = Ident.valueOf(ctx.IDENT().getText());
         Pair<Operand, Boolean> pair = this.blockManager.current().compute(target);
-        if (pair.b) { // Literal
-            return new OperandExpression(pair.a, true);
-        }
+//        if (pair.b) { // Literal
+//            return new OperandExpression(pair.a, true);
+//        }
         Register tmpRegister = this.blockManager.currentFunc().alloc();
         this.blockManager.addToCurrent(new LoadStatement(tmpRegister, pair.a));
         return new OperandExpression(tmpRegister, pair.b);

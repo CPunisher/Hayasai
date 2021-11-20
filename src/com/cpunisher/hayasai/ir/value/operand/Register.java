@@ -4,6 +4,7 @@ import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.util.IRegisterAllocator;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.util.IrKeywords;
+import com.cpunisher.hayasai.util.SyntaxException;
 
 public final class Register extends Operand {
     private Ident ident;
@@ -34,5 +35,10 @@ public final class Register extends Operand {
     public String generate() {
         assert this.ident != null;
         return IrKeywords.REG_IDENT + this.ident.generate();
+    }
+
+    @Override
+    public int getComputedValue() {
+        throw new SyntaxException("Register have no definite value.");
     }
 }

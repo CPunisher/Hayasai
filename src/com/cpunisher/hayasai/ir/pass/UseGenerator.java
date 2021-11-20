@@ -11,6 +11,7 @@ import java.util.List;
 public class UseGenerator implements IPass {
     @Override
     public void pass(SymbolTable module) {
+        this.genUse(module.getGlobalFunc().getEntry());
         for (FunctionDef def : module.getFuncDefTable().values()) {
             for (Block block : def.getAllBlocks()) {
                 this.genUse(block);

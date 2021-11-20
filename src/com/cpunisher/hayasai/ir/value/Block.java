@@ -17,13 +17,13 @@ import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.*;
 
-public final class Block extends Value implements IVariableTable<Register, Literal> {
+public final class Block extends Value implements IVariableTable<Register, Register> {
 
     private final Block parent;
     private final FunctionDef functionDef;
     private final Register register;
     private final List<Statement> subList;
-    private final VariableTable<Register, Literal> localVars;
+    private final VariableTable<Register, Register> localVars;
     private final BlockCfg blockCfg;
 
     public Block(FunctionDef functionDef, Block parent) {
@@ -109,12 +109,12 @@ public final class Block extends Value implements IVariableTable<Register, Liter
     }
 
     @Override
-    public Literal getConst(Ident ident) {
-        Literal value =  this.localVars.getConst(ident);
-        if (value == null && this.hasParent()) {
-            value = this.parent.getConst(ident);
+    public Register getConst(Ident ident) {
+        Register register =  this.localVars.getConst(ident);
+        if (register == null && this.hasParent()) {
+            register = this.parent.getConst(ident);
         }
-        return value;
+        return register;
     }
 
     @Override
@@ -130,8 +130,15 @@ public final class Block extends Value implements IVariableTable<Register, Liter
     }
 
     @Override
-    public void putConst(Ident ident, Literal constValue) {
-        this.localVars.putConst(ident, constValue);
+    public void putConst(Ident ident, Register register) {
+        this.localVars.putConst(ident, register);
+    }
+
+    public Register putConst(Ident ident, Type type) {
+        Register register = this.functionDef.alloc(type.getPointer());
+        this.localVars.putConst(ident, register);
+        this.addSubToFront(new AllocaStatement(register, type));
+        return register;
     }
 
     public boolean terminated() {

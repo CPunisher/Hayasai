@@ -16,12 +16,13 @@ public class Literal extends Operand {
         this.value = number;
     }
 
-    public int getValue() {
-        return this.value;
-    }
-
     @Override
     public String generate() {
         return String.valueOf(this.value);
+    }
+
+    @Override
+    public int getComputedValue() {
+        return this.value;
     }
 }

@@ -25,6 +25,10 @@ public class BinaryOperationStatement extends ReceiverStatement {
         this.setReceiverType();
     }
 
+    public BinaryOperator getOperator() {
+        return operator;
+    }
+
     @Override
     public String generate() {
         StringJoiner joiner = new StringJoiner(" ");
