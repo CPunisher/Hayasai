@@ -41,4 +41,9 @@ public final class Register extends Operand {
     public int getComputedValue() {
         throw new SyntaxException("Register have no definite value.");
     }
+
+    @Override
+    public boolean canCompute() {
+        return false;
+    }
 }

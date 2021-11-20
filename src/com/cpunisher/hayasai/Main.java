@@ -24,7 +24,8 @@ public class Main {
         new DeadCodeRemove(),
         new BlockMerge(),
         new UseGenerator(),
-        new MemToReg()
+        new MemToReg(),
+        new ConstFold()
     );
 
     public static void main(String[] args) throws IOException {

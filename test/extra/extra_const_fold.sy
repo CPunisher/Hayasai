@@ -1,0 +1,26 @@
+int main() {
+    int a = 1, sum = 0;
+    {
+        int a = 2;
+        sum = sum + a;
+        {
+            int a = 3;
+            sum = sum + a;
+            {
+                int a = 4;
+                sum = sum + a;
+                {
+                    int a = 5;
+                    sum = sum + a;
+                    {
+                        int a = 6;
+                        {
+                            sum = sum + 6;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return sum;
+}

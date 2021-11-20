@@ -203,6 +203,8 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         return new StoreStatement(exp, pair.a);
     }
 
+
+    /* 变量/常量声明与定义 */
     @Override
     public Value visitConstDecl(MiniSysYParser.ConstDeclContext ctx) {
         for (var constDef : ctx.constDef()) {
@@ -271,10 +273,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     }
 
     /* visitExp 系列必须返回 OperandExpression */
-    private <T extends ParseTree> OperandExpression handleBinaryExp(List<T> expCtx, List<String> opList, java.util.function.Function<T, Value> visit) {
+    private <T extends ParseTree> OperandExpression handleBinaryExp(List<T> expCtx, List<String> opList, java.util.function.Function<T, Value> visitFunc) {
         List<OperandExpression> exps = new LinkedList<>();
         for (T ctx : expCtx) {
-            exps.add((OperandExpression) visit(ctx));
+            exps.add((OperandExpression) visitFunc.apply(ctx));
         }
 
         OperandExpression expression = exps.get(0);

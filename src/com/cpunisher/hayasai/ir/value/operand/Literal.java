@@ -25,4 +25,17 @@ public class Literal extends Operand {
     public int getComputedValue() {
         return this.value;
     }
+
+    @Override
+    public boolean canCompute() {
+        return true;
+    }
+
+    @Override
+    public void addUser(Use use) {
+    }
+
+    @Override
+    public void replaceUser(Operand newOperand) {
+    }
 }

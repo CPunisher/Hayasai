@@ -21,37 +21,9 @@ public class MemToReg implements IPass {
 
     @Override
     public void pass(SymbolTable module) {
-        this.constReplace(module.getGlobalFunc());
         this.memToReg(module.getGlobalFunc());
         for (FunctionDef functionDef : module.getFuncDefTable().values()) {
             this.memToReg(functionDef);
-        }
-    }
-
-    private void constReplace(FunctionDef functionDef) {
-        Block block = functionDef.getEntry();
-        Iterator<Statement> iterator = block.getSubList().iterator();
-        while (iterator.hasNext()) {
-            Statement statement = iterator.next();
-            if (statement instanceof LoadStatement loadStatement) {
-                int newValue = loadStatement.getOperands().get(0).getComputedValue();
-                Register receiver = loadStatement.getReceiver();
-                for (Operand.Use use : receiver.getUses()) {
-                    use.getUser().replace(receiver, new Literal(newValue));
-                }
-                receiver.clearUse();
-                iterator.remove();
-            } else if (statement instanceof BinaryOperationStatement binaryOperationStatement) {
-                Operand operand1 = binaryOperationStatement.getOperands().get(0);
-                Operand operand2 = binaryOperationStatement.getOperands().get(1);
-                Register receiver = binaryOperationStatement.getReceiver();
-                int newValue = binaryOperationStatement.getOperator().apply(operand1.getComputedValue(), operand2.getComputedValue());
-                for (Operand.Use use : receiver.getUses()) {
-                    use.getUser().replace(receiver, new Literal(newValue));
-                }
-                receiver.clearUse();
-                iterator.remove();
-            }
         }
     }
 
@@ -147,11 +119,7 @@ public class MemToReg implements IPass {
             } else if (statement instanceof LoadStatement loadStatement) {
                 if (!shouldHandle(loadStatement.getOperands().get(0))) continue;
                 Operand operand = curMap.get((Register) loadStatement.getOperands().get(0));
-                Operand origin = loadStatement.getReceiver();
-                for (Operand.Use use : origin.getUses()) {
-                    use.getUser().replace(origin, operand);
-                }
-                operand.clearUse();
+                loadStatement.getReceiver().replaceUser(operand);
                 iterator.remove();
             } else if (statement instanceof StoreStatement storeStatement) {
                 if (!shouldHandle(((StoreStatement) statement).getAddr())) continue;

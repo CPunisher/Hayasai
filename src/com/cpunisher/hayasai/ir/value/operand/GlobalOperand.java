@@ -32,6 +32,11 @@ public final class GlobalOperand extends Operand implements IUser {
     }
 
     @Override
+    public boolean canCompute() {
+        return this.initValue instanceof Literal;
+    }
+
+    @Override
     public String generate() {
         return IrKeywords.GLOBAL_IDENT + this.ident.generate();
     }

@@ -24,12 +24,22 @@ public abstract class Operand extends Value {
 
     public abstract int getComputedValue();
 
+    public abstract boolean canCompute();
+
     public void addUser(Use use) {
         this.uses.add(use);
     }
 
     public List<Use> getUses() {
         return Collections.unmodifiableList(uses);
+    }
+
+    public void replaceUser(Operand newOperand) {
+        for (Operand.Use use : this.getUses()) {
+            use.getUser().replace(this, newOperand);
+            newOperand.addUser(use);
+        }
+        this.clearUse();
     }
 
     public void clearUse() {
