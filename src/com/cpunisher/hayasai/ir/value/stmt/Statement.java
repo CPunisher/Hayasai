@@ -17,16 +17,6 @@ public abstract class Statement extends Value implements IUser {
     }
 
     @Override
-    public Operand getOperandOfRank(int rank) {
-        return this.operands.get(rank);
-    }
-
-    @Override
-    public void setOperandOfRank(int rank, Operand operand) {
-        this.operands.set(rank, operand);
-    }
-
-    @Override
     public List<Operand> getOperands() {
         return Collections.unmodifiableList(this.operands);
     }

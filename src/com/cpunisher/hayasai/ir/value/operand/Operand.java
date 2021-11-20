@@ -56,19 +56,13 @@ public abstract class Operand extends Value {
 
     public static final class Use {
         private final IUser user;
-        private final int rank;
 
-        public Use(IUser user, int rank) {
+        public Use(IUser user) {
             this.user = user;
-            this.rank = rank;
         }
 
         public IUser getUser() {
             return user;
-        }
-
-        public int getRank() {
-            return rank;
         }
     }
 }

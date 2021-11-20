@@ -23,7 +23,7 @@ public class UseGenerator implements IPass {
         for (Statement statement : block.getUnmodifiableSubList()) {
             List<Operand> operands = statement.getOperands();
             for (int i = 0; i < operands.size(); i++) {
-                operands.get(i).addUser(new Operand.Use(statement, i));
+                operands.get(i).addUser(new Operand.Use(statement));
             }
         }
     }

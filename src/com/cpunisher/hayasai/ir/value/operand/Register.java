@@ -33,7 +33,7 @@ public final class Register extends Operand {
 
     @Override
     public String generate() {
-        assert this.ident != null;
+//        assert this.ident != null;
         return IrKeywords.REG_IDENT + this.ident.generate();
     }
 

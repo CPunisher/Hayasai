@@ -16,7 +16,7 @@ public final class GlobalOperand extends Operand implements IUser {
         super(type);
         this.ident = ident;
         this.initValue = initValue;
-        this.initValue.addUser(new Use(this, 0));
+        this.initValue.addUser(new Use(this));
     }
 
     public Operand getInitValue() {
@@ -44,16 +44,6 @@ public final class GlobalOperand extends Operand implements IUser {
     @Override
     public void replace(Operand oldOperand, Operand newOperand) {
         this.initValue = newOperand;
-    }
-
-    @Override
-    public Operand getOperandOfRank(int rank) {
-        return this.initValue;
-    }
-
-    @Override
-    public void setOperandOfRank(int rank, Operand operand) {
-        this.initValue = operand;
     }
 
     @Override

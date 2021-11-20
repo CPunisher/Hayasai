@@ -8,9 +8,5 @@ public interface IUser {
 
     void replace(Operand oldOperand, Operand newOperand);
 
-    Operand getOperandOfRank(int rank);
-
-    void setOperandOfRank(int rank, Operand operand);
-
     List<Operand> getOperands();
 }

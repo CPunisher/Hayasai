@@ -5,13 +5,9 @@ import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.ReceiverStatement;
-import com.cpunisher.hayasai.ir.value.stmt.Statement;
 import com.cpunisher.hayasai.util.IrKeywords;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 
 public class PhiStatement extends ReceiverStatement {
     private final Map<Block, Operand> values;
@@ -28,10 +24,20 @@ public class PhiStatement extends ReceiverStatement {
 
     public void putValue(Block block, Operand operand) {
         this.values.put(block, operand);
+        operand.addUser(new Operand.Use(this));
     }
 
-    public Map<Block, Operand> getValues() {
-        return Collections.unmodifiableMap(this.values);
+    @Override
+    public void replace(Operand oldOperand, Operand newOperand) {
+        this.values.replaceAll((key, value) -> {
+            if (value == oldOperand) return newOperand;
+            return value;
+        });
+    }
+
+    @Override
+    public List<Operand> getOperands() {
+        return new ArrayList<>(this.values.values());
     }
 
     @Override
