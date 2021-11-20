@@ -21,6 +21,7 @@ public final class IrKeywords {
 
     public static final String VOID = "void";
     public static final String INT = "i32";
+    public static final String I8 = "i8";
     public static final String BIT = "i1";
     public static final String POINTER = "*";
 
@@ -40,6 +41,7 @@ public final class IrKeywords {
     public static final String BR = "br";
     public static final String PHI = "phi";
     public static final String GEP = "getelementptr";
+    public static final String BITCAST = "bitcast";
     public static final String LABEL = "label";
     public static final String RETURN = "ret";
 

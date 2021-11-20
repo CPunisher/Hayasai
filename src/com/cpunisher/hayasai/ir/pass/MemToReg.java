@@ -114,7 +114,8 @@ public class MemToReg implements IPass {
         Iterator<Statement> iterator = cur.getBlock().getSubList().iterator();
         while (iterator.hasNext()) {
             Statement statement = iterator.next();
-            if (statement instanceof AllocaStatement) {
+            if (statement instanceof AllocaStatement allocaStatement) {
+                if (!this.allocateSet.contains(allocaStatement.getReceiver())) continue;
                 iterator.remove();
             } else if (statement instanceof LoadStatement loadStatement) {
                 if (!shouldHandle(loadStatement.getOperands().get(0))) continue;

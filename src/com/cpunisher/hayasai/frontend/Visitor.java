@@ -3,6 +3,7 @@ package com.cpunisher.hayasai.frontend;
 import com.cpunisher.hayasai.frontend.antlr.MiniSysYBaseVisitor;
 import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
+import com.cpunisher.hayasai.ir.type.ArrayType;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.util.NumberOperator;
 import com.cpunisher.hayasai.ir.value.expr.VoidExpression;
@@ -23,6 +24,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +37,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     private final ConditionContext condCtx = new ConditionContext();
     private final LoopContext loopCtx = new LoopContext();
     private final DeclContext declCtx = new DeclContext();
+    private final ArrayInitContext arrayInitCtx = new ArrayInitContext();
     private BlockManager blockManager;
     private boolean isGlobal = false;
 
@@ -219,19 +222,62 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     public Value visitConstDef(MiniSysYParser.ConstDefContext ctx) {
         Ident ident = Ident.valueOf(ctx.IDENT().getText());
         Type type = this.declCtx.getDeclType();
-        OperandExpression expression = (OperandExpression) visitConstInitVal(ctx.constInitVal());
-        if (!expression.isImmutable()) {
-            throw new SyntaxException("initializer element is not a compile-time constant.");
-        }
+        type = this.resolveType(ctx.constExp(), type, ident);
 
         if (this.isGlobal) {
-            this.symbolTable.getGlobalVars().putConst(ident, new GlobalOperand(symbolTable, type.getPointer(), ident, expression.getOperand()));
+            if (type instanceof ArrayType arrayType) {
+
+            } else {
+                OperandExpression expression = (OperandExpression) visitConstInitVal(ctx.constInitVal());
+                if (!expression.isImmutable()) {
+                    throw new SyntaxException("initializer element is not a compile-time constant.");
+                }
+                this.symbolTable.getGlobalVars().putConst(ident, new GlobalOperand(symbolTable, type.getPointer(), ident, expression.getOperand()));
+            }
         } else {
             Register register = this.blockManager.current().putConst(ident, type);
-            assert type.equals(expression.getOperand().getType());
-            return new StoreStatement(expression, register);
+            if (type instanceof ArrayType arrayType) {
+                this.initArray(register, arrayType);
+                this.arrayInitCtx.clear();
+                this.arrayInitCtx.getLevel().push(register);
+                return visitConstInitVal(ctx.constInitVal());
+            } else {
+                OperandExpression expression = (OperandExpression) visitConstInitVal(ctx.constInitVal());
+                if (!expression.isImmutable()) {
+                    throw new SyntaxException("initializer element is not a compile-time constant.");
+                }
+                assert type.equals(expression.getOperand().getType());
+                return new StoreStatement(expression, register);
+            }
         }
         return null;
+    }
+
+    @Override
+    public Value visitConstInitVal(MiniSysYParser.ConstInitValContext ctx) {
+        if (ctx.constInitVal().size() > 0) {
+            Register last = this.arrayInitCtx.getLevel().peek();
+            for (int i = 0; i < ctx.constInitVal().size(); i++) {
+                MiniSysYParser.ConstInitValContext initValContext = ctx.constInitVal(i);
+
+                Type type = last.getType().getWrappedType().getPointer();
+                Register cur = this.blockManager.currentFunc().alloc(type);
+                this.blockManager.addToCurrent(new GepStatement(cur, last.getType().getWrappedType(), last, List.of(Literal.INT_ZERO, new Literal(i))));
+                this.arrayInitCtx.getLevel().push(cur);
+
+                OperandExpression expression = (OperandExpression) visitConstInitVal(initValContext);
+                if (expression != null) {
+                    if (!expression.isImmutable()) {
+                        throw new SyntaxException("initializer element is not a compile-time constant.");
+                    }
+                    this.blockManager.addToCurrent(new StoreStatement(expression, cur));
+                }
+
+                this.arrayInitCtx.getLevel().pop();
+            }
+            return null;
+        }
+        return visitConstExp(ctx.constExp());
     }
 
     @Override
@@ -248,6 +294,8 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     public Value visitVarDef(MiniSysYParser.VarDefContext ctx) {
         Ident ident = Ident.valueOf(ctx.IDENT().getText());
         Type type = this.declCtx.getDeclType();
+        type = this.resolveType(ctx.constExp(), type, ident);
+
         if (this.isGlobal) {
             OperandExpression expression;
             if (ctx.initVal() != null) {
@@ -264,12 +312,74 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         } else {
             Register register = this.blockManager.current().putVar(ident, type);
             if (ctx.initVal() != null) {
-                OperandExpression expression = (OperandExpression) visitInitVal(ctx.initVal());
-                assert type.equals(expression.getOperand().getType());
-                return new StoreStatement(expression, register);
+                if (type instanceof ArrayType arrayType) {
+                    this.initArray(register, arrayType);
+                    this.arrayInitCtx.clear();
+                    this.arrayInitCtx.getLevel().push(register);
+                    return visitInitVal(ctx.initVal());
+                } else {
+                    OperandExpression expression = (OperandExpression) visitInitVal(ctx.initVal());
+                    assert type.equals(expression.getOperand().getType());
+                    return new StoreStatement(expression, register);
+                }
             }
         }
         return null;
+    }
+
+    private Type resolveType(List<MiniSysYParser.ConstExpContext> constExp, Type origin, Ident ident) {
+        if (constExp.size() > 0) {
+            List<Operand> size = new LinkedList<>();
+            for (MiniSysYParser.ConstExpContext expCtx : constExp) {
+                OperandExpression exp = (OperandExpression) this.visitConstExp(expCtx);
+                if (!exp.isImmutable()) {
+                    throw new SyntaxException("Size of array [" + ident.getIdent() + "] is not a compile-time constant.");
+                }
+                size.add(exp.getOperand());
+            }
+            origin = new ArrayType(origin, size);
+        }
+        return origin;
+    }
+
+    private void initArray(Register arrayPointer, ArrayType arrayType) {
+        Operand last = arrayType.getSize().get(0);
+        for (int i = 1; i < arrayType.getSize().size(); i++) {
+            Register cur = this.blockManager.currentFunc().alloc();
+            this.blockManager.addToCurrent(new BinaryOperationStatement(cur, last, arrayType.getSize().get(i), NumberOperator.MUL));
+            last = cur;
+        }
+        Register cur = this.blockManager.currentFunc().alloc();
+        Register cast = this.blockManager.currentFunc().alloc();
+        this.blockManager.addToCurrent(new BinaryOperationStatement(cur, last, new Literal(4), NumberOperator.MUL));
+        this.blockManager.addToCurrent(new BitcastStatement(cast, arrayPointer, Type.INT.getPointer()));
+        this.blockManager.addToCurrent(new CallStatement(Type.VOID, Ident.valueOf("memset"), List.of(
+                new OperandExpression(cast), new OperandExpression(Literal.INT_ZERO), new OperandExpression(cur)
+        )));
+    }
+
+    @Override
+    public Value visitInitVal(MiniSysYParser.InitValContext ctx) {
+        if (ctx.initVal().size() > 0) {
+            Register last = this.arrayInitCtx.getLevel().peek();
+            for (int i = 0; i < ctx.initVal().size(); i++) {
+                MiniSysYParser.InitValContext initValContext = ctx.initVal(i);
+
+                Type type = last.getType().getWrappedType().getPointer();
+                Register cur = this.blockManager.currentFunc().alloc(type);
+                this.blockManager.addToCurrent(new GepStatement(cur, last.getType().getWrappedType(), last, List.of(Literal.INT_ZERO, new Literal(i))));
+                this.arrayInitCtx.getLevel().push(cur);
+
+                OperandExpression expression = (OperandExpression) visitInitVal(initValContext);
+                if (expression != null) {
+                    this.blockManager.addToCurrent(new StoreStatement(expression, cur));
+                }
+
+                this.arrayInitCtx.getLevel().pop();
+            }
+            return null;
+        }
+        return visitExp(ctx.exp());
     }
 
     /* visitExp 系列必须返回 OperandExpression */
@@ -487,8 +597,21 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 //        if (pair.b) { // Literal
 //            return new OperandExpression(pair.a, true);
 //        }
+
+        Operand addr = pair.a;
+        if (ctx.exp().size() > 0) {
+            List<Operand> index = new ArrayList<>();
+            index.add(Literal.INT_ZERO);
+            for (MiniSysYParser.ExpContext expContext : ctx.exp()) {
+                index.add(((OperandExpression) visitExp(expContext)).getOperand());
+            }
+            Register pointer = this.blockManager.currentFunc().alloc();
+            this.blockManager.addToCurrent(new GepStatement(pointer, pair.a.getType().getWrappedType(), pair.a, index));
+            addr = pointer;
+        }
+
         Register tmpRegister = this.blockManager.currentFunc().alloc();
-        this.blockManager.addToCurrent(new LoadStatement(tmpRegister, pair.a));
+        this.blockManager.addToCurrent(new LoadStatement(tmpRegister, addr));
         return new OperandExpression(tmpRegister, pair.b);
     }
 
