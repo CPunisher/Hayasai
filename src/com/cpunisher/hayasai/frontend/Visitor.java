@@ -4,7 +4,7 @@ import com.cpunisher.hayasai.frontend.antlr.MiniSysYBaseVisitor;
 import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.type.Type;
-import com.cpunisher.hayasai.ir.util.BinaryOperator;
+import com.cpunisher.hayasai.ir.util.NumberOperator;
 import com.cpunisher.hayasai.ir.value.expr.VoidExpression;
 import com.cpunisher.hayasai.ir.value.func.Function;
 import com.cpunisher.hayasai.ir.value.operand.GlobalOperand;
@@ -296,7 +296,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 Operand operand1 = last != null ? last : expression.getOperand();
                 cur = this.blockManager.currentFunc().alloc();
                 immutable = immutable && exps.get(i).isImmutable();
-                BinaryOperator operator = BinaryOperator.valueOf(opList.get(i - 1));
+                NumberOperator operator = NumberOperator.valueOf(opList.get(i - 1));
                 this.blockManager.addToCurrent(new BinaryOperationStatement(cur, operand1, exps.get(i).getOperand(), operator));
                 last = cur;
             }
@@ -345,7 +345,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                         operand = cur;
                     }
                     cur = this.blockManager.currentFunc().alloc();
-                    this.blockManager.addToCurrent(new BinaryOperationStatement(cur, Literal.INT_ZERO, operand, BinaryOperator.SUB));
+                    this.blockManager.addToCurrent(new BinaryOperationStatement(cur, Literal.INT_ZERO, operand, NumberOperator.SUB));
                     last = cur;
                 } else if (validUnaryOpList.get(i).NOT() != null) {
                     cur = this.blockManager.currentFunc().alloc(Type.BIT);

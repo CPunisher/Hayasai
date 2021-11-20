@@ -4,38 +4,40 @@ import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 
-public abstract class BinaryOperator extends Value {
-    public static final BinaryOperator ADD = new BinaryOperator(IrKeywords.ADD) {
+import java.util.function.BiFunction;
+
+public abstract class NumberOperator extends Value implements IBinaryOperator {
+    public static final NumberOperator ADD = new NumberOperator(IrKeywords.ADD) {
         public int apply(int a, int b) {
             return a + b;
         }
     };
-    public static final BinaryOperator SUB = new BinaryOperator(IrKeywords.SUB) {
+    public static final NumberOperator SUB = new NumberOperator(IrKeywords.SUB) {
         public int apply(int a, int b) {
             return a - b;
         }
     };
-    public static final BinaryOperator MUL = new BinaryOperator(IrKeywords.MUL)  {
+    public static final NumberOperator MUL = new NumberOperator(IrKeywords.MUL)  {
         public int apply(int a, int b) {
             return a * b;
         }
     };
-    public static final BinaryOperator SDIV = new BinaryOperator(IrKeywords.SDIV)  {
+    public static final NumberOperator SDIV = new NumberOperator(IrKeywords.SDIV)  {
         public int apply(int a, int b) {
             return a / b;
         }
     };
-    public static final BinaryOperator SREM = new BinaryOperator(IrKeywords.SREM)  {
+    public static final NumberOperator SREM = new NumberOperator(IrKeywords.SREM)  {
         public int apply(int a, int b) {
             return a % b;
         }
     };
-    public static final BinaryOperator AND = new BinaryOperator(IrKeywords.AND)  {
+    public static final NumberOperator AND = new NumberOperator(IrKeywords.AND)  {
         public int apply(int a, int b) {
             return a & b;
         }
     };
-    public static final BinaryOperator OR = new BinaryOperator(IrKeywords.OR)  {
+    public static final NumberOperator OR = new NumberOperator(IrKeywords.OR)  {
         public int apply(int a, int b) {
             return a | b;
         }
@@ -43,13 +45,11 @@ public abstract class BinaryOperator extends Value {
 
     private final String instruction;
 
-    private BinaryOperator(String instruction) {
+    private NumberOperator(String instruction) {
         this.instruction = instruction;
     }
 
-    public abstract int apply(int a, int b);
-
-    public static BinaryOperator valueOf(String op) {
+    public static NumberOperator valueOf(String op) {
         switch (op) {
             case "+" -> { return ADD; }
             case "-" -> { return SUB; }
