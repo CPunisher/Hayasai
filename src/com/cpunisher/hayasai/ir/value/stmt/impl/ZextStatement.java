@@ -23,11 +23,6 @@ public class ZextStatement extends ReceiverStatement {
     }
 
     @Override
-    public void build() {
-        this.receiver.build();
-    }
-
-    @Override
     public String generate() {
         StringJoiner joiner = new StringJoiner(" ");
         joiner.add(receiver.generate());

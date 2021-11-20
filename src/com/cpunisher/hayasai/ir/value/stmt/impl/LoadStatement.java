@@ -15,12 +15,6 @@ public class LoadStatement extends ReceiverStatement {
         this.setReceiverType();
     }
 
-
-    @Override
-    public void build() {
-        this.receiver.build();
-    }
-
     @Override
     public String generate() {
         StringJoiner joiner = new StringJoiner(" ");

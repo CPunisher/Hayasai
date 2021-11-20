@@ -9,6 +9,11 @@ public abstract class ReceiverStatement extends Statement {
         this.receiver = receiver;
     }
 
+    @Override
+    public void build() {
+        this.receiver.build();
+    }
+
     public Register getReceiver() {
         return receiver;
     }
