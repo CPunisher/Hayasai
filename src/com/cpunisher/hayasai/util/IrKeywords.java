@@ -37,6 +37,7 @@ public final class IrKeywords {
     public static final String ICMP = "icmp";
     public static final String BR = "br";
     public static final String PHI = "phi";
+    public static final String GEP = "getelementptr";
     public static final String LABEL = "label";
     public static final String RETURN = "ret";
 
