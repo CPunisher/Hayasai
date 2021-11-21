@@ -1,12 +1,6 @@
-int func(int p){
-	p = p - 1;
-	return p;
+void func(int p[]){
+    p = p + 1;
 }
 int main(){
-	int b;
-	int a = 10;
-	b = func(a);
-	return b;
+	return 0;
 }
-
-int func = 2;

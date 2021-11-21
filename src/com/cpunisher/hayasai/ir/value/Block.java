@@ -62,7 +62,7 @@ public final class Block extends Value implements IVariableTable<Register, Regis
             if (funcType.equals(Type.VOID)) {
                 this.addSub(new RetStatement(new OperandExpression(new VoidOperand())));
             } else if (funcType.equals(Type.INT)) {
-                this.addSub(new RetStatement(new OperandExpression(new Literal(1))));
+                this.addSub(new RetStatement(new OperandExpression(Literal.INT_ZERO)));
             }
         }
         this.register.build();

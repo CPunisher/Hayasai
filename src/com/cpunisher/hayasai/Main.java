@@ -24,10 +24,10 @@ import java.util.stream.Collectors;
 
 public class Main {
     private static final List<IPass> PASS_LIST = List.of(
-//        new DeadCodeRemove(),
-//        new BlockMerge(),
+        new DeadCodeRemove(),
+        new BlockMerge(),
         new UseGenerator(),
-//        new MemToReg(),
+        new MemToReg(),
         new ConstFold()
     );
 

@@ -5,6 +5,7 @@ import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.ReceiverStatement;
 import com.cpunisher.hayasai.util.IrKeywords;
+import com.cpunisher.hayasai.util.SyntaxException;
 
 import java.util.Arrays;
 import java.util.StringJoiner;
@@ -15,9 +16,11 @@ public class BinaryOperationStatement extends ReceiverStatement {
 
     public BinaryOperationStatement(Register receiver, Operand operand1, Operand operand2, NumberOperator operator) {
         super(receiver);
-        assert receiver.getType() == operand1.getType();
-        assert receiver.getType() == operand2.getType();
-        assert operand1.getType() == operand2.getType();
+        if (!operand1.getType().equals(operand2.getType()) ||
+                !receiver.getType().equals(operand2.getType()) ||
+                !receiver.getType().equals(operand1.getType())) {
+            throw new SyntaxException("Operand types are not equal.");
+        }
 
         this.operator = operator;
         this.operands = Arrays.asList(operand1, operand2);
