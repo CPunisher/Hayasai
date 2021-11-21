@@ -13,6 +13,19 @@ public final class Pointer extends Type {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof Pointer pointer)) {
+            return false;
+        }
+
+        return this.elementType.equals(pointer.elementType);
+    }
+
+    @Override
     public Type getWrappedType() {
         return this.elementType;
     }

@@ -6,6 +6,7 @@ import com.cpunisher.hayasai.ir.value.operand.Operand;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 
 public final class ArrayType extends Type implements IUser {
     private static final String ARR_PREFIX = "array_";
@@ -34,6 +35,20 @@ public final class ArrayType extends Type implements IUser {
             wrappedCache = new ArrayType(this.elementType, subSize);
         }
         return this.wrappedCache;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof ArrayType arrayType)) {
+            return false;
+        }
+
+        return IntStream.range(0, this.size.size()).allMatch(i ->
+                this.size.get(i).getComputedValue() == arrayType.size.get(i).getComputedValue());
     }
 
     public List<Operand> getSize() {

@@ -1,0 +1,9 @@
+void f(int a[][3]) {
+
+}
+
+int main() {
+    int a[5][3] = {};
+    f(a);
+    return 0;
+}
