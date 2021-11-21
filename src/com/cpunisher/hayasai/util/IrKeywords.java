@@ -27,6 +27,7 @@ public final class IrKeywords {
 
     public static final String GLOBAL = "global";
     public static final String CONSTANT = "constant";
+    public static final String ZERO_INITIALIZER = "zeroinitializer";
 
     public static final String CALL = "call";
     public static final String DEFINE = "define";

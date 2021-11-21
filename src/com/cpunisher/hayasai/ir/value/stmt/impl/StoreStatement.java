@@ -1,6 +1,5 @@
 package com.cpunisher.hayasai.ir.value.stmt.impl;
 
-import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.operand.GlobalOperand;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
