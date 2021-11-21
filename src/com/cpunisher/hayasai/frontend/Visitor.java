@@ -286,7 +286,9 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 if (!expression.isImmutable()) {
                     throw new SyntaxException("initializer element [" + ident.getIdent() + "] is not a compile-time constant.");
                 }
-                assert type.equals(expression.getOperand().getType());
+                if (!type.equals(expression.getOperand().getType())) {
+                    throw new SyntaxException("Stored value and pointer type do not match");
+                }
                 return new StoreStatement(expression, register);
             }
         }
@@ -352,7 +354,6 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 if (!expression.isImmutable() || !expression.canCompute()) {
                     throw new SyntaxException("initializer element [" + ident.getIdent() + "] is not a compile-time constant.");
                 }
-                assert type.equals(expression.getOperand().getType());
                 this.symbolTable.putVar(ident, new GlobalOperand(symbolTable, type.getPointer(), ident, expression.getOperand()));
             }
         } else {
@@ -365,7 +366,9 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                     return visitInitVal(ctx.initVal());
                 } else {
                     OperandExpression expression = (OperandExpression) visitInitVal(ctx.initVal());
-                    assert type.equals(expression.getOperand().getType());
+                    if (!type.equals(expression.getOperand().getType())) {
+                        throw new SyntaxException("Stored value and pointer type do not match");
+                    }
                     return new StoreStatement(expression, register);
                 }
             }

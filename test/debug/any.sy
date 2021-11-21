@@ -1,6 +1,7 @@
-void func(int p[]){
-    p = p + 1;
+void f() {
 }
+
 int main(){
-	return 0;
+    int a = f();
+	return a;
 }
