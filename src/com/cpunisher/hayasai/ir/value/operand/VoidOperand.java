@@ -1,6 +1,13 @@
 package com.cpunisher.hayasai.ir.value.operand;
 
+import com.cpunisher.hayasai.ir.type.Type;
+
 public class VoidOperand extends Operand {
+
+    public VoidOperand() {
+        super(Type.VOID);
+    }
+
     @Override
     public String generate() {
         return "";

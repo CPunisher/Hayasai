@@ -474,8 +474,8 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     }
 
     @Override
-    public Value visitBasicUnaryExp(MiniSysYParser.BasicUnaryExpContext ctx) {
-        OperandExpression expression = (OperandExpression) visitPrimaryExp(ctx.primaryExp());
+    public Value visitUnaryExp(MiniSysYParser.UnaryExpContext ctx) {
+        OperandExpression expression = (OperandExpression) visit(ctx.children.get(ctx.getChildCount() - 1));
         List<MiniSysYParser.UnaryOpContext> validUnaryOpList = ctx.unaryOp().stream()
                 .filter(unaryOpContext -> unaryOpContext.MINUS() != null || unaryOpContext.NOT() != null)
                 .collect(Collectors.toList());
