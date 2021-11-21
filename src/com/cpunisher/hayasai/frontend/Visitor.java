@@ -275,12 +275,13 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                     }
                     this.blockManager.addToCurrent(new StoreStatement(expression, cur));
                 }
-
                 this.arrayInitCtx.getLevel().pop();
             }
-            return null;
         }
-        return visitConstExp(ctx.constExp());
+        if (ctx.constExp() != null) {
+            return visitConstExp(ctx.constExp());
+        }
+        return null;
     }
 
     @Override
@@ -382,12 +383,13 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 if (expression != null) {
                     this.blockManager.addToCurrent(new StoreStatement(expression, cur));
                 }
-
                 this.arrayInitCtx.getLevel().pop();
             }
-            return null;
         }
-        return visitExp(ctx.exp());
+        if (ctx.exp() != null) {
+            return visitExp(ctx.exp());
+        }
+        return null;
     }
 
     /* visitExp 系列必须返回 OperandExpression */
