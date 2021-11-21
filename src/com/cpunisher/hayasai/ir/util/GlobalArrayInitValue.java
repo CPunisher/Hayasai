@@ -38,7 +38,11 @@ public class GlobalArrayInitValue extends Value {
                 }
                 return value;
             } else if (initValContext.exp() != null) {
-                return ((OperandExpression) visitor.visitExp(initValContext.exp())).getOperand();
+                OperandExpression exp = (OperandExpression) visitor.visitExp(initValContext.exp());
+                if (!exp.isImmutable() && !exp.canCompute()) {
+                    throw new SyntaxException("initializer element is not a compile-time constant.");
+                }
+                return exp.getOperand();
             }
         } else if (!(type instanceof ArrayType)) {
             return Literal.INT_ZERO;
@@ -60,7 +64,11 @@ public class GlobalArrayInitValue extends Value {
                 }
                 return value;
             } else if (constInitValContext.constExp() != null) {
-                return ((OperandExpression) visitor.visitConstExp(constInitValContext.constExp())).getOperand();
+                OperandExpression exp = (OperandExpression) visitor.visitConstExp(constInitValContext.constExp());
+                if (!exp.isImmutable() && !exp.canCompute()) {
+                    throw new SyntaxException("initializer element is not a compile-time constant.");
+                }
+                return exp.getOperand();
             }
         } else if (!(type instanceof ArrayType)) {
             return Literal.INT_ZERO;

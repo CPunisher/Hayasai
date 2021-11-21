@@ -347,7 +347,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             List<Operand> size = new LinkedList<>();
             for (MiniSysYParser.ConstExpContext expCtx : constExp) {
                 OperandExpression exp = (OperandExpression) this.visitConstExp(expCtx);
-                if (!exp.isImmutable()) {
+                if (!exp.isImmutable() && !exp.canCompute()) {
                     throw new SyntaxException("Size of array [" + ident.getIdent() + "] is not a compile-time constant.");
                 }
                 size.add(exp.getOperand());
