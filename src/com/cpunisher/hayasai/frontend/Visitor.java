@@ -347,7 +347,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             List<Operand> size = new LinkedList<>();
             for (MiniSysYParser.ConstExpContext expCtx : constExp) {
                 OperandExpression exp = (OperandExpression) this.visitConstExp(expCtx);
-                if (!exp.isImmutable() && !exp.canCompute()) {
+                if (!exp.isImmutable() || !exp.canCompute()) {
                     throw new SyntaxException("Size of array [" + ident.getIdent() + "] is not a compile-time constant.");
                 }
                 size.add(exp.getOperand());
@@ -519,6 +519,9 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             return visitExp(ctx.exp());
         } else if (ctx.lVal() != null) {
             OperandExpression expression = (OperandExpression) visitLVal(ctx.lVal());
+            if (expression.isImmutable() && expression.canCompute()) {
+                return expression;
+            }
             Register tmpRegister = this.blockManager.currentFunc().alloc();
             this.blockManager.addToCurrent(new LoadStatement(tmpRegister, expression.getOperand()));
             return new OperandExpression(tmpRegister, expression.isImmutable());

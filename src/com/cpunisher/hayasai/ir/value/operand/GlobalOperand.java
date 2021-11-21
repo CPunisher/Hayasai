@@ -32,8 +32,8 @@ public final class GlobalOperand extends Operand implements IUser {
 
     @Override
     public int getComputedValue() {
-        if (this.initValue instanceof Literal literal && this.symbolTable.isGlobalConst(this.ident)) {
-            return literal.getComputedValue();
+        if (this.canCompute()) {
+            return ((Literal) this.initValue).getComputedValue();
         }
         throw new SyntaxException("Only immutable integer type can be computed.");
     }
