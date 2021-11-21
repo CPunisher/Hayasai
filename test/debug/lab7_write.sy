@@ -1,0 +1,5 @@
+const int b[4][5] = {};
+int main() {
+    b[1][2] = 114514;
+    return 0;
+}

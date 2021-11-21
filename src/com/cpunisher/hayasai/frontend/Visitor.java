@@ -199,13 +199,14 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 
     @Override
     public Value visitAssignStmt(MiniSysYParser.AssignStmtContext ctx) {
-        Ident target = Ident.valueOf(ctx.lVal().IDENT().getText());
-        Pair<Operand, Boolean> pair = this.blockManager.current().compute(target);
-        if (pair.b) {
+//        Ident target = Ident.valueOf(ctx.lVal().IDENT().getText());
+//        Pair<Operand, Boolean> pair = this.blockManager.current().compute(target);
+        OperandExpression lval = (OperandExpression) visitLVal(ctx.lVal());
+        if (lval.isImmutable()) {
             throw new SyntaxException("Cannot assign to constant [" + ctx.lVal().IDENT().getText() + "].");
         }
         OperandExpression exp = (OperandExpression) visitExp(ctx.exp());
-        return new StoreStatement(exp, pair.a);
+        return new StoreStatement(exp, lval.getOperand());
     }
 
 
