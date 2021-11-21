@@ -31,11 +31,11 @@ public class Type extends Value {
             return true;
         }
 
-        if (obj.getClass().equals(this.getClass())) {
+        if (!(obj instanceof Type type)) {
             return false;
         }
 
-        return this.name.equals(((Type) obj).name);
+        return this.name.equals(type.name);
     }
 
     public Pointer getPointer() {
