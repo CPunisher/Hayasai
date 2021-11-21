@@ -206,6 +206,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             throw new SyntaxException("Cannot assign to constant [" + ctx.lVal().IDENT().getText() + "].");
         }
         OperandExpression exp = (OperandExpression) visitExp(ctx.exp());
+
+        if (!lval.getOperand().getType().getWrappedType().equals(exp.getOperand().getType())) {
+            throw new SyntaxException("Stored value and pointer type do not match");
+        }
         return new StoreStatement(exp, lval.getOperand());
     }
 
@@ -617,6 +621,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 index.add(((OperandExpression) visitExp(expContext)).getOperand());
             }
             Register pointer = this.blockManager.currentFunc().alloc();
+
+            if (!(pair.a.getType() instanceof ArrayType)) {
+                throw new SyntaxException("Invalid array indices.");
+            }
             this.blockManager.addToCurrent(new GepStatement(pointer, pair.a.getType().getWrappedType(), pair.a, index));
             addr = pointer;
         }
