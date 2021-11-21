@@ -5,12 +5,15 @@ import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.frontend.Visitor;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.pass.*;
+import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.Value;
+import com.cpunisher.hayasai.ir.value.func.Function;
 import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.util.IOUtils;
 import com.cpunisher.hayasai.util.IrKeywords;
+import com.cpunisher.hayasai.util.SyntaxException;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -49,6 +52,11 @@ public class Main {
 
         Map<Ident, FunctionDecl> functionDeclMap = symbolTable.getFuncDeclTable();
         Map<Ident, FunctionDef> functionDefMap = symbolTable.getFuncDefTable();
+        // int main()
+        Function funcMain = functionDefMap.get(Ident.valueOf("main"));
+        if (funcMain == null || !funcMain.getFuncType().equals(Type.INT) || funcMain.getParam().size() != 0) {
+            throw new SyntaxException("No main function.");
+        }
 
         PASS_LIST.forEach(pass -> pass.pass(symbolTable));
 
