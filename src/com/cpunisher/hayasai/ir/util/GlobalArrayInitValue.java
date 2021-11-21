@@ -30,9 +30,6 @@ public class GlobalArrayInitValue extends Value {
                 GlobalArrayInitValue value = new GlobalArrayInitValue(type);
                 // nested array
                 ArrayType arrayType = (ArrayType) type;
-                if (!arrayType.getSize().get(0).canCompute()) {
-                    throw new SyntaxException("Array size is not a compile-time constant.");
-                }
                 for (int i = 0; i < arrayType.getSize().get(0).getComputedValue(); i++) {
                     value.nested.add(parse(visitor, type.getWrappedType(), initValContext.initVal(i)));
                 }
@@ -56,9 +53,6 @@ public class GlobalArrayInitValue extends Value {
                 GlobalArrayInitValue value = new GlobalArrayInitValue(type);
                 // nested array
                 ArrayType arrayType = (ArrayType) type;
-                if (!arrayType.getSize().get(0).canCompute()) {
-                    throw new SyntaxException("Array size is not a compile-time constant.");
-                }
                 for (int i = 0; i < arrayType.getSize().get(0).getComputedValue(); i++) {
                     value.nested.add(parse(visitor, type.getWrappedType(), constInitValContext.constInitVal(i)));
                 }
