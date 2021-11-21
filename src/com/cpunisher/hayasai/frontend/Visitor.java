@@ -4,6 +4,7 @@ import com.cpunisher.hayasai.frontend.antlr.MiniSysYBaseVisitor;
 import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.type.ArrayType;
+import com.cpunisher.hayasai.ir.type.Pointer;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.util.GlobalArrayInitValue;
 import com.cpunisher.hayasai.ir.util.NumberOperator;
@@ -622,10 +623,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             }
             Register pointer = this.blockManager.currentFunc().alloc();
 
-            if (!(pair.a.getType() instanceof ArrayType)) {
-                throw new SyntaxException("Invalid array indices.");
+            if (!(addr.getType().getWrappedType() instanceof ArrayType arrayType) || arrayType.getSize().size() < index.size() - 1) {
+                throw new SyntaxException("Subscripted value is not an array, pointer, or vector.");
             }
-            this.blockManager.addToCurrent(new GepStatement(pointer, pair.a.getType().getWrappedType(), pair.a, index));
+            this.blockManager.addToCurrent(new GepStatement(pointer, addr.getType().getWrappedType(), addr, index));
             addr = pointer;
         }
 
