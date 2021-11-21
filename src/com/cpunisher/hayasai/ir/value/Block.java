@@ -4,12 +4,15 @@ import com.cpunisher.hayasai.ir.global.IVariableTable;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.global.VariableTable;
 import com.cpunisher.hayasai.ir.type.Type;
+import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
+import com.cpunisher.hayasai.ir.value.operand.VoidOperand;
 import com.cpunisher.hayasai.ir.value.stmt.*;
 import com.cpunisher.hayasai.ir.value.stmt.impl.AllocaStatement;
+import com.cpunisher.hayasai.ir.value.stmt.impl.RetStatement;
 import com.cpunisher.hayasai.util.BlockCfg;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
@@ -54,6 +57,14 @@ public final class Block extends Value implements IVariableTable<Register, Regis
 
     @Override
     public void build() {
+        if (!this.terminated()) {
+            Type funcType = this.functionDef.getFuncType();
+            if (funcType.equals(Type.VOID)) {
+                this.addSub(new RetStatement(new OperandExpression(new VoidOperand())));
+            } else if (funcType.equals(Type.INT)) {
+                this.addSub(new RetStatement(new OperandExpression(Literal.INT_ZERO)));
+            }
+        }
         this.register.build();
         this.subList.forEach(Value::build);
     }
