@@ -265,14 +265,14 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 
         if (this.isGlobal) {
             if (type instanceof ArrayType arrayType) {
-                this.symbolTable.getGlobalVars().putVar(ident, new GlobalOperand(symbolTable, type.getPointer(), ident,
+                this.symbolTable.putVar(ident, new GlobalOperand(symbolTable, type.getPointer(), ident,
                         GlobalArrayInitValue.parse(this, arrayType, ctx.constInitVal())));
             } else {
                 OperandExpression expression = (OperandExpression) visitConstInitVal(ctx.constInitVal());
                 if (!expression.isImmutable() || !expression.canCompute()) {
                     throw new SyntaxException("initializer element is not a compile-time constant.");
                 }
-                this.symbolTable.getGlobalVars().putConst(ident, new GlobalOperand(symbolTable, type.getPointer(), ident, expression.getOperand()));
+                this.symbolTable.putConst(ident, new GlobalOperand(symbolTable, type.getPointer(), ident, expression.getOperand()));
             }
         } else {
             Register register = this.blockManager.current().putConst(ident, type);
@@ -339,7 +339,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 
         if (this.isGlobal) {
             if (type instanceof ArrayType arrayType) {
-                this.symbolTable.getGlobalVars().putVar(ident, new GlobalOperand(symbolTable, type.getPointer(), ident,
+                this.symbolTable.putVar(ident, new GlobalOperand(symbolTable, type.getPointer(), ident,
                         GlobalArrayInitValue.parse(this, arrayType, ctx.initVal())));
             } else {
                 OperandExpression expression;
@@ -353,7 +353,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                     throw new SyntaxException("initializer element [" + ident.getIdent() + "] is not a compile-time constant.");
                 }
                 assert type.equals(expression.getOperand().getType());
-                this.symbolTable.getGlobalVars().putVar(ident, new GlobalOperand(symbolTable, type.getPointer(), ident, expression.getOperand()));
+                this.symbolTable.putVar(ident, new GlobalOperand(symbolTable, type.getPointer(), ident, expression.getOperand()));
             }
         } else {
             Register register = this.blockManager.current().putVar(ident, type);

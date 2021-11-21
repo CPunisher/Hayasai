@@ -98,10 +98,10 @@ public final class Block extends Value implements IVariableTable<Register, Regis
         }
 
         if (operand == null) {
-            operand = SymbolTable.INSTANCE.getGlobalVars().getConst(ident);
+            operand = SymbolTable.INSTANCE.getConst(ident);
             immutable = true;
             if (operand == null) {
-                operand = SymbolTable.INSTANCE.getGlobalVars().getVar(ident);
+                operand = SymbolTable.INSTANCE.getVar(ident);
                 immutable = false;
             }
             if (operand == null)

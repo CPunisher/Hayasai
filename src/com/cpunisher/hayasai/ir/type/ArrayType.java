@@ -37,19 +37,19 @@ public final class ArrayType extends Type implements IUser {
         return this.wrappedCache;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-
-        if (!(obj instanceof ArrayType arrayType)) {
-            return false;
-        }
-
-        return IntStream.range(0, this.size.size()).allMatch(i ->
-                this.size.get(i).getComputedValue() == arrayType.size.get(i).getComputedValue());
-    }
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (this == obj) {
+//            return true;
+//        }
+//
+//        if (!(obj instanceof ArrayType arrayType)) {
+//            return false;
+//        }
+//
+//        return IntStream.range(0, this.size.size()).allMatch(i ->
+//                this.size.get(i).getComputedValue() == arrayType.size.get(i).getComputedValue());
+//    }
 
     public List<Operand> getSize() {
         return size;

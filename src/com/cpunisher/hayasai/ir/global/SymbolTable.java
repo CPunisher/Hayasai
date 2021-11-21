@@ -13,7 +13,7 @@ import com.cpunisher.hayasai.util.SyntaxException;
 
 import java.util.*;
 
-public final class SymbolTable {
+public final class SymbolTable implements IVariableTable<GlobalOperand, GlobalOperand> {
     public static final SymbolTable INSTANCE = new SymbolTable();
 
     private final FunctionDef globalFunc = FunctionDef.createEmpty();
@@ -32,16 +32,15 @@ public final class SymbolTable {
     }
 
     public void putFunctionDecl(FunctionDecl functionDecl) {
-        FunctionDecl decl = this.funcDeclTable.get(functionDecl.getIdent());
-        if (decl == null || !decl.equals(functionDecl)) {
-            this.funcDeclTable.put(functionDecl.getIdent(), functionDecl);
+        if (this.identExists(functionDecl.getIdent())) {
+            throw new SyntaxException("Ident " + functionDecl.getIdent().getIdent() + " has already existed.");
         }
+        this.funcDeclTable.put(functionDecl.getIdent(), functionDecl);
     }
 
     public void putFunctionDef(FunctionDef functionDef) {
-        FunctionDef def = this.funcDefTable.get(functionDef.getIdent());
-        if (def != null && def.equals(functionDef)) {
-            throw new SyntaxException("Function has already existed.");
+        if (this.identExists(functionDef.getIdent())) {
+            throw new SyntaxException("Ident " + functionDef.getIdent().getIdent() + " has already existed.");
         }
         this.funcDefTable.put(functionDef.getIdent(), functionDef);
     }
@@ -54,6 +53,39 @@ public final class SymbolTable {
         return f;
     }
 
+    @Override
+    public GlobalOperand getVar(Ident ident) {
+        return this.globalVars.getVar(ident);
+    }
+
+    @Override
+    public GlobalOperand getConst(Ident ident) {
+        return this.globalVars.getConst(ident);
+    }
+
+    @Override
+    public void putVar(Ident ident, GlobalOperand value) {
+        if (this.identExists(ident)) {
+            throw new SyntaxException("Ident " + ident.getIdent() + " has already existed.");
+        }
+        this.globalVars.putVar(ident, value);
+    }
+
+    @Override
+    public void putConst(Ident ident, GlobalOperand constValue) {
+        if (this.identExists(ident)) {
+            throw new SyntaxException("Ident " + ident.getIdent() + " has already existed.");
+        }
+        this.globalVars.putConst(ident, constValue);
+    }
+
+    public boolean identExists(Ident ident) {
+        return this.funcDeclTable.containsKey(ident)
+                || this.funcDefTable.containsKey(ident)
+                || this.getConst(ident) != null
+                || this.getVar(ident) != null;
+    }
+
     public Map<Ident, FunctionDecl> getFuncDeclTable() {
         return Collections.unmodifiableMap(this.funcDeclTable);
     }
@@ -62,9 +94,9 @@ public final class SymbolTable {
         return Collections.unmodifiableMap(this.funcDefTable);
     }
 
-    public VariableTable<GlobalOperand, GlobalOperand> getGlobalVars() {
-        return globalVars;
-    }
+//    public VariableTable<GlobalOperand, GlobalOperand> getGlobalVars() {
+//        return globalVars;
+//    }
 
     public FunctionDef getGlobalFunc() {
         return globalFunc;
@@ -75,8 +107,8 @@ public final class SymbolTable {
     }
 
     public String generateVars() {
-        Map<Ident, GlobalOperand> globalVarsMap = this.getGlobalVars().getVarTable();
-        Map<Ident, GlobalOperand> globalConstMap = this.getGlobalVars().getConstTable();
+        Map<Ident, GlobalOperand> globalVarsMap = this.globalVars.getVarTable();
+        Map<Ident, GlobalOperand> globalConstMap = this.globalVars.getConstTable();
         StringJoiner result = new StringJoiner(IrKeywords.LINE_SEPARATOR);
 
         for (Map.Entry<Ident, GlobalOperand> entry : globalVarsMap.entrySet()) {
