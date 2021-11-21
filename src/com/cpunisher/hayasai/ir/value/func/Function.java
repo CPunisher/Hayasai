@@ -32,7 +32,7 @@ public abstract class Function extends Value {
         for (int i = 0; i < exp.size(); i++) {
             Type type1 = this.params.get(i).getArgType();
             Type type2 = exp.get(i).getOperand().getType();
-            if (type1 != type2) {
+            if (!type1.equals(type2)) {
                 return false;
             }
         }

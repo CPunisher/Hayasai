@@ -667,7 +667,11 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             if (addr.getType().getWrappedType() instanceof ArrayType arrayType) {
                 dim = arrayType.getSize().size();
             } else if (addr.getType().getWrappedType() instanceof Pointer) {
-                dim = 1;
+                Type tmp = addr.getType();
+                while (tmp.getWrappedType() != tmp) {
+                    dim++;
+                    tmp = tmp.getWrappedType();
+                }
             }
 
             if (dim < index.size() - 1) {
