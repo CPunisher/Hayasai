@@ -17,17 +17,17 @@ public final class SymbolTable {
     public static final SymbolTable INSTANCE = new SymbolTable();
 
     private final FunctionDef globalFunc = FunctionDef.createEmpty();
-    private final Hashtable<Ident, FunctionDecl> funcDeclTable = new Hashtable<>();
-    private final Hashtable<Ident, FunctionDef> funcDefTable = new Hashtable<>();
+    private final Map<Ident, FunctionDecl> funcDeclTable = new LinkedHashMap<>();
+    private final Map<Ident, FunctionDef> funcDefTable = new LinkedHashMap<>();
     private final VariableTable<GlobalOperand, GlobalOperand> globalVars = new VariableTable<>();
 
     private SymbolTable() {
         this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getint"), Function.EMPTY_ARGS));
         this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getch"), Function.EMPTY_ARGS));
-        this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getarray"), Function.parseParam(new ArrayType(Type.INT, List.of(Literal.INT_ZERO)))));
+        this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getarray"), Function.parseParam(Type.INT.getPointer())));
         this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putint"), Function.parseParam(Type.INT)));
         this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putch"), Function.parseParam(Type.INT)));
-        this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putarray"), Function.parseParam(Type.INT, new ArrayType(Type.INT, List.of(Literal.INT_ZERO)))));
+        this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putarray"), Function.parseParam(Type.INT, Type.INT.getPointer())));
         this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("memset"), Function.parseParam(Type.INT.getPointer(), Type.INT, Type.INT)));
     }
 

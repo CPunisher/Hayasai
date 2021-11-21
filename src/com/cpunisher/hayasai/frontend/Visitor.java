@@ -23,10 +23,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
@@ -43,34 +40,60 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 
     @Override
     public Value visitCompUnit(MiniSysYParser.CompUnitContext ctx) {
-        this.isGlobal = true;
-        this.blockManager = new BlockManager(symbolTable.getGlobalFunc());
-        this.blockManager.setCurrent(this.blockManager.create(false, null));
-        for (MiniSysYParser.DeclContext declContext : ctx.decl()) {
-            visitDecl(declContext);
+        BlockManager globalManager = new BlockManager(symbolTable.getGlobalFunc());
+        globalManager.setCurrent(globalManager.create(false, null));
+        for (ParseTree child : ctx.children) {
+            this.isGlobal = true;
+            this.blockManager = globalManager;
+            this.visit(child);
         }
-        return visitFuncDef(ctx.funcDef());
+        return null;
     }
 
     @Override
     public Value visitFuncDef(MiniSysYParser.FuncDefContext ctx) {
         this.isGlobal = false;
-        Type type = (Type) visitFuncType(ctx.funcType());
+        Type type = Type.valueOf(ctx.funcType().getText());
         Ident ident = Ident.valueOf(ctx.IDENT().getText());
-        FunctionDef functionDef = new FunctionDef(type, ident, Function.EMPTY_ARGS);
+        List<FunctionDef.FunctionIdentParam> params = Function.EMPTY_ARGS;
+        if (ctx.funcFParams() != null) {
+            params = new LinkedList<>();
+            for (MiniSysYParser.FuncFParamContext fpCtx : ctx.funcFParams().funcFParam()) {
+                params.add((FunctionDef.FunctionIdentParam) visitFuncFParam(fpCtx));
+            }
+        }
+        FunctionDef functionDef = new FunctionDef(type, ident, params);
         symbolTable.putFunctionDef(functionDef);
+
+        for (Function.FunctionParam param : functionDef.getParam()) {
+            FunctionDef.FunctionIdentParam identParam = (FunctionDef.FunctionIdentParam) param;
+            Register register = functionDef.alloc(identParam.getArgType());
+            functionDef.putVar(identParam.getArgIdent(), register);
+            identParam.setRegister(register);
+        }
 
         this.blockManager = new BlockManager(functionDef);
         Block block = this.blockManager.create(false, null);
         this.blockManager.setCurrent(block);
+        for (Map.Entry<Ident, Register> entry : functionDef.getVarEntriesSet()) {
+            Register register = block.putVar(entry.getKey(), entry.getValue().getType());
+            block.addSub(new StoreStatement(new OperandExpression(entry.getValue()), register));
+        }
+
         visitBlock(ctx.block());
         this.blockManager = null;
         return null;
     }
 
     @Override
-    public Value visitFuncType(MiniSysYParser.FuncTypeContext ctx) {
-        return Type.valueOf(ctx.getText());
+    public Value visitFuncFParam(MiniSysYParser.FuncFParamContext ctx) {
+        Type type = Type.valueOf(ctx.btype().getText());
+        Ident ident = Ident.valueOf(ctx.IDENT().getText());
+        if (ctx.L_BRACKET().size() > 0) {
+            type = this.resolveType(ctx.constExp(), type, ident);
+            type = type.getPointer();
+        }
+        return new FunctionDef.FunctionIdentParam(type, ident);
     }
 
     @Override
@@ -530,8 +553,14 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             if (expression.isImmutable() && expression.canCompute()) {
                 return expression;
             }
+
             Register tmpRegister = this.blockManager.currentFunc().alloc();
-            this.blockManager.addToCurrent(new LoadStatement(tmpRegister, expression.getOperand()));
+            if (expression.getOperand().getType().getWrappedType() instanceof ArrayType) {
+                this.blockManager.addToCurrent(new GepStatement(tmpRegister, expression.getOperand().getType().getWrappedType(),
+                        expression.getOperand(), List.of(Literal.INT_ZERO, Literal.INT_ZERO)));
+            } else {
+                this.blockManager.addToCurrent(new LoadStatement(tmpRegister, expression.getOperand()));
+            }
             return new OperandExpression(tmpRegister, expression.isImmutable());
         } else if (ctx.number() != null) {
             return visitNumber(ctx.number());
@@ -634,7 +663,14 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             }
             Register pointer = this.blockManager.currentFunc().alloc();
 
-            if (!(addr.getType().getWrappedType() instanceof ArrayType arrayType) || arrayType.getSize().size() < index.size() - 1) {
+            int dim = 0;
+            if (addr.getType().getWrappedType() instanceof ArrayType arrayType) {
+                dim = arrayType.getSize().size();
+            } else if (addr.getType().getWrappedType() instanceof Pointer) {
+                dim = 1;
+            }
+
+            if (dim < index.size() - 1) {
                 throw new SyntaxException("Subscripted value is not an array, pointer, or vector.");
             }
             this.blockManager.addToCurrent(new GepStatement(pointer, addr.getType().getWrappedType(), addr, index));

@@ -68,7 +68,7 @@ public abstract class Function extends Value {
         return Arrays.stream(types).map(FunctionParam::new).collect(Collectors.toList());
     }
 
-    public static class FunctionParam {
+    public static class FunctionParam extends Value {
         private final Type argType;
 
         public FunctionParam(Type argType) {
@@ -90,6 +90,11 @@ public abstract class Function extends Value {
             }
 
             return this.getArgType().equals(functionParam.getArgType());
+        }
+
+        @Override
+        public String generate() {
+            return this.argType.generate();
         }
     }
 }

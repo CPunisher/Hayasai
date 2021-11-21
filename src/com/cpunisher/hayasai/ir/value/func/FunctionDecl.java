@@ -21,8 +21,7 @@ public final class FunctionDecl extends Function {
         builder.append(IrKeywords.GLOBAL_IDENT);
         builder.append(this.ident.generate());
         builder.append(this.params.stream()
-                        .map(FunctionParam::getArgType)
-                        .map(Type::generate)
+                        .map(FunctionParam::generate)
                         .collect(Collectors.joining(IrKeywords.SEPARATOR + " ", IrKeywords.LPARENTHESE, IrKeywords.RPARENTHESE)));
         return builder.toString();
     }

@@ -15,7 +15,7 @@ public final class ArrayType extends Type implements IUser {
     private ArrayType wrappedCache;
 
     public ArrayType(Type elementType, List<Operand> size) {
-        super(ARR_PREFIX + elementType + size.size());
+        super(ARR_PREFIX + elementType.getName() + size.size());
         this.elementType = elementType;
         this.size = new ArrayList<>(size);
         for (Operand operand : this.size) {

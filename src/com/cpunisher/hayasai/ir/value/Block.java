@@ -19,14 +19,14 @@ import java.util.*;
 
 public final class Block extends Value implements IVariableTable<Register, Register> {
 
-    private final Block parent;
+    private final IVariableTable<Register, Register> parent;
     private final FunctionDef functionDef;
     private final Register register;
     private final List<Statement> subList;
     private final VariableTable<Register, Register> localVars;
     private final BlockCfg blockCfg;
 
-    public Block(FunctionDef functionDef, Block parent) {
+    public Block(FunctionDef functionDef, IVariableTable<Register, Register> parent) {
         this.subList = new LinkedList<>();
         this.blockCfg = new BlockCfg(this);
         this.localVars = new VariableTable<>();
@@ -37,7 +37,7 @@ public final class Block extends Value implements IVariableTable<Register, Regis
     }
 
     public Block(FunctionDef functionDef) {
-        this(functionDef, null);
+        this(functionDef, functionDef);
     }
 
     public void addSubToFront(Statement sub) {
@@ -102,7 +102,7 @@ public final class Block extends Value implements IVariableTable<Register, Regis
     @Override
     public Register getVar(Ident ident) {
         Register register = this.localVars.getVar(ident);
-        if (register == null && this.hasParent()) {
+        if (register == null) {
             register = this.parent.getVar(ident);
         }
         return register;
@@ -111,7 +111,7 @@ public final class Block extends Value implements IVariableTable<Register, Regis
     @Override
     public Register getConst(Ident ident) {
         Register register =  this.localVars.getConst(ident);
-        if (register == null && this.hasParent()) {
+        if (register == null) {
             register = this.parent.getConst(ident);
         }
         return register;
@@ -169,11 +169,7 @@ public final class Block extends Value implements IVariableTable<Register, Regis
         return this.subList;
     }
 
-    public boolean hasParent() {
-        return this.parent != null;
-    }
-
-    public Block getParent() {
+    public IVariableTable<Register, Register> getParent() {
         return parent;
     }
 

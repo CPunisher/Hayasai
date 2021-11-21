@@ -6,6 +6,7 @@ import com.cpunisher.hayasai.util.SyntaxException;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class VariableTable<T extends Operand, U extends Operand> implements IVariableTable<T, U> {
@@ -13,8 +14,8 @@ public class VariableTable<T extends Operand, U extends Operand> implements IVar
     private final Map<Ident, U> constTable;
 
     public VariableTable() {
-        this.varTable = new HashMap<>();
-        this.constTable = new HashMap<>();
+        this.varTable = new LinkedHashMap<>();
+        this.constTable = new LinkedHashMap<>();
     }
 
     public T getVar(Ident ident) {

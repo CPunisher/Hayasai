@@ -1,5 +1,6 @@
 package com.cpunisher.hayasai.frontend;
 
+import com.cpunisher.hayasai.ir.global.IVariableTable;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
@@ -22,7 +23,7 @@ public final class BlockManager {
         this.functionDef = functionDef;
     }
 
-    public Block create(boolean isNext, Block parent) {
+    public Block create(boolean isNext, IVariableTable<Register, Register> parent) {
         Block block;
         if (parent == null) {
             block = new Block(functionDef);
