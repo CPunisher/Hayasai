@@ -10,16 +10,13 @@ import com.cpunisher.hayasai.ir.util.GlobalArrayInitValue;
 import com.cpunisher.hayasai.ir.util.NumberOperator;
 import com.cpunisher.hayasai.ir.value.expr.VoidExpression;
 import com.cpunisher.hayasai.ir.value.func.Function;
-import com.cpunisher.hayasai.ir.value.operand.GlobalOperand;
+import com.cpunisher.hayasai.ir.value.operand.*;
 import com.cpunisher.hayasai.ir.value.stmt.*;
-import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
-import com.cpunisher.hayasai.ir.value.operand.Operand;
-import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.impl.*;
 import com.cpunisher.hayasai.util.SyntaxException;
 import org.antlr.v4.runtime.RuleContext;
@@ -195,7 +192,18 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     /* visitStmt 和 declare 系列必须返回 Statement 或 Block */
     @Override
     public Value visitRetStmt(MiniSysYParser.RetStmtContext ctx) {
-        return new RetStatement((OperandExpression) visitExp(ctx.exp()));
+        Type funcType = this.blockManager.currentFunc().getFuncType();
+        if (ctx.exp() != null) {
+            OperandExpression retExp = (OperandExpression) visitExp(ctx.exp());
+            if (retExp.getOperand().getType().equals(funcType)) {
+                return new RetStatement(retExp);
+            }
+            throw new SyntaxException("Return type is not match to declared type.");
+        }
+        if (Type.VOID.equals(funcType)) {
+            return new RetStatement(new OperandExpression(new VoidOperand()));
+        }
+        throw new SyntaxException("Return type is not match to declared type.");
     }
 
     @Override

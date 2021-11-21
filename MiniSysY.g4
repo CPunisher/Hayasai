@@ -1,6 +1,6 @@
 grammar MiniSysY;
 
-compUnit: decl* funcDef;
+compUnit: (decl | funcDef)+;
 decl: constDecl | varDecl;
 btype: 'int';
 constDecl: 'const' btype constDef (',' constDef)* ';';
@@ -11,8 +11,10 @@ varDecl: btype varDef (',' varDef)* ';';
 varDef: IDENT ('[' constExp ']')* | IDENT ('[' constExp ']')* '=' initVal;
 initVal: exp | '{' (initVal (',' initVal)*)? '}';
 
-funcDef: funcType IDENT '(' ')' block;
-funcType: 'int';
+funcDef: funcType IDENT '(' funcFParams? ')' block;
+funcType: 'void' | 'int';
+funcFParams: funcFParam (',' funcFParam)*;
+funcFParam: btype IDENT ('[' ']' ('[' exp ']')*)?;
 block: '{' blockItem* '}';
 blockItem: decl | stmt;
 stmt: assignStmt | block | ifStmt | whileStmt | breakStmt | continueStmt | expStmt | retStmt;
@@ -21,7 +23,7 @@ ifStmt: 'if' '(' cond ')' stmt ('else' stmt)?;
 whileStmt: 'while' '(' cond ')' stmt;
 breakStmt: 'break' ';';
 continueStmt: 'continue' ';';
-retStmt: 'return' exp ';';
+retStmt: 'return' exp? ';';
 expStmt: exp? ';';
 
 lVal: IDENT ('[' exp ']')*;

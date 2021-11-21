@@ -49,8 +49,7 @@ public abstract class Function extends Value {
             return false;
         }
 
-        return this.ident.equals(func.ident) && this.params.size() == func.params.size()
-                && IntStream.range(0, this.params.size()).allMatch(i -> this.params.get(i).equals(func.params.get(i)));
+        return this.ident.equals(func.ident);
     }
 
     public Type getFuncType() {

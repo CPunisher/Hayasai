@@ -1,5 +1,6 @@
 package com.cpunisher.hayasai.ir.global;
 
+import com.cpunisher.hayasai.ir.type.ArrayType;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.func.Function;
@@ -10,10 +11,7 @@ import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 
 public final class SymbolTable {
     public static final SymbolTable INSTANCE = new SymbolTable();
@@ -26,8 +24,10 @@ public final class SymbolTable {
     private SymbolTable() {
         this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getint"), Function.EMPTY_ARGS));
         this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getch"), Function.EMPTY_ARGS));
+        this.putFunctionDecl(new FunctionDecl(Type.INT, Ident.valueOf("getarray"), Function.parseParam(new ArrayType(Type.INT, List.of(Literal.INT_ZERO)))));
         this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putint"), Function.parseParam(Type.INT)));
         this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putch"), Function.parseParam(Type.INT)));
+        this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("putarray"), Function.parseParam(Type.INT, new ArrayType(Type.INT, List.of(Literal.INT_ZERO)))));
         this.putFunctionDecl(new FunctionDecl(Type.VOID, Ident.valueOf("memset"), Function.parseParam(Type.INT.getPointer(), Type.INT, Type.INT)));
     }
 
