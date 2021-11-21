@@ -661,22 +661,25 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             for (MiniSysYParser.ExpContext expContext : ctx.exp()) {
                 index.add(((OperandExpression) visitExp(expContext)).getOperand());
             }
-            Register pointer = this.blockManager.currentFunc().alloc();
 
             int dim = 0;
             if (addr.getType().getWrappedType() instanceof ArrayType arrayType) {
                 dim = arrayType.getSize().size();
             } else if (addr.getType().getWrappedType() instanceof Pointer) {
-                Type tmp = addr.getType();
-                while (tmp.getWrappedType() != tmp) {
-                    dim++;
-                    tmp = tmp.getWrappedType();
+                Register pointer = this.blockManager.currentFunc().alloc();
+                this.blockManager.addToCurrent(new LoadStatement(pointer, addr));
+                index.remove(0);
+                addr = pointer;
+                if (addr.getType().getWrappedType() instanceof ArrayType arrayType) {
+                    dim = arrayType.getSize().size();
                 }
             }
 
             if (dim < index.size() - 1) {
                 throw new SyntaxException("Subscripted value is not an array, pointer, or vector.");
             }
+
+            Register pointer = this.blockManager.currentFunc().alloc();
             this.blockManager.addToCurrent(new GepStatement(pointer, addr.getType().getWrappedType(), addr, index));
             addr = pointer;
         }
