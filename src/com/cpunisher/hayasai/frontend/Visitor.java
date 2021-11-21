@@ -513,7 +513,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         if (ctx.exp() != null) {
             return visitExp(ctx.exp());
         } else if (ctx.lVal() != null) {
-            return visitLVal(ctx.lVal());
+            OperandExpression expression = (OperandExpression) visitLVal(ctx.lVal());
+            Register tmpRegister = this.blockManager.currentFunc().alloc();
+            this.blockManager.addToCurrent(new LoadStatement(tmpRegister, expression.getOperand()));
+            return new OperandExpression(tmpRegister, expression.isImmutable());
         } else if (ctx.number() != null) {
             return visitNumber(ctx.number());
         }
@@ -618,9 +621,9 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             addr = pointer;
         }
 
-        Register tmpRegister = this.blockManager.currentFunc().alloc();
-        this.blockManager.addToCurrent(new LoadStatement(tmpRegister, addr));
-        return new OperandExpression(tmpRegister, pair.b);
+//        Register tmpRegister = this.blockManager.currentFunc().alloc();
+//        this.blockManager.addToCurrent(new LoadStatement(tmpRegister, addr));
+        return new OperandExpression(addr, pair.b);
     }
 
     @Override
