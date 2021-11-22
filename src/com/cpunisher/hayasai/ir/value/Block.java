@@ -22,8 +22,8 @@ import java.util.*;
 
 public final class Block extends Value implements IVariableTable<Register, Register> {
 
+    private FunctionDef functionDef;
     private final IVariableTable<Register, Register> parent;
-    private final FunctionDef functionDef;
     private final Register register;
     private final List<Statement> subList;
     private final VariableTable<Register, Register> localVars;
@@ -170,6 +170,10 @@ public final class Block extends Value implements IVariableTable<Register, Regis
         }
         this.subList.addAll(block.getSubList());
         this.blockCfg.merge(block.getBlockCfg());
+    }
+
+    public void setFunctionDef(FunctionDef functionDef) {
+        this.functionDef = functionDef;
     }
 
     public List<Statement> getUnmodifiableSubList() {

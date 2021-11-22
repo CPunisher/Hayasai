@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 public final class FunctionDef extends Function implements IRegisterAllocator, IVariableTable<Register, Register> {
     private final List<Block> blocks;
     private final VariableTable<Register, Register> paramVars;
-    private final IRegisterAllocator allocator;
+    private final DefaultAllocator allocator;
 
     public FunctionDef(Type funcType, Ident ident, List<? extends FunctionIdentParam> params) {
         super(funcType, ident, params);
@@ -28,6 +28,13 @@ public final class FunctionDef extends Function implements IRegisterAllocator, I
 
     public static FunctionDef createEmpty() {
         return new FunctionDef(Type.VOID, Ident.EMPTY_IDENT, List.of());
+    }
+
+    public void merge(FunctionDef functionDef) {
+        for (Block block : functionDef.blocks) {
+            block.setFunctionDef(this);
+        }
+        this.allocator.merge(functionDef.allocator);
     }
 
     @Override

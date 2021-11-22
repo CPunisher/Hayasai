@@ -8,7 +8,7 @@ import com.cpunisher.hayasai.util.SyntaxException;
 
 public final class Register extends Operand {
     private Ident ident;
-    private final IRegisterAllocator allocator;
+    private IRegisterAllocator allocator;
 
     public Register(IRegisterAllocator allocator) {
         this(Type.INT, allocator);
@@ -24,6 +24,10 @@ public final class Register extends Operand {
         if (this.ident == null) {
             this.ident = allocator.genIdent();
         }
+    }
+
+    public void setAllocator(IRegisterAllocator allocator) {
+        this.allocator = allocator;
     }
 
     public Ident getIdent() {

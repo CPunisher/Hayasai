@@ -1,5 +1,6 @@
 package com.cpunisher.hayasai.frontend;
 
+import com.cpunisher.hayasai.HayasaiFrontend;
 import com.cpunisher.hayasai.frontend.antlr.MiniSysYBaseVisitor;
 import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
@@ -28,7 +29,8 @@ import java.util.stream.Collectors;
 
 public class Visitor extends MiniSysYBaseVisitor<Value> {
 
-    private final SymbolTable symbolTable = SymbolTable.INSTANCE;
+    private final HayasaiFrontend frontend;
+    private final SymbolTable symbolTable;
 
     private final ConditionContext condCtx = new ConditionContext();
     private final LoopContext loopCtx = new LoopContext();
@@ -37,6 +39,11 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     private BlockManager blockManager;
     private boolean isGlobal = false;
 
+    public Visitor(HayasaiFrontend frontend) {
+        this.frontend = frontend;
+        this.symbolTable = frontend.getModule();
+    }
+
     @Override
     public Value visitCompUnit(MiniSysYParser.CompUnitContext ctx) {
         BlockManager globalManager = new BlockManager(symbolTable.getGlobalFunc());
@@ -44,7 +51,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         for (ParseTree child : ctx.children) {
             this.isGlobal = true;
             this.blockManager = globalManager;
-            this.visit(child);
+            Value res = this.visit(child);
+            if (res instanceof FunctionDef functionDef) {
+                symbolTable.putFunctionDef(functionDef);
+            }
         }
         return null;
     }
@@ -62,7 +72,6 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             }
         }
         FunctionDef functionDef = new FunctionDef(type, ident, params);
-        symbolTable.putFunctionDef(functionDef);
 
         for (Function.FunctionParam param : functionDef.getParam()) {
             FunctionDef.FunctionIdentParam identParam = (FunctionDef.FunctionIdentParam) param;
@@ -81,7 +90,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 
         visitBlock(ctx.block());
         this.blockManager = null;
-        return null;
+        return functionDef;
     }
 
     @Override
@@ -393,7 +402,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         Register cast = this.blockManager.currentFunc().alloc();
         this.blockManager.addToCurrent(new BinaryOperationStatement(cur, last, new Literal(4), NumberOperator.MUL));
         this.blockManager.addToCurrent(new BitcastStatement(cast, arrayPointer, Type.INT.getPointer()));
-        this.blockManager.addToCurrent(new CallStatement(Type.VOID, Ident.valueOf("memset"), List.of(
+        this.blockManager.addToCurrent(new CallStatement(symbolTable.getFunctionByIdent(Ident.valueOf("memset")), List.of(
                 new OperandExpression(cast), new OperandExpression(Literal.INT_ZERO), new OperandExpression(cur)
         )));
     }
@@ -531,10 +540,10 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 
         if (f.getFuncType() != Type.VOID) {
             Register register = this.blockManager.currentFunc().alloc(f.getFuncType());
-            this.blockManager.addToCurrent(new CallStatement(register, f.getFuncType(), ident, args));
+            this.blockManager.addToCurrent(new CallStatement(register, f, args));
             return new OperandExpression(register);
         }
-        this.blockManager.addToCurrent(new CallStatement(f.getFuncType(), ident, args));
+        this.blockManager.addToCurrent(new CallStatement(f, args));
         return VoidExpression.VOID_EXPRESSION;
     }
 

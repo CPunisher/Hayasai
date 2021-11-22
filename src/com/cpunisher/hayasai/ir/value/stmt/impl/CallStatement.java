@@ -3,6 +3,7 @@ package com.cpunisher.hayasai.ir.value.stmt.impl;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
+import com.cpunisher.hayasai.ir.value.func.Function;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.ReceiverStatement;
@@ -16,15 +17,17 @@ import java.util.stream.Collectors;
 public class CallStatement extends ReceiverStatement {
     private final Type funcType;
     private final Ident funcIdent;
+    private final Function function;
 
-    public CallStatement(Type funcType, Ident funcIdent, List<OperandExpression> args) {
-        this(null, funcType, funcIdent, args);
+    public CallStatement(Function function, List<OperandExpression> args) {
+        this(null, function, args);
     }
 
-    public CallStatement(Register receiver, Type funcType, Ident funcIdent, List<OperandExpression> args) {
+    public CallStatement(Register receiver, Function function, List<OperandExpression> args) {
         super(receiver);
-        this.funcType = funcType;
-        this.funcIdent = funcIdent;
+        this.funcType = function.getFuncType();
+        this.funcIdent = function.getIdent();
+        this.function = function;
 
         this.operands = args.stream().map(OperandExpression::getOperand).collect(Collectors.toList());
         this.setReceiverType();
@@ -60,5 +63,9 @@ public class CallStatement extends ReceiverStatement {
         if (this.receiver != null) {
             this.receiver.setType(this.funcType);
         }
+    }
+
+    public Function getFunction() {
+        return function;
     }
 }

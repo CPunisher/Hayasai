@@ -85,11 +85,11 @@ public final class SymbolTable implements IVariableTable<GlobalOperand, GlobalOp
     }
 
     public Map<Ident, FunctionDecl> getFuncDeclTable() {
-        return Collections.unmodifiableMap(this.funcDeclTable);
+        return this.funcDeclTable;
     }
 
     public Map<Ident, FunctionDef> getFuncDefTable() {
-        return Collections.unmodifiableMap(this.funcDefTable);
+        return this.funcDefTable;
     }
 
 //    public VariableTable<GlobalOperand, GlobalOperand> getGlobalVars() {

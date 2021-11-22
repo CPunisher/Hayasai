@@ -1,0 +1,11 @@
+int foo(int t) {
+    if(t == 1){
+        return 5;
+    } else {
+        return 10;
+    }
+}
+
+int main() {
+    return foo(1) + foo(0);
+}
