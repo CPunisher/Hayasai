@@ -5,12 +5,10 @@ import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.ReceiverStatement;
-import com.cpunisher.hayasai.ir.value.stmt.Statement;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.StringJoiner;
 
 public class IcmpStatement extends ReceiverStatement {
@@ -72,7 +70,7 @@ public class IcmpStatement extends ReceiverStatement {
                 case "<" -> { return SLT; }
                 case "<=" -> { return SLE; }
             }
-            throw new SyntaxException("Unknown Compare type [" + text + "]");
+            throw SyntaxException.unknownCompareType(text);
         }
     }
 }

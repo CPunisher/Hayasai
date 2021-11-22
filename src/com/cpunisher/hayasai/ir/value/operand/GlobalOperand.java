@@ -1,6 +1,5 @@
 package com.cpunisher.hayasai.ir.value.operand;
 
-import com.cpunisher.hayasai.ir.global.IVariableTable;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.IUser;
@@ -35,7 +34,7 @@ public final class GlobalOperand extends Operand implements IUser {
         if (this.canCompute()) {
             return ((Literal) this.initValue).getComputedValue();
         }
-        throw new SyntaxException("Only immutable integer type can be computed.");
+        throw SyntaxException.computedError(this.getClass());
     }
 
     @Override

@@ -105,7 +105,7 @@ public final class Block extends Value implements IVariableTable<Register, Regis
                 immutable = false;
             }
             if (operand == null)
-                throw new SyntaxException("Ident [" + ident.getIdent()  + "] is not declared.");
+                throw SyntaxException.identNotDeclare(ident.getIdent());
         }
         return new Pair<>(operand, immutable);
     }

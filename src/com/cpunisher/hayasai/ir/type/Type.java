@@ -6,7 +6,6 @@ import com.cpunisher.hayasai.util.SyntaxException;
 
 public class Type extends Value {
     public static final Type INT = new Type(IrKeywords.INT);
-    public static final Type I8 = new Type(IrKeywords.I8);
     public static final Type BIT = new Type(IrKeywords.BIT);
     public static final Type VOID = new Type(IrKeywords.VOID);
 
@@ -22,7 +21,7 @@ public class Type extends Value {
             case "int" -> { return INT; }
             case "void" -> { return VOID; }
         }
-        throw new SyntaxException("Unknown type.");
+        throw SyntaxException.unknownType(cType);
     }
 
     @Override

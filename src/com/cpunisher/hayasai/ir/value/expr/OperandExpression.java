@@ -31,7 +31,7 @@ public class OperandExpression extends Expression {
 
     public int getIntValue() {
         if (!this.isImmutable()) {
-            throw new SyntaxException("Mutable variable doesn't have definite value.");
+            throw SyntaxException.computedError(this.getClass());
         }
         return this.operand.getComputedValue();
     }

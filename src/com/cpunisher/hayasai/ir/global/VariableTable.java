@@ -5,7 +5,6 @@ import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.util.SyntaxException;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -28,14 +27,14 @@ public class VariableTable<T extends Operand, U extends Operand> implements IVar
 
     public void putVar(Ident ident, T value) {
         if (this.identExists(ident)) {
-            throw new SyntaxException("Ident [" + ident.getIdent() + "] exists.");
+            throw SyntaxException.identExists(ident.getIdent());
         }
         this.varTable.put(ident, value);
     }
 
     public void putConst(Ident ident, U constValue) {
         if (this.identExists(ident)) {
-            throw new SyntaxException("Ident [" + ident.getIdent() + "] exists.");
+            throw SyntaxException.identExists(ident.getIdent());
         }
         this.constTable.put(ident, constValue);
     }

@@ -24,7 +24,6 @@ import org.antlr.v4.runtime.misc.Pair;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.*;
-import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
 
 public class Visitor extends MiniSysYBaseVisitor<Value> {
@@ -136,11 +135,6 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         this.condCtx.setBlockTrue(blockTrue);
         this.condCtx.setBlockFalse(blockElse);
         OperandExpression condEntryExp = (OperandExpression) visitCond(ctx.cond());
-//        if (condExp.getOperand().getType() == Type.INT) {
-//            Register cur = this.blockManager.current().alloc(Type.BIT);
-//            this.blockManager.addToCurrent(new IcmpStatement(cur, condExp.getOperand(), Literal.INT_ZERO, IcmpStatement.CompareType.NE));
-//            condExp = new OperandExpression(cur);
-//        }
 
         this.blockManager.setCurrent(blockTrue);
         this.blockManager.setNext(blockTrue, blockAfter);
@@ -199,7 +193,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitBreakStmt(MiniSysYParser.BreakStmtContext ctx) {
         if (this.loopCtx.peekAfter() == null) {
-            throw new SyntaxException("'break' statement not in loop or switch statement");
+            throw SyntaxException.breakError();
         }
         return new BrStatement(this.loopCtx.peekAfter(), this.blockManager.current());
     }
@@ -207,7 +201,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
     @Override
     public Value visitContinueStmt(MiniSysYParser.ContinueStmtContext ctx) {
         if (this.loopCtx.peekCondition() == null) {
-            throw new SyntaxException("'continue' statement not in loop statement");
+            throw SyntaxException.continueError();
         }
         return new BrStatement(this.loopCtx.peekCondition(), this.blockManager.current());
     }
@@ -221,12 +215,12 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             if (retExp.getOperand().getType().equals(funcType)) {
                 return new RetStatement(retExp);
             }
-            throw new SyntaxException("Return type is not match to declared type.");
+            throw SyntaxException.returnTypeMatch(funcType, retExp.getOperand().getType());
         }
         if (Type.VOID.equals(funcType)) {
             return new RetStatement(new OperandExpression(new VoidOperand()));
         }
-        throw new SyntaxException("Return type is not match to declared type.");
+        throw SyntaxException.returnTypeMatch(funcType, Type.VOID);
     }
 
     @Override
@@ -235,12 +229,12 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
 //        Pair<Operand, Boolean> pair = this.blockManager.current().compute(target);
         OperandExpression lval = (OperandExpression) visitLVal(ctx.lVal());
         if (lval.isImmutable()) {
-            throw new SyntaxException("Cannot assign to constant [" + ctx.lVal().IDENT().getText() + "].");
+            throw SyntaxException.assignToConst(ctx.lVal().IDENT().getText());
         }
         OperandExpression exp = (OperandExpression) visitExp(ctx.exp());
 
         if (!lval.getOperand().getType().getWrappedType().equals(exp.getOperand().getType())) {
-            throw new SyntaxException("Stored value and pointer type do not match");
+            throw SyntaxException.storeTypeMatch(lval.getOperand().getType(), exp.getOperand().getType());
         }
         return new StoreStatement(exp, lval.getOperand());
     }
@@ -270,7 +264,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             } else {
                 OperandExpression expression = (OperandExpression) visitConstInitVal(ctx.constInitVal());
                 if (!expression.isImmutable() || !expression.canCompute()) {
-                    throw new SyntaxException("initializer element is not a compile-time constant.");
+                    throw SyntaxException.valueCompileTime(ident.getIdent());
                 }
                 this.symbolTable.putConst(ident, new GlobalOperand(symbolTable, type.getPointer(), ident, expression.getOperand()));
             }
@@ -284,7 +278,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             } else {
                 OperandExpression expression = (OperandExpression) visitConstInitVal(ctx.constInitVal());
                 if (!expression.isImmutable()) {
-                    throw new SyntaxException("initializer element [" + ident.getIdent() + "] is not a compile-time constant.");
+                    throw SyntaxException.valueCompileTime(ident.getIdent());
                 }
                 assert type.equals(expression.getOperand().getType());
                 return new StoreStatement(expression, register);
@@ -308,7 +302,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 OperandExpression expression = (OperandExpression) visitConstInitVal(initValContext);
                 if (expression != null) {
                     if (!expression.isImmutable()) {
-                        throw new SyntaxException("initializer element is not a compile-time constant.");
+                        throw SyntaxException.valueCompileTime();
                     }
                     this.blockManager.addToCurrent(new StoreStatement(expression, cur));
                 }
@@ -350,7 +344,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 }
 
                 if (!expression.isImmutable() || !expression.canCompute()) {
-                    throw new SyntaxException("initializer element [" + ident.getIdent() + "] is not a compile-time constant.");
+                    throw SyntaxException.valueCompileTime(ident.getIdent());
                 }
                 assert type.equals(expression.getOperand().getType());
                 this.symbolTable.putVar(ident, new GlobalOperand(symbolTable, type.getPointer(), ident, expression.getOperand()));
@@ -379,7 +373,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             for (MiniSysYParser.ConstExpContext expCtx : constExp) {
                 OperandExpression exp = (OperandExpression) this.visitConstExp(expCtx);
                 if (!exp.isImmutable() || !exp.canCompute()) {
-                    throw new SyntaxException("Size of array [" + ident.getIdent() + "] is not a compile-time constant.");
+                    throw SyntaxException.sizeOfArray(ident.getIdent());
                 }
                 size.add(exp.getOperand());
             }
@@ -528,11 +522,11 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 .collect(Collectors.toList());
         Function f = this.symbolTable.getFunctionByIdent(ident);
         if (f == null) {
-            throw new SyntaxException("Function [" + ident.getIdent() + "] is not declared.");
+            throw SyntaxException.funcNotDeclare(ident.getIdent());
         }
 
         if (!f.checkArgs(args)) {
-            throw new SyntaxException("Function [" + ident.getIdent() + "] arguments error.");
+            throw SyntaxException.argsNotMatch(ident.getIdent(), f.getParam(), args);
         }
 
         if (f.getFuncType() != Type.VOID) {
@@ -676,7 +670,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             }
 
             if (dim < index.size() - 1) {
-                throw new SyntaxException("Subscripted value is not an array, pointer, or vector.");
+                throw SyntaxException.subscripted(target.getIdent());
             }
 
             Register pointer = this.blockManager.currentFunc().alloc();
@@ -684,8 +678,6 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             addr = pointer;
         }
 
-//        Register tmpRegister = this.blockManager.currentFunc().alloc();
-//        this.blockManager.addToCurrent(new LoadStatement(tmpRegister, addr));
         return new OperandExpression(addr, pair.b);
     }
 

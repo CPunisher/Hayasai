@@ -55,7 +55,7 @@ public class Main {
         // int main()
         Function funcMain = functionDefMap.get(Ident.valueOf("main"));
         if (funcMain == null || !funcMain.getFuncType().equals(Type.INT) || funcMain.getParam().size() != 0) {
-            throw new SyntaxException("No main function.");
+            throw SyntaxException.noMain();
         }
 
         PASS_LIST.forEach(pass -> pass.pass(symbolTable));

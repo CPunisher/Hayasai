@@ -37,7 +37,7 @@ public class GlobalArrayInitValue extends Value {
             } else if (initValContext.exp() != null) {
                 OperandExpression exp = (OperandExpression) visitor.visitExp(initValContext.exp());
                 if (!exp.isImmutable() && !exp.canCompute()) {
-                    throw new SyntaxException("initializer element is not a compile-time constant.");
+                    throw SyntaxException.valueCompileTime();
                 }
                 return exp.getOperand();
             }
@@ -60,7 +60,7 @@ public class GlobalArrayInitValue extends Value {
             } else if (constInitValContext.constExp() != null) {
                 OperandExpression exp = (OperandExpression) visitor.visitConstExp(constInitValContext.constExp());
                 if (!exp.isImmutable() && !exp.canCompute()) {
-                    throw new SyntaxException("initializer element is not a compile-time constant.");
+                    throw SyntaxException.valueCompileTime();
                 }
                 return exp.getOperand();
             }

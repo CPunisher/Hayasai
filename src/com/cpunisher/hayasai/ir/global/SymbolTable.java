@@ -1,13 +1,11 @@
 package com.cpunisher.hayasai.ir.global;
 
-import com.cpunisher.hayasai.ir.type.ArrayType;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.func.Function;
 import com.cpunisher.hayasai.ir.value.func.FunctionDecl;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.GlobalOperand;
-import com.cpunisher.hayasai.ir.value.operand.Literal;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 
@@ -33,14 +31,14 @@ public final class SymbolTable implements IVariableTable<GlobalOperand, GlobalOp
 
     public void putFunctionDecl(FunctionDecl functionDecl) {
         if (this.identExists(functionDecl.getIdent())) {
-            throw new SyntaxException("Ident " + functionDecl.getIdent().getIdent() + " has already existed.");
+            throw SyntaxException.identExists(functionDecl.getIdent().getIdent());
         }
         this.funcDeclTable.put(functionDecl.getIdent(), functionDecl);
     }
 
     public void putFunctionDef(FunctionDef functionDef) {
         if (this.identExists(functionDef.getIdent())) {
-            throw new SyntaxException("Ident " + functionDef.getIdent().getIdent() + " has already existed.");
+            throw SyntaxException.identExists(functionDef.getIdent().getIdent());
         }
         this.funcDefTable.put(functionDef.getIdent(), functionDef);
     }
@@ -66,7 +64,7 @@ public final class SymbolTable implements IVariableTable<GlobalOperand, GlobalOp
     @Override
     public void putVar(Ident ident, GlobalOperand value) {
         if (this.identExists(ident)) {
-            throw new SyntaxException("Ident " + ident.getIdent() + " has already existed.");
+            throw SyntaxException.identExists(ident.getIdent());
         }
         this.globalVars.putVar(ident, value);
     }
@@ -74,7 +72,7 @@ public final class SymbolTable implements IVariableTable<GlobalOperand, GlobalOp
     @Override
     public void putConst(Ident ident, GlobalOperand constValue) {
         if (this.identExists(ident)) {
-            throw new SyntaxException("Ident " + ident.getIdent() + " has already existed.");
+            throw SyntaxException.identExists(ident.getIdent());
         }
         this.globalVars.putConst(ident, constValue);
     }

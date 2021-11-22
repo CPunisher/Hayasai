@@ -39,7 +39,7 @@ public final class Register extends Operand {
 
     @Override
     public int getComputedValue() {
-        throw new SyntaxException("Register have no definite value.");
+        throw SyntaxException.noDefiniteValue();
     }
 
     @Override

@@ -4,8 +4,6 @@ import com.cpunisher.hayasai.ir.value.Value;
 import com.cpunisher.hayasai.util.IrKeywords;
 import com.cpunisher.hayasai.util.SyntaxException;
 
-import java.util.function.BiFunction;
-
 public abstract class NumberOperator extends Value implements IBinaryOperator {
     public static final NumberOperator ADD = new NumberOperator(IrKeywords.ADD) {
         public int apply(int a, int b) {
@@ -59,7 +57,7 @@ public abstract class NumberOperator extends Value implements IBinaryOperator {
             case "&", "&&" -> { return AND; }
             case "|", "||" -> { return OR; }
         }
-        throw new SyntaxException("Unknown operator.");
+        throw SyntaxException.unknownOperator(op);
     }
 
     @Override
