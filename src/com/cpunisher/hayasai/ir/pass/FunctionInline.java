@@ -32,6 +32,10 @@ public class FunctionInline implements IPass {
 
         FunctionDef funcMain = module.getFuncDefTable().get(Ident.valueOf("main"));
         this.doInline(funcMain, module);
+        for (FunctionDef functionDef : this.nonRecursiveSet) {
+            if (functionDef != funcMain)
+                module.getFuncDefTable().remove(functionDef.getIdent(), functionDef);
+        }
     }
 
     private void doInline(FunctionDef functionDef, SymbolTable module) {
@@ -84,8 +88,6 @@ public class FunctionInline implements IPass {
                         blockToAdd.addAll(inlineFunc.getAllBlocks());
                         functionDef.merge(inlineFunc);
 
-                        // remove statement and function def
-                        module.getFuncDefTable().remove(inlineFunc.getIdent(), inlineFunc);
                         changed = true;
                     }
                 }
