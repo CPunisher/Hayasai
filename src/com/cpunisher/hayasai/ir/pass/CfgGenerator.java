@@ -8,15 +8,17 @@ import com.cpunisher.hayasai.ir.value.stmt.Statement;
 import com.cpunisher.hayasai.ir.value.stmt.impl.BrCondStatement;
 import com.cpunisher.hayasai.ir.value.stmt.impl.BrStatement;
 
-public class CfgGenerator implements IPass {
+import java.util.function.Consumer;
+
+public class CfgGenerator implements IPass, Consumer<FunctionDef> {
     @Override
     public void pass(SymbolTable module) {
         for (FunctionDef functionDef : module.getFuncDefTable().values()) {
-            this.generateCfg(functionDef);
+            this.accept(functionDef);
         }
     }
 
-    private void generateCfg(FunctionDef functionDef) {
+    public void accept(FunctionDef functionDef) {
         for (Block block : functionDef.getAllBlocks()) {
             for (Statement statement : block.getUnmodifiableSubList()) {
                 if (statement instanceof BrStatement) {

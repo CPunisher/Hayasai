@@ -27,15 +27,14 @@ public class HayasaiFrontend {
     private final Visitor visitor = new Visitor(this);
 
     private final List<IPass> passList = List.of(
-        new UseGenerator(),
         new FunctionInline(this),
         // -- BlockCfg --
         new UseGenerator(),
-        new CfgGenerator(),
-        new BlockMerge(),
-        new MemToReg(),
-        new ConstFold(),
-        new DeadCodeRemove()
+        new CfgGenerator()
+//        new BlockMerge().
+//        new MemToReg()
+//        new ConstFold(),
+//        new DeadCodeRemove()
     );
 
     public void visitAst(String input) {

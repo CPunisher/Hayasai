@@ -10,15 +10,21 @@ import com.cpunisher.hayasai.ir.value.stmt.impl.BinaryOperationStatement;
 import com.cpunisher.hayasai.ir.value.stmt.impl.LoadStatement;
 
 import java.util.Iterator;
+import java.util.function.Consumer;
 
-public class ConstFold implements IPass {
+public class ConstFold implements IPass, Consumer<FunctionDef> {
     @Override
     public void pass(SymbolTable module) {
         this.constFold(module.getGlobalFunc().getEntry());
         for (FunctionDef functionDef : module.getFuncDefTable().values()) {
-            for (Block block : functionDef.getAllBlocks()) {
-                this.constFold(block);
-            }
+            this.accept(functionDef);
+        }
+    }
+
+    @Override
+    public void accept(FunctionDef functionDef) {
+        for (Block block : functionDef.getAllBlocks()) {
+            this.constFold(block);
         }
     }
 

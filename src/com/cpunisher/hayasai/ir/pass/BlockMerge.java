@@ -6,24 +6,25 @@ import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.util.BlockCfg;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * 1. 只有一个子块的块合并其子节点
  */
-public class BlockMerge implements IPass {
+public class BlockMerge implements IPass, Consumer<FunctionDef> {
     private final List<Stack<Block>> singleLink = new ArrayList<>();
     private final Set<BlockCfg> visitSet = new HashSet<>();
 
     @Override
     public void pass(SymbolTable module) {
         for (FunctionDef functionDef : module.getFuncDefTable().values()) {
-            this.singleLink.clear();
-            this.visitSet.clear();
-            this.blockMerge(functionDef);
+            this.accept(functionDef);
         }
     }
 
-    private void blockMerge(FunctionDef functionDef) {
+    public void accept(FunctionDef functionDef) {
+        this.singleLink.clear();
+        this.visitSet.clear();
         this.findSingleLink(functionDef.getEntry().getBlockCfg(), null);
         for (Stack<Block> blockStack : singleLink) {
             while (blockStack.size() > 1) {
@@ -36,8 +37,6 @@ public class BlockMerge implements IPass {
                 functionDef.getAllBlocks().remove(merged);
             }
         }
-
-        Iterator<Block> iterator = functionDef.getAllBlocks().iterator();
     }
 
     private void findSingleLink(BlockCfg cur, Stack<Block> linkStack) {

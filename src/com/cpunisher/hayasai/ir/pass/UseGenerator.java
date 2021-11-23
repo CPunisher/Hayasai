@@ -7,28 +7,34 @@ import com.cpunisher.hayasai.ir.value.operand.Operand;
 import com.cpunisher.hayasai.ir.value.stmt.Statement;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public class UseGenerator implements IPass {
+public class UseGenerator implements IPass, Consumer<FunctionDef> {
     @Override
     public void pass(SymbolTable module) {
         this.clearUse(module.getGlobalFunc().getEntry());
         this.genUse(module.getGlobalFunc().getEntry());
         for (FunctionDef def : module.getFuncDefTable().values()) {
-            for (Block block : def.getAllBlocks()) {
-                this.clearUse(block);
-            }
+            this.accept(def);
+        }
+    }
 
-            for (Block block : def.getAllBlocks()) {
-                this.genUse(block);
-            }
+    @Override
+    public void accept(FunctionDef functionDef) {
+        for (Block block : functionDef.getAllBlocks()) {
+            this.clearUse(block);
+        }
+
+        for (Block block : functionDef.getAllBlocks()) {
+            this.genUse(block);
         }
     }
 
     private void clearUse(Block block) {
         for (Statement statement : block.getUnmodifiableSubList()) {
             List<Operand> operands = statement.getOperands();
-            for (int i = 0; i < operands.size(); i++) {
-                operands.get(i).clearUse();
+            for (Operand operand : operands) {
+                operand.clearUse();
             }
         }
     }
@@ -36,8 +42,8 @@ public class UseGenerator implements IPass {
     private void genUse(Block block) {
         for (Statement statement : block.getUnmodifiableSubList()) {
             List<Operand> operands = statement.getOperands();
-            for (int i = 0; i < operands.size(); i++) {
-                operands.get(i).addUser(new Operand.Use(statement));
+            for (Operand operand : operands) {
+                operand.addUser(new Operand.Use(statement));
             }
         }
     }

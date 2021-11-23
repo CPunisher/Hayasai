@@ -12,22 +12,23 @@ import com.cpunisher.hayasai.ir.value.stmt.impl.*;
 import com.cpunisher.hayasai.util.BlockCfg;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class MemToReg implements IPass {
+public class MemToReg implements IPass, Consumer<FunctionDef> {
 
     private final Set<Register> allocateSet = new HashSet<>();
     private final Map<PhiStatement, Register> phiMap = new HashMap<>();
 
     @Override
     public void pass(SymbolTable module) {
-        this.memToReg(module.getGlobalFunc());
+        this.accept(module.getGlobalFunc());
         for (FunctionDef functionDef : module.getFuncDefTable().values()) {
-            this.memToReg(functionDef);
+            this.accept(functionDef);
         }
     }
 
-    private void memToReg(FunctionDef functionDef) {
+    public void accept(FunctionDef functionDef) {
         List<BlockCfg> blocks = functionDef.getAllBlocks().stream().map(Block::getBlockCfg).collect(Collectors.toList());
         allocateSet.clear();
         phiMap.clear();
