@@ -11,8 +11,8 @@ import java.util.*;
  * 1. 只有一个子块的块合并其子节点
  */
 public class BlockMerge implements IPass {
-    private List<Stack<Block>> singleLink = new ArrayList<>();
-    private Set<BlockCfg> visitSet = new HashSet<>();
+    private final List<Stack<Block>> singleLink = new ArrayList<>();
+    private final Set<BlockCfg> visitSet = new HashSet<>();
 
     @Override
     public void pass(SymbolTable module) {

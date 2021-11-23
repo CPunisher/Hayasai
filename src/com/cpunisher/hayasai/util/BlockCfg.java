@@ -30,10 +30,6 @@ public final class BlockCfg {
         return block;
     }
 
-    public List<BlockCfg> getPredecessorList() {
-        return predecessorList;
-    }
-
     public List<BlockCfg> getDoms() {
         return doms;
     }
@@ -50,11 +46,17 @@ public final class BlockCfg {
         return idom;
     }
 
-    public List<BlockCfg> getSuccessorList() { return this.successorList; }
+    public List<BlockCfg> getPredecessorList() {
+        return predecessorList;
+    }
+
+    public List<BlockCfg> getSuccessorList() {
+        return successorList;
+    }
 
     public void merge(BlockCfg blockCfg) {
-        this.successorList.addAll(blockCfg.getSuccessorList());
-        for (BlockCfg successor : blockCfg.getSuccessorList()) {
+        this.successorList.addAll(blockCfg.successorList);
+        for (BlockCfg successor : blockCfg.successorList) {
             Collections.replaceAll(successor.predecessorList, blockCfg, this);
         }
     }

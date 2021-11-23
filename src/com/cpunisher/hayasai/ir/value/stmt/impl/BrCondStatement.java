@@ -10,16 +10,10 @@ import java.util.Arrays;
 import java.util.StringJoiner;
 
 public class BrCondStatement extends TerminateStatement {
-    public BrCondStatement(OperandExpression cond, Block block1, Block block2, Block cur) {
+    public BrCondStatement(OperandExpression cond, Block block1, Block block2) {
         assert cond.getOperand().getType() == Type.BIT;
 
         this.operands = Arrays.asList(cond.getOperand(), block1.getBlockRegister(), block2.getBlockRegister());
-        if (!cur.terminated()) {
-            cur.getBlockCfg().getSuccessorList().add(block1.getBlockCfg());
-            cur.getBlockCfg().getSuccessorList().add(block2.getBlockCfg());
-            block1.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
-            block2.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
-        }
     }
 
     @Override

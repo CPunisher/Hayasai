@@ -120,7 +120,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 visitBlockItem(blockItemContext);
 
                 this.blockManager.setCurrent(blockAfter);
-                lastBlock.addSub(new BrStatement(blockIn, lastBlock));
+                lastBlock.addSub(new BrStatement(blockIn));
             } else {
                 this.blockManager.addToCurrent((Statement) visitBlockItem(blockItemContext));
             }
@@ -165,7 +165,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             }
         }
 //        lastBlock.addSub(new BrCondStatement(condExp, blockTrue.getBlockRegister(), blockElse.getBlockRegister()));
-        lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), lastBlock));
+        lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp)));
         this.blockManager.setCurrent(blockAfter);
         return null;
     }
@@ -194,8 +194,8 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         }
         this.loopCtx.pop();
 
-        lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp), lastBlock));
-        this.blockManager.addToCurrent(new BrStatement(blockCond, this.blockManager.current()));
+        lastBlock.addSub(new BrStatement(this.blockManager.getBlockByExp(condEntryExp)));
+        this.blockManager.addToCurrent(new BrStatement(blockCond));
         this.blockManager.setCurrent(blockAfter);
         return null;
     }
@@ -205,7 +205,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         if (this.loopCtx.peekAfter() == null) {
             throw SyntaxException.breakError();
         }
-        return new BrStatement(this.loopCtx.peekAfter(), this.blockManager.current());
+        return new BrStatement(this.loopCtx.peekAfter());
     }
 
     @Override
@@ -213,7 +213,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         if (this.loopCtx.peekCondition() == null) {
             throw SyntaxException.continueError();
         }
-        return new BrStatement(this.loopCtx.peekCondition(), this.blockManager.current());
+        return new BrStatement(this.loopCtx.peekCondition());
     }
 
     /* visitStmt 和 declare 系列必须返回 Statement 或 Block */
@@ -635,7 +635,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
         for (int i = 0; i < ctx.eqExp().size(); i++) {
             this.blockManager.setCurrent(blocks[i]);
             OperandExpression expression = (OperandExpression) visitEqExp(ctx.eqExp(i));
-            this.blockManager.addToCurrent(new BrCondStatement(expression, blocks[i + 1], this.condCtx.getNextOr(), this.blockManager.current()));
+            this.blockManager.addToCurrent(new BrCondStatement(expression, blocks[i + 1], this.condCtx.getNextOr()));
         }
         return new OperandExpression(blocks[0].getBlockRegister());
     }

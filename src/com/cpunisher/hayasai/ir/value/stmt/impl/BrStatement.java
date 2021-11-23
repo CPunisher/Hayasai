@@ -11,10 +11,8 @@ import java.util.StringJoiner;
 
 public class BrStatement extends TerminateStatement {
 
-    public BrStatement(Block block, Block cur) {
+    public BrStatement(Block block) {
         this.operands = Arrays.asList(block.getBlockRegister());
-        block.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
-        cur.getBlockCfg().getSuccessorList().add(block.getBlockCfg());
     }
 
     @Override

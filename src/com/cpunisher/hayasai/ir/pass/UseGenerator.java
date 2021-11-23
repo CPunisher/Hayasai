@@ -11,10 +11,24 @@ import java.util.List;
 public class UseGenerator implements IPass {
     @Override
     public void pass(SymbolTable module) {
+        this.clearUse(module.getGlobalFunc().getEntry());
         this.genUse(module.getGlobalFunc().getEntry());
         for (FunctionDef def : module.getFuncDefTable().values()) {
             for (Block block : def.getAllBlocks()) {
+                this.clearUse(block);
+            }
+
+            for (Block block : def.getAllBlocks()) {
                 this.genUse(block);
+            }
+        }
+    }
+
+    private void clearUse(Block block) {
+        for (Statement statement : block.getUnmodifiableSubList()) {
+            List<Operand> operands = statement.getOperands();
+            for (int i = 0; i < operands.size(); i++) {
+                operands.get(i).clearUse();
             }
         }
     }
