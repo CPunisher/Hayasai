@@ -11,33 +11,11 @@ import java.util.Set;
 
 public class DeadCodeRemove implements IPass {
 
-    private final Set<Block> validBlock = new HashSet<>();
 
     @Override
     public void pass(SymbolTable module) {
         for (FunctionDef def : module.getFuncDefTable().values()) {
-            this.validBlock.clear();
-            this.visit(def.getEntry().getBlockCfg());
 
-            Iterator<Block> iterator = def.getAllBlocks().iterator();
-            while (iterator.hasNext()) {
-                Block block = iterator.next();
-                if (!validBlock.contains(block)) {
-                    for (BlockCfg successor : block.getBlockCfg().getSuccessorList()) {
-                        successor.getPredecessorList().remove(block.getBlockCfg());
-                    }
-                    iterator.remove();
-                }
-            }
-        }
-    }
-
-    private void visit(BlockCfg cur) {
-        this.validBlock.add(cur.getBlock());
-        for (BlockCfg successor : cur.getSuccessorList()) {
-            if (!validBlock.contains(successor.getBlock())) {
-                visit(successor);
-            }
         }
     }
 }

@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 public class BlockMerge implements IPass, Consumer<FunctionDef> {
     private final List<Stack<Block>> singleLink = new ArrayList<>();
     private final Set<BlockCfg> visitSet = new HashSet<>();
+    private final Set<Block> validBlock = new HashSet<>();
 
     @Override
     public void pass(SymbolTable module) {
@@ -37,6 +38,21 @@ public class BlockMerge implements IPass, Consumer<FunctionDef> {
                 functionDef.getAllBlocks().remove(merged);
             }
         }
+
+        // Unused block remove
+        this.validBlock.clear();
+        this.visit(functionDef.getEntry().getBlockCfg());
+
+        Iterator<Block> iterator = functionDef.getAllBlocks().iterator();
+        while (iterator.hasNext()) {
+            Block block = iterator.next();
+            if (!validBlock.contains(block)) {
+                for (BlockCfg successor : block.getBlockCfg().getSuccessorList()) {
+                    successor.getPredecessorList().remove(block.getBlockCfg());
+                }
+                iterator.remove();
+            }
+        }
     }
 
     private void findSingleLink(BlockCfg cur, Stack<Block> linkStack) {
@@ -58,6 +74,15 @@ public class BlockMerge implements IPass, Consumer<FunctionDef> {
         for (BlockCfg successor : cur.getSuccessorList()) {
             if (!this.visitSet.contains(successor))
                 this.findSingleLink(successor, linkStack);
+        }
+    }
+
+    private void visit(BlockCfg cur) {
+        this.validBlock.add(cur.getBlock());
+        for (BlockCfg successor : cur.getSuccessorList()) {
+            if (!validBlock.contains(successor.getBlock())) {
+                visit(successor);
+            }
         }
     }
 }
