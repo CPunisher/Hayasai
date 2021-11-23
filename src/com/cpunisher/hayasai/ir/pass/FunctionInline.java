@@ -5,6 +5,7 @@ import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
+import com.cpunisher.hayasai.ir.value.func.Function;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.Statement;
@@ -15,7 +16,7 @@ import java.util.function.Consumer;
 
 public class FunctionInline implements IPass {
 
-    private final Set<FunctionDef> nonRecursiveSet = new HashSet<>();
+    private final Map<FunctionDef, Set<FunctionDef>> callerMap = new HashMap<>();
     private final HayasaiFrontend frontend;
 
     public FunctionInline(HayasaiFrontend frontend) {
@@ -25,20 +26,19 @@ public class FunctionInline implements IPass {
     @Override
     public void pass(SymbolTable module) {
         for (FunctionDef functionDef : module.getFuncDefTable().values()) {
-            if (!this.isRecursive(functionDef)) {
-                this.nonRecursiveSet.add(functionDef);
-            }
+            this.updateCallee(functionDef);
         }
 
         FunctionDef funcMain = module.getFuncDefTable().get(Ident.valueOf("main"));
-        this.doInline(funcMain, module);
-        for (FunctionDef functionDef : this.nonRecursiveSet) {
-            if (functionDef != funcMain)
-                module.getFuncDefTable().remove(functionDef.getIdent(), functionDef);
+        this.doInline(funcMain);
+        for (FunctionDef callee : this.callerMap.keySet()) {
+            if (shouldRemove(callee)) {
+                module.getFuncDefTable().remove(callee.getIdent(), callee);
+            }
         }
     }
 
-    private void doInline(FunctionDef functionDef, SymbolTable module) {
+    private void doInline(FunctionDef functionDef) {
         List<Block> blockToAdd = new LinkedList<>();
         List<Statement> stmToAdd = new LinkedList<>();
         List<Consumer<FunctionDef>> preprocessor = List.of(new UndefinedBehavior(), new UseGenerator());
@@ -49,7 +49,9 @@ public class FunctionInline implements IPass {
                 ListIterator<Statement> iterator = block.getSubList().listIterator();
                 while (iterator.hasNext()) {
                     Statement statement = iterator.next();
-                    if (statement instanceof CallStatement callStatement && nonRecursiveSet.contains(callStatement.getFunction())) {
+                    if (statement instanceof CallStatement callStatement
+                            && callStatement.getFunction() instanceof FunctionDef def
+                            && !this.isRecursive(def)) {
                         FunctionDef inlineFunc = this.frontend.getCopiedFuncDef(callStatement.getFunction().getIdent());
                         preprocessor.forEach(consumer -> consumer.accept(inlineFunc));
 
@@ -117,17 +119,32 @@ public class FunctionInline implements IPass {
         }
     }
 
-    // add ret
-    private boolean isRecursive(FunctionDef functionDef) {
+    private void updateCallee(FunctionDef functionDef) {
+        Set<FunctionDef> calleeSet = new HashSet<>();
         for (Block block : functionDef.getAllBlocks()) {
             for (Statement statement : block.getSubList()) {
-                if (statement instanceof CallStatement callStatement) {
-                    if (callStatement.getFunction() == functionDef) {
-                        return true;
-                    }
+                if (statement instanceof CallStatement callStatement && callStatement.getFunction() instanceof FunctionDef callee) {
+                    calleeSet.add(callee);
                 }
             }
         }
-        return false;
+        for (FunctionDef callee : calleeSet) {
+            Set<FunctionDef> callerSet = new HashSet<>();
+            callerSet.add(functionDef);
+            this.callerMap.merge(callee, callerSet, (e1, e2) -> {
+               e1.addAll(e2);
+               return e1;
+            });
+        }
+    }
+
+    // remove non-recursive(include its caller) and unused
+    private boolean shouldRemove(FunctionDef functionDef) {
+        Set<FunctionDef> callerSet = this.callerMap.get(functionDef);
+        return callerSet == null || callerSet.stream().noneMatch(this::isRecursive);
+    }
+
+    private boolean isRecursive(FunctionDef functionDef) {
+        return this.callerMap.containsKey(functionDef) && this.callerMap.get(functionDef).contains(functionDef);
     }
 }
