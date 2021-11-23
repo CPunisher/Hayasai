@@ -66,6 +66,8 @@ public class BlockMerge implements IPass, Consumer<FunctionDef> {
                     this.singleLink.add(linkStack);
                 }
                 linkStack.push(successor.getBlock());
+            } else {
+                linkStack = null;
             }
         } else {
             linkStack = null;
