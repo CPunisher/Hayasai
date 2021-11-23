@@ -530,7 +530,12 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
                 .map(this::visitExp)
                 .map(OperandExpression.class::cast)
                 .collect(Collectors.toList());
-        Function f = this.symbolTable.getFunctionByIdent(ident);
+        Function f;
+        if (this.blockManager.currentFunc().getIdent().equals(ident)) {
+            f = this.blockManager.currentFunc();
+        } else {
+            f = this.symbolTable.getFunctionByIdent(ident);
+        }
         if (f == null) {
             throw SyntaxException.funcNotDeclare(ident.getIdent());
         }
