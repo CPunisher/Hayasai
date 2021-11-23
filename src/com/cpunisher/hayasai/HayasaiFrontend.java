@@ -4,8 +4,7 @@ import com.cpunisher.hayasai.frontend.Visitor;
 import com.cpunisher.hayasai.frontend.antlr.MiniSysYLexer;
 import com.cpunisher.hayasai.frontend.antlr.MiniSysYParser;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
-import com.cpunisher.hayasai.ir.pass.FunctionInline;
-import com.cpunisher.hayasai.ir.pass.IPass;
+import com.cpunisher.hayasai.ir.pass.*;
 import com.cpunisher.hayasai.ir.type.Type;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.Value;
@@ -28,12 +27,12 @@ public class HayasaiFrontend {
     private final Visitor visitor = new Visitor(this);
 
     private final List<IPass> passList = List.of(
-            new FunctionInline()
-//        new DeadCodeRemove(),
-//        new BlockMerge(),
-//        new UseGenerator(),
-//        new MemToReg(),
-//        new ConstFold()
+        new FunctionInline(this),
+        new DeadCodeRemove(),
+        new BlockMerge(),
+        new UseGenerator(),
+        new MemToReg(),
+        new ConstFold()
     );
 
     public void visitAst(String input) {

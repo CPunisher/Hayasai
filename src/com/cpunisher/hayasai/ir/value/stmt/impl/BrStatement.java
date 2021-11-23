@@ -13,10 +13,8 @@ public class BrStatement extends TerminateStatement {
 
     public BrStatement(Block block, Block cur) {
         this.operands = Arrays.asList(block.getBlockRegister());
-        if (!cur.terminated()) {
-            block.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
-            cur.getBlockCfg().getSuccessorList().add(block.getBlockCfg());
-        }
+        block.getBlockCfg().getPredecessorList().add(cur.getBlockCfg());
+        cur.getBlockCfg().getSuccessorList().add(block.getBlockCfg());
     }
 
     @Override

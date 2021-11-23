@@ -8,7 +8,7 @@ public class Main {
         String input = IOUtils.readFromStream(System.in);
         HayasaiFrontend frontend = new HayasaiFrontend();
         frontend.visitAst(input);
-        frontend.check();
+//        frontend.check();
         frontend.passAll();
         frontend.generateCode();
     }

@@ -53,6 +53,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             this.blockManager = globalManager;
             Value res = this.visit(child);
             if (res instanceof FunctionDef functionDef) {
+                this.frontend.addFuncDefCtx((MiniSysYParser.FuncDefContext) child);
                 symbolTable.putFunctionDef(functionDef);
             }
         }

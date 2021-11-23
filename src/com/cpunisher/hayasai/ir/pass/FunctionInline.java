@@ -1,9 +1,11 @@
 package com.cpunisher.hayasai.ir.pass;
 
+import com.cpunisher.hayasai.HayasaiFrontend;
 import com.cpunisher.hayasai.ir.global.SymbolTable;
 import com.cpunisher.hayasai.ir.value.Block;
 import com.cpunisher.hayasai.ir.value.Ident;
 import com.cpunisher.hayasai.ir.value.expr.OperandExpression;
+import com.cpunisher.hayasai.ir.value.func.Function;
 import com.cpunisher.hayasai.ir.value.func.FunctionDef;
 import com.cpunisher.hayasai.ir.value.operand.Register;
 import com.cpunisher.hayasai.ir.value.stmt.Statement;
@@ -14,6 +16,11 @@ import java.util.*;
 public class FunctionInline implements IPass {
 
     private final Set<FunctionDef> nonRecursiveSet = new HashSet<>();
+    private final HayasaiFrontend frontend;
+
+    public FunctionInline(HayasaiFrontend frontend) {
+        this.frontend = frontend;
+    }
 
     @Override
     public void pass(SymbolTable module) {
@@ -23,26 +30,36 @@ public class FunctionInline implements IPass {
             }
         }
 
-        FunctionDef funcMain = module.getFuncDefTable().get(Ident.valueOf("main"));
+//        FunctionDef funcMain = module.getFuncDefTable().get(Ident.valueOf("main"));
+        for(FunctionDef functionDef : module.getFuncDefTable().values()) {
+            if (nonRecursiveSet.contains(functionDef)) {
+                this.doInline(functionDef, module);
+            }
+        }
+    }
+
+    private void doInline(FunctionDef functionDef, SymbolTable module) {
         List<Block> blockToAdd = new LinkedList<>();
         List<Statement> stmToAdd = new LinkedList<>();
-        for (Block block : funcMain.getAllBlocks()) {
+        for (Block block : functionDef.getAllBlocks()) {
             ListIterator<Statement> iterator = block.getSubList().listIterator();
             while (iterator.hasNext()) {
                 Statement statement = iterator.next();
                 if (statement instanceof CallStatement callStatement && nonRecursiveSet.contains(callStatement.getFunction())) {
-                    FunctionDef inlineFunc = (FunctionDef) callStatement.getFunction();
+                    FunctionDef inlineFunc = this.frontend.getCopiedFuncDef(callStatement.getFunction().getIdent());
                     Block entry = inlineFunc.getEntry();
                     Register receiver = callStatement.getReceiver();
+                    Register addr = functionDef.alloc();
                     if (receiver != null) {
-                        stmToAdd.add(new AllocaStatement(receiver, inlineFunc.getFuncType()));
+                        stmToAdd.add(new AllocaStatement(addr, inlineFunc.getFuncType()));
                     }
 
                     // call -> br
                     iterator.set(new BrStatement(entry, block));
 
                     // after block
-                    Block afterBlock = new Block(funcMain, block.getParent());
+                    Block afterBlock = new Block(functionDef, block.getParent());
+                    afterBlock.addSub(new LoadStatement(receiver, addr));
                     afterBlock.mergeTable(block);
                     while (iterator.hasNext()) {
                         afterBlock.addSub(iterator.next());
@@ -51,20 +68,20 @@ public class FunctionInline implements IPass {
                     blockToAdd.add(afterBlock);
 
                     // replace args
-//                    int argIndex = 0;
-//                    for (Map.Entry<Ident, Register> argEntry : inlineFunc.getVarEntriesSet()) {
-//                        argEntry.getValue().replaceUser(callStatement.getOperands().get(argIndex++));
-//                    }
+                    int argIndex = 0;
+                    for (Map.Entry<Ident, Register> argEntry : inlineFunc.getVarEntriesSet()) {
+                        argEntry.getValue().replaceUser(callStatement.getOperands().get(argIndex++));
+                    }
 
                     // ret -> [store], br
-                    this.replaceRet(inlineFunc, receiver, afterBlock);
+                    this.replaceRet(inlineFunc, addr, afterBlock);
 
                     // merge function def
                     blockToAdd.addAll(inlineFunc.getAllBlocks());
-                    funcMain.merge(inlineFunc);
+                    functionDef.merge(inlineFunc);
 
                     // remove statement and function def
-                    module.getFuncDefTable().remove(inlineFunc.getIdent(), inlineFunc);
+//                    module.getFuncDefTable().remove(inlineFunc.getIdent(), inlineFunc);
 
                     break;
                 }
@@ -72,7 +89,7 @@ public class FunctionInline implements IPass {
             stmToAdd.forEach(block::addSubToFront);
             stmToAdd.clear();
         }
-        blockToAdd.forEach(funcMain::addBlock);
+        blockToAdd.forEach(functionDef::addBlock);
     }
 
     private void replaceRet(FunctionDef inlineFunc, Register receiver, Block afterBlock) {
