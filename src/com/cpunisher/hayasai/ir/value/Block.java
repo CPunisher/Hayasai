@@ -57,14 +57,6 @@ public final class Block extends Value implements IVariableTable<Register, Regis
 
     @Override
     public void build() {
-        if (!this.terminated()) {
-            Type funcType = this.functionDef.getFuncType();
-            if (funcType.equals(Type.VOID)) {
-                this.addSub(new RetStatement(new OperandExpression(new VoidOperand())));
-            } else if (funcType.equals(Type.INT)) {
-                this.addSub(new RetStatement(new OperandExpression(Literal.INT_ZERO)));
-            }
-        }
         this.register.build();
         this.subList.forEach(Value::build);
     }

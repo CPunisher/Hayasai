@@ -37,6 +37,7 @@ public class FunctionInline implements IPass {
     private void doInline(FunctionDef functionDef, SymbolTable module) {
         List<Block> blockToAdd = new LinkedList<>();
         List<Statement> stmToAdd = new LinkedList<>();
+        List<Consumer<FunctionDef>> preprocessor = List.of(new UndefinedBehavior(), new UseGenerator());
         boolean changed = true;
         while (changed) {
             changed = false;
@@ -46,8 +47,7 @@ public class FunctionInline implements IPass {
                     Statement statement = iterator.next();
                     if (statement instanceof CallStatement callStatement && nonRecursiveSet.contains(callStatement.getFunction())) {
                         FunctionDef inlineFunc = this.frontend.getCopiedFuncDef(callStatement.getFunction().getIdent());
-                        Consumer<FunctionDef> useGenerator = new UseGenerator();
-                        useGenerator.accept(inlineFunc);
+                        preprocessor.forEach(consumer -> consumer.accept(inlineFunc));
 
                         Block entry = inlineFunc.getEntry();
                         Register receiver = callStatement.getReceiver();
@@ -78,7 +78,7 @@ public class FunctionInline implements IPass {
                         }
 
                         // ret -> [store], br
-                        this.replaceRet(inlineFunc, addr, afterBlock);
+                        this.replaceRet(inlineFunc, receiver == null ? null : addr, afterBlock);
 
                         // merge function def
                         blockToAdd.addAll(inlineFunc.getAllBlocks());

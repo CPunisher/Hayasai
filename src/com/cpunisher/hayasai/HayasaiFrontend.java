@@ -17,6 +17,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,17 +26,6 @@ public class HayasaiFrontend {
     private final SymbolTable module = SymbolTable.INSTANCE;
     private final Map<Ident, MiniSysYParser.FuncDefContext> funcDefContextMap = new HashMap<>();
     private final Visitor visitor = new Visitor(this);
-
-    private final List<IPass> passList = List.of(
-        new FunctionInline(this),
-        // -- BlockCfg --
-        new UseGenerator(),
-        new CfgGenerator()
-//        new BlockMerge().
-//        new MemToReg()
-//        new ConstFold(),
-//        new DeadCodeRemove()
-    );
 
     public void visitAst(String input) {
         CharStream charStream = CharStreams.fromString(input);
@@ -63,6 +53,15 @@ public class HayasaiFrontend {
     }
 
     public void passAll() {
+        List<IPass> passList = new LinkedList<>();
+        passList.add(new UndefinedBehavior());
+        passList.add(new FunctionInline(this));
+        passList.add(new UseGenerator());
+        passList.add(new CfgGenerator());
+        passList.add(new BlockMerge());
+        passList.add(new MemToReg());
+        passList.add(new ConstFold());
+        passList.add(new DeadCodeRemove());
         passList.forEach(pass -> pass.pass(module));
     }
 
