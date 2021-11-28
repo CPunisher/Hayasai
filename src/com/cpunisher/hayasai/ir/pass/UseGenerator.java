@@ -22,7 +22,7 @@ public class UseGenerator implements IPass, Consumer<FunctionDef> {
     @Override
     public void accept(FunctionDef functionDef) {
         for (Block block : functionDef.getAllBlocks()) {
-            this.clearUse(block);
+//            this.clearUse(block);
         }
 
         for (Block block : functionDef.getAllBlocks()) {
