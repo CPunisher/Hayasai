@@ -61,3 +61,35 @@ image = { source = "dockerfile", path = "." }
 run = [
     "java -ea -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
 ]
+
+[jobs.mem2reg]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+    "java -ea -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
+]
+
+[jobs.mdarray]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+    "java -ea -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
+]
+
+[jobs.inline]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+    "java -ea -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
+]
+
+[jobs.short_circuit]
+
+image = { source = "dockerfile", path = "." }
+
+run = [
+    "java -ea -classpath \".:lib/*:out\" com.cpunisher.hayasai.Main < \"$input\" > \"$ir\"",
+]
