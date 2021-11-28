@@ -1,0 +1,5 @@
+int main() {
+    const int va = 1;
+    int arr[va] = {};
+    return va;
+}

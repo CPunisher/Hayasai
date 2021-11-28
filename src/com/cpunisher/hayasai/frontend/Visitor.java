@@ -382,7 +382,7 @@ public class Visitor extends MiniSysYBaseVisitor<Value> {
             List<Operand> size = new LinkedList<>();
             for (MiniSysYParser.ConstExpContext expCtx : constExp) {
                 OperandExpression exp = (OperandExpression) this.visitConstExp(expCtx);
-                if (!exp.isImmutable() || !exp.canCompute()) {
+                if (!exp.isImmutable() || (isGlobal && !exp.canCompute())) {
                     throw SyntaxException.sizeOfArray(ident.getIdent());
                 }
                 size.add(exp.getOperand());
